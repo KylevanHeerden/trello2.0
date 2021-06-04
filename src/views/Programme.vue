@@ -73,28 +73,28 @@
       <v-card
         id="productCard"
         flat
-        class="pl-3 productCard"
+        class=" productCard"
         v-for="product in filteredSearchProducts"
         :key="product.id"
       >
         <!--filteredSearchProducts is function to filter products on search-->
         <router-link :to="{ name: 'Product', params: { id: product.id } }">
-          <v-row :class="`pa-3 product ${product.status}`">
-            <v-col xs="12" md="6" class="col">
+          <v-layout :class="`pa-3 product ${product.status}`">
+            <v-flex xs="12" md="6">
               <div class="caption grey--text">Product Name</div>
               <div class="card-text-black">{{ product.name }}</div>
-            </v-col>
-            <v-col xs="6" sm="4" md="2">
+            </v-flex>
+            <v-flex xs="6" sm="4" md="2">
               <div class="caption grey--text">Person</div>
               <div class="card-text-black">{{ product.person }}</div>
-            </v-col>
-            <v-col xs="6" sm="4" md="2">
+            </v-flex>
+            <v-flex xs="6" sm="4" md="2">
               <div class="caption grey--text">Edit date</div>
               <div class="card-text-black">
                 {{ dateOnly(product.updatedOn) }}
               </div>
-            </v-col>
-            <v-col xs="2" sm="4" md="2">
+            </v-flex>
+            <v-flex xs="2" sm="4" md="2">
               <v-chip
                 small
                 :color="`${chipColor(product.status)}`"
@@ -105,8 +105,8 @@
                 {{ product.status }}
               </v-chip>
               <!--Here we bind the class so that the color of chip changes by status-->
-            </v-col>
-          </v-row>
+            </v-flex>
+          </v-layout>
           <v-divider></v-divider>
         </router-link>
       </v-card>
@@ -292,7 +292,7 @@ export default {
 }
 
 .productCard {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0px;
 }
 
 .v-label.theme--light {
