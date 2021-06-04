@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "purchase-app-staging",
+    "staging": "purchase-app-staging",
+    "production": "purchase-app-f14b0"
+  },
+  "hosting": {
+    "public": "./dist",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
