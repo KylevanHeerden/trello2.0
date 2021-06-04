@@ -27,7 +27,7 @@
         </v-card-title>
 
         <v-card-text>
-          <v-stepper vertical>
+          <v-stepper flat vertical>
             <v-stepper-step step="1" editable>Purchase Request</v-stepper-step>
             <v-stepper-content step="1">
               Purchase request from

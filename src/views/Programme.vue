@@ -73,42 +73,40 @@
       <v-card
         id="productCard"
         flat
-        class="pl-3"
+        class="pl-3 productCard"
         v-for="product in filteredSearchProducts"
         :key="product.id"
       >
         <!--filteredSearchProducts is function to filter products on search-->
         <router-link :to="{ name: 'Product', params: { id: product.id } }">
-          <v-layout row wrap :class="`pa-3 product ${product.status}`">
-            <v-flex xs12 md6>
+          <v-row :class="`pa-3 product ${product.status}`">
+            <v-col xs="12" md="6" class="col">
               <div class="caption grey--text">Product Name</div>
               <div class="card-text-black">{{ product.name }}</div>
-            </v-flex>
-            <v-flex xs6 sm4 md2>
+            </v-col>
+            <v-col xs="6" sm="4" md="2">
               <div class="caption grey--text">Person</div>
               <div class="card-text-black">{{ product.person }}</div>
-            </v-flex>
-            <v-flex xs6 sm4 md2>
+            </v-col>
+            <v-col xs="6" sm="4" md="2">
               <div class="caption grey--text">Edit date</div>
               <div class="card-text-black">
                 {{ dateOnly(product.updatedOn) }}
               </div>
-            </v-flex>
-            <v-flex xs2 sm4 md2>
-              <div class="right">
-                <v-chip
-                  small
-                  :color="`${chipColor(product.status)}`"
-                  :class="
-                    `${product.status} white--text caption my-2 fixedSize justify-center`
-                  "
-                >
-                  {{ product.status }}
-                </v-chip>
-                <!--Here we bind the class so that the color of chip changes by status-->
-              </div>
-            </v-flex>
-          </v-layout>
+            </v-col>
+            <v-col xs="2" sm="4" md="2">
+              <v-chip
+                small
+                :color="`${chipColor(product.status)}`"
+                :class="
+                  `${product.status} white--text caption my-2 fixedSize justify-center`
+                "
+              >
+                {{ product.status }}
+              </v-chip>
+              <!--Here we bind the class so that the color of chip changes by status-->
+            </v-col>
+          </v-row>
           <v-divider></v-divider>
         </router-link>
       </v-card>
@@ -293,8 +291,8 @@ export default {
   padding: 0 !important;
 }
 
-.noMargin {
-  height: 60px;
+.productCard {
+  margin-bottom: 0.75rem;
 }
 
 .v-label.theme--light {
@@ -304,6 +302,7 @@ export default {
 .maxHeight {
   max-height: 57.5vh;
   overflow-y: auto;
+  margin-top: 2rem;
 }
 
 /* width */
