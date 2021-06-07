@@ -4,8 +4,15 @@
       <v-app-bar-nav-icon
         dark
         @click.stop="conditionalDrawer"
+        data-cypress="navDrawerBtn"
       ></v-app-bar-nav-icon>
-      <router-link style="color: white" text dark to="/">
+      <router-link
+        style="color: white"
+        text
+        dark
+        to="/"
+        data-cypress="homeLink"
+      >
         <v-toolbar-title class="text-uppercase NavTitle">
           <span class="font-weight-light">RAPTOR</span>
           <span class="App">App</span>
@@ -19,9 +26,14 @@
 
       <v-spacer></v-spacer>
       <div>
-        <v-icon color="white" medium @click.stop="conditionalDrawer2"
-          >notifications_none</v-icon
+        <v-icon
+          color="white"
+          medium
+          @click.stop="conditionalDrawer2"
+          data-cypress="notificationBell"
         >
+          notifications_none
+        </v-icon>
         <v-icon
           v-if="notifications.length != 0 && logInStatus"
           color="red"
@@ -69,6 +81,7 @@
       bottom
       temporary
       class="blue-grey darken-3"
+      data-cypress="navDrawer"
     >
       <v-layout column align-center text-center>
         <v-flex class="mt-9">
@@ -108,6 +121,7 @@
       class="grey lighten-5"
       right
       width="400"
+      data-cypress="notificationDrawer"
     >
       <v-list-item class="blue-grey darken-3 notificationsHeader">
         <v-list-item-content>

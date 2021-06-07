@@ -76,7 +76,15 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "vue/no-v-html": 0,
+      "no-console": 0
+    },
+    "overrides": [
+      {
+        "files": ["*-test.js","*.spec.js"]
+      }
+    ]
   },
   "browserslist": [
     "> 1%",
