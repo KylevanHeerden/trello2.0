@@ -56,7 +56,7 @@
           <span>sign in</span>
           <v-icon dark right>exit_to_app</v-icon>
         </v-btn>
-        <v-btn text dark v-else @click="logout()">
+        <v-btn text dark v-else data-cypress="logoutBtn" @click="logout()">
           <span>sign out</span>
           <v-icon dark right>exit_to_app</v-icon>
         </v-btn>

@@ -17,12 +17,26 @@
                     max-width="700"
                     src="@/assets/N1.png"
                     contain
+                    data-cypress="nanodynLogo"
                   ></v-img>
-                  <h6 class="googleFont">CREATING AN INNOVATION</h6>
-                  <h6 class="googleFont paddingbottom2rem">REVOLUTION</h6>
+                  <h6 class="googleFont" data-cypress="nanodynSlogan1">
+                    CREATING AN INNOVATION
+                  </h6>
+                  <h6
+                    class="googleFont paddingbottom2rem"
+                    data-cypress="nanodynSlogan2"
+                  >
+                    REVOLUTION
+                  </h6>
 
-                  <p class="message">{{ message }}</p>
-                  <v-form @submit.prevent class="paddingbottom2rem">
+                  <p class="message" data-cypress="loginErrorMessage">
+                    {{ message }}
+                  </p>
+                  <v-form
+                    @submit.prevent
+                    class="paddingbottom2rem"
+                    data-cypress="loginForm"
+                  >
                     <v-text-field
                       v-model.trim="loginForm.email"
                       type="text"
@@ -31,6 +45,7 @@
                       outlined
                       rounded
                       class="v-input__control v-input__slot"
+                      data-cypress="loginEmail"
                     ></v-text-field>
 
                     <v-text-field
@@ -42,6 +57,7 @@
                       outlined
                       rounded
                       class="v-input__control v-input__slot"
+                      data-cypress="loginPassword"
                       @click:append="show = !show"
                       @keyup.enter="login()"
                     ></v-text-field>
@@ -49,6 +65,7 @@
                     <v-btn
                       @click="login()"
                       class="backgroundColorPrimary margintop2rem"
+                      data-cypress="loginBtn"
                     >
                       Log In
                     </v-btn>
@@ -59,12 +76,13 @@
                             @click="togglePasswordReset()"
                             v-bind="attrs"
                             v-on="on"
+                            data-cypress="forgotPasswordLink"
                           >
                             Forgot Password
                           </a>
                         </template>
 
-                        <v-card>
+                        <v-card data-cypress="resetPasswordModal">
                           <v-card-title class="headline backgroundColorPrimary">
                             Reset Password
                             <v-spacer></v-spacer>
@@ -73,6 +91,7 @@
                               icon
                               x-small
                               text
+                              data-cypress="resetPasswordClearBtn"
                               @click="showPasswordReset = false"
                             >
                               <v-icon>clear</v-icon>
@@ -80,7 +99,12 @@
                           </v-card-title>
 
                           <v-col cols="12" sm="8" md="8" class="cardCol">
-                            <v-text-field v-model="resetEmail" label="Email">
+                            <v-text-field
+                              v-model="resetEmail"
+                              label="Email"
+                              data-cypress="resetPasswordEmail"
+                              :rules="inputRulesEmail"
+                            >
                             </v-text-field>
                           </v-col>
 
@@ -91,6 +115,7 @@
                             <v-btn
                               color="primary"
                               text
+                              data-cypress="resetBtn"
                               @click="sendPasswordReset()"
                             >
                               Reset
@@ -98,9 +123,13 @@
                           </v-card-actions>
                         </v-card>
                       </v-dialog>
-                      <a @click="toggleForm()" class="paddingleft1rem"
-                        >Create an Account</a
+                      <a
+                        @click="toggleForm()"
+                        class="paddingleft1rem"
+                        data-cypress="createAccountLink"
                       >
+                        Create an Account
+                      </a>
                     </div>
                   </v-form>
                 </v-card>
@@ -115,7 +144,11 @@
                   <h6 class="googleFont">CREATING AN INNOVATION</h6>
                   <h6 class="googleFont paddingbottom1rem">REVOLUTION</h6>
 
-                  <form @submit.prevent class="margintop10px">
+                  <form
+                    @submit.prevent
+                    class="margintop10px"
+                    data-cypress="signupForm"
+                  >
                     <v-text-field
                       v-model.trim="signupForm.name"
                       type="text"
@@ -123,7 +156,9 @@
                       id="name"
                       outlined
                       rounded
+                      :rules="inputRulesRequired"
                       class="v-input__control v-input__slot"
+                      data-cypress="signupName"
                     ></v-text-field>
 
                     <v-text-field
@@ -133,7 +168,9 @@
                       id="surname"
                       outlined
                       rounded
+                      :rules="inputRulesRequired"
                       class="v-input__control v-input__slot"
+                      data-cypress="signupSurname"
                     ></v-text-field>
 
                     <v-text-field
@@ -144,6 +181,7 @@
                       outlined
                       rounded
                       class="v-input__control v-input__slot"
+                      data-cypress="signupEmail"
                     ></v-text-field>
 
                     <v-text-field
@@ -158,18 +196,21 @@
                       hint="Minimum 8 Charaters with a lowercase letter, a uppercase letter, a number and a special charater"
                       :rules="inputRulesPassword"
                       @click:append="show = !show"
+                      data-cypress="signupPassword"
                     ></v-text-field>
 
                     <v-btn
                       @click="signup()"
                       class="backgroundColorPrimary margintop30px"
-                      >Sign Up</v-btn
+                      data-cypress="signupBtn"
                     >
+                      Sign Up
+                    </v-btn>
                   </form>
                   <div class="margintop10px">
-                    <a @click="toggleForm()"
-                      >Back to Log In <v-icon medium>arrow_right_alt</v-icon></a
-                    >
+                    <a @click="toggleForm()" data-cypress="backToLoginLink">
+                      Back to Log In <v-icon medium>arrow_right_alt</v-icon>
+                    </a>
                   </div>
                 </v-card>
               </v-col>
@@ -204,6 +245,7 @@ export default {
       showLoginForm: true,
       resetEmail: "",
       inputRulesEmail: [
+        (v) => !!v || "Required",
         (v) =>
           /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(v) ||
           "Invalid email",
@@ -216,6 +258,7 @@ export default {
           ) ||
           "Minimum 8 Charaters with a lowercase letter, a uppercase letter, a number and a special charater",
       ],
+      inputRulesRequired: [(v) => !!v || "Required"],
     };
   },
   methods: {

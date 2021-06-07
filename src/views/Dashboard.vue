@@ -37,7 +37,11 @@
             class="card-text-black"
             :to="{ name: 'Programme', params: { id: programme.id } }"
           >
-            <v-card flat class="ma-3 border">
+            <v-card
+              flat
+              class="ma-3 border"
+              :data-cypress="`Programme-${programme.name}`"
+            >
               <v-card-text class="text-center">
                 <div class="subheading">{{ programme.name }}</div>
                 <div class="grey--text">
