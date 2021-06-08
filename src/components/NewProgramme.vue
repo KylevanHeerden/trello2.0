@@ -9,12 +9,13 @@
         color="primary"
         v-bind="attrs"
         v-on="on"
+        data-cypress="addNewProgrammeBtn"
       >
         <v-icon dark> mdi-plus </v-icon>
         Add Programme
       </v-btn>
     </template>
-    <v-card>
+    <v-card data-cypress="newProgrammeModal">
       <v-card-title class="headline backgroundColorPrimary">
         New Programme
       </v-card-title>
@@ -24,23 +25,29 @@
             label="Title"
             v-model="newProgramme.name"
             :rules="inputRules"
+            data-cypress="newProgrammeTitle"
           >
           </v-text-field>
           <v-text-field
             label="Team"
             v-model="newProgramme.team.team_name"
             :rules="inputRules"
+            data-cypresss="newProgrammeTeam"
           >
           </v-text-field>
           <v-select
             v-model="newTeam.technical_approver.users"
             label="Technical Authority"
             :items="mapUsersArray"
+            item-text="text"
+            item-value="value"
             multiple
             chips
             hint="More than one may be selected"
             persistent-hint
             return-object
+            :rules="selectRequired"
+            data-cypress="newProgTechnicalAuth"
           ></v-select>
           <v-select
             v-model="newTeam.purchase_approver.users"
@@ -51,6 +58,8 @@
             hint="More than one may be selected"
             persistent-hint
             return-object
+            :rules="selectRequired"
+            data-cypress="newProgPurchaseAuth"
           ></v-select>
           <v-select
             v-model="newTeam.procurer.users"
@@ -61,12 +70,15 @@
             hint="More than one may be selected"
             persistent-hint
             return-object
+            :rules="selectRequired"
+            data-cypress="newProgProcurer"
           ></v-select>
           <v-text-field
             v-model="newProgramme.budget"
             label="Buget Value"
             :rules="inputRulesMoney"
             prefix="R"
+            data-cypress="budgetValue"
           >
           </v-text-field>
         </v-form>
@@ -78,6 +90,7 @@
           text
           @click="newProgrammeDialog = false"
           v-if="!loading"
+          data-cypress="newProgrammeCancelBtn"
         >
           Cancel
         </v-btn>
@@ -86,6 +99,7 @@
           text
           @click="submit"
           :loading="loading"
+          data-cypress="newProgrammeAddBtn"
         >
           Add
         </v-btn>
@@ -131,6 +145,7 @@ export default {
         createdOn: new Date(),
         updatedOn: new Date(),
       },
+      selectRequired: [(v) => v.length > 0 || "Required"],
       inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
       inputRulesMoney: [
         (v) => v.match(/^\d+(?:\.\d{0,2})$/) || "Must be in the format R0.00",

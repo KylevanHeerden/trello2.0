@@ -82,7 +82,7 @@
     },
     "overrides": [
       {
-        "files": ["*-test.js","*.spec.js"]
+        "files": ["*.spec.js"]
       }
     ]
   },
