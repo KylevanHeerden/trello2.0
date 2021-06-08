@@ -4,7 +4,12 @@
     <!--Have to be :items for the breadcrumbs -->
     <v-row class="noMargin" justify="center">
       <v-col cols="12" md="4">
-        <v-text-field v-model="search" label="Search Products"> </v-text-field>
+        <v-text-field
+          v-model="search"
+          label="Search Products"
+          data-cypress="searchbar"
+        >
+        </v-text-field>
         <!--Search input-->
       </v-col>
       <v-col cols="12" md="2" class="text-center">
@@ -15,6 +20,7 @@
           :value="budgetPercentage"
           :color="budgetColor"
           class="budgetCircle"
+          data-cypress="progressCircle"
         >
           {{ `${budgetPercentage}%` }}
         </v-progress-circular>
@@ -60,22 +66,29 @@
           <span>Sort by status</span>
         </v-tooltip>
         <v-spacer></v-spacer>
-        <v-btn small color="primary" dark :href="programmeBoardLink"
-          >Programme Board</v-btn
+        <v-btn
+          small
+          color="primary"
+          dark
+          :href="programmeBoardLink"
+          data-cypress="programmeBoardLink"
         >
+          Programme Board
+        </v-btn>
         <!--NewProduct btn with programme s prop and @getNewProduct as emited function from child-->
         <NewProduct :programme="programme"></NewProduct>
       </v-layout>
     </v-container>
 
     <!--The container holding the card-links to the product page-->
-    <v-container fluid class="maxHeight">
+    <v-container fluid class="maxHeight" data-cypress="productContainer">
       <v-card
         id="productCard"
         flat
         class=" productCard"
         v-for="product in filteredSearchProducts"
         :key="product.id"
+        data-cypress="productCard"
       >
         <!--filteredSearchProducts is function to filter products on search-->
         <router-link :to="{ name: 'Product', params: { id: product.id } }">
