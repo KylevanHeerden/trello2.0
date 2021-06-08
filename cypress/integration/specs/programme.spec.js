@@ -37,8 +37,23 @@ describe("Test the programme view", () => {
     );
   });
 
+  // it("Test adde new Product", () => {
+  //   cy.get("[data-cypress=addProductBtn]").click();
+  //   cy.get("[data-cypress=newProductModal]").should("exist");
+
+  //   cy.get("[data-cypress=newProductCancelBtn]").click();
+
+  //   cy.get("[data-cypress=addProductBtn]").click();
+
+  //   cy.get("[data-cypress=newProductName]").type("Cypress Item");
+  //   cy.get("[data-cypress=newProductAddBtn]").click();
+  //   cy.wait(5000);
+  // });
+
   it("Test if programme board link works", () => {
-    cy.get("[data-cypress=productCard]").click();
+    cy.get("[data-cypress=productCard]")
+      .first()
+      .click();
     cy.url().should("include", "/product/");
   });
 });

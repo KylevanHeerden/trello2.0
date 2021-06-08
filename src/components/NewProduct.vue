@@ -9,12 +9,13 @@
         color="primary"
         v-bind="attrs"
         v-on="on"
+        data-cypress="addProductBtn"
       >
         <v-icon dark> mdi-plus </v-icon>
         Add Product
       </v-btn>
     </template>
-    <v-card>
+    <v-card data-cypress="newProductModal">
       <v-card-title class="headline backgroundColorPrimary">
         New Product
       </v-card-title>
@@ -39,6 +40,7 @@
                   label="Product Name"
                   v-model="newProduct.name"
                   :rules="inputRules"
+                  data-cypress="newProductName"
                 >
                 </v-text-field>
               </v-col>
@@ -53,6 +55,7 @@
           text
           @click="newProductDialog = false"
           v-if="!loading"
+          data-cypress="newProductCancelBtn"
         >
           Cancel
         </v-btn>
@@ -61,6 +64,7 @@
           text
           @click="submit"
           :loading="loading"
+          data-cypress="newProductAddBtn"
         >
           Add
         </v-btn>
