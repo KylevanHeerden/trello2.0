@@ -163,7 +163,7 @@
 </template>
 
 <script>
-import { db } from "@/firebase";
+import { mapActions, mapGetters, mapState } from "vuex";
 export default {
   name: "Navbar",
   components: {},
@@ -175,6 +175,11 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      removeNotification: "removeNotification",
+
+      logout: "logout",
+    }),
     conditionalDrawer() {
       if (this.logInStatus) {
         this.drawer = !this.drawer;
@@ -185,50 +190,35 @@ export default {
         this.drawer2 = !this.drawer2;
       }
     },
-    login() {
-      this.$store.dispatch("login", {
-        email: this.loginForm.email,
-        password: this.loginForm.password,
-      });
+    forward(productId) {
+      this.$router.push(`/product/${productId}`);
     },
     logout() {
       this.$store.dispatch("logout");
     },
-    forward(productId) {
-      this.$router.push(`/product/${productId}`);
-    },
-    removeNotification(notificationId) {
-      db.collection("notifications")
-        .doc(notificationId)
-        .delete();
-      this.$store.dispatch("getNotifications");
-    },
   },
 
   computed: {
-    links() {
-      return this.$store.state.links;
-    },
-    logInStatus() {
-      return this.$store.state.user.loggedIn;
-    },
-    user() {
-      let user = this.$store.getters.getUserProfile;
-      return user;
-    },
-    notifications() {
-      let notifications = this.$store.getters.getNotifications;
-      let filteredNotifications = notifications.filter(
-        (notification) => notification.user_id == this.user.id
-      );
+    ...mapState({
+      links: (state) => state.links,
+      notifications() {
+        let notifications = this.$store.state.notifications.notifications;
 
-      return filteredNotifications.sort((a, b) => {
-        return b.createdOn - a.createdOn;
-      });
-    },
+        let filteredNotifications = notifications.filter(
+          (notification) => notification.user_id == this.user.id
+        );
+
+        return filteredNotifications.sort((a, b) => {
+          return b.createdOn - a.createdOn;
+        });
+      },
+      logInStatus: (state) => state.user.loggedIn,
+      user: (state) => state.userProfile,
+    }),
+    ...mapGetters({}),
   },
 
-  mounted() {
+  created() {
     this.$store.dispatch("getNotifications");
   },
 };

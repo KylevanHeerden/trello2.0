@@ -73,6 +73,7 @@ import Draggable from "vuedraggable";
 import Card from "@/components/Card.vue";
 import NewCard from "@/components/NewCard.vue";
 import { db } from "@/firebase";
+import { mapGetters } from "vuex";
 
 export default {
   name: "Products",
@@ -262,6 +263,11 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      suppliers: "getSuppliers",
+      comments: "getComments",
+    }),
+
     fetchedProductId() {
       let fetchedId = this.$route.params.id;
       return fetchedId;
@@ -277,10 +283,6 @@ export default {
       );
       return programme;
     },
-    lists() {
-      let lists = this.$store.getters.getLists;
-      return lists;
-    },
     cards() {
       let unfilteredCards = this.$store.getters.getCards;
       let cards = unfilteredCards.filter(
@@ -291,26 +293,9 @@ export default {
       sortedCards.map((card) => this.Array[card.list_id - 1].cards.push(card));
       return cards;
     },
-
-    suppliers() {
-      let suppliers = this.$store.getters.getSuppliers;
-      return suppliers;
-    },
-    comments() {
-      let comments = this.$store.getters.getComments;
-      return comments;
-    },
     team() {
       let team = this.$store.getters.getTeamsByProgrammeId(this.programme.id);
       return team;
-    },
-    user() {
-      let user = this.$store.getters.getUserProfile;
-      return user;
-    },
-    users() {
-      let users = this.$store.getters.getUserProfile;
-      return users;
     },
     links() {
       return [
@@ -333,7 +318,6 @@ export default {
     //Methods run before page load complete so that data available in store but also local3000ly in component
     this.$store.dispatch("getProducts");
     this.$store.dispatch("getProgrammes");
-    this.$store.dispatch("getLists");
     this.$store.dispatch("getSuppliers");
     this.$store.dispatch("getComments");
     this.$store.dispatch("getTeams");

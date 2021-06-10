@@ -19,42 +19,42 @@ describe("Test the NewProgramme component", () => {
     cy.get("[data-cypress=newProgrammeModal]").should("not.be.visible");
   });
 
-  //   it("Test if new programme is added", () => {
-  //     cy.get("[data-cypress=addNewProgrammeBtn]").click();
+  // it("Test if new programme is added", () => {
+  //   cy.get("[data-cypress=addNewProgrammeBtn]").click();
 
-  //     cy.get("[data-cypress=newProgTechnicalAuth]")
-  //       .parent()
-  //       .click();
+  //   cy.get("[data-cypress=newProgTechnicalAuth]")
+  //     .parent()
+  //     .click();
 
-  //     cy.get(".v-list-item")
-  //       .eq(6)
-  //       .click();
+  //   cy.get(".v-list-item")
+  //     .eq(6)
+  //     .click();
 
-  //     cy.get("[data-cypress=newProgProcurer]")
-  //       .parent()
-  //       .click();
+  //   cy.get("[data-cypress=newProgProcurer]")
+  //     .parent()
+  //     .click();
 
-  //     cy.get(".v-list-item")
-  //       .eq(9)
-  //       .click();
+  //   cy.get(".v-list-item")
+  //     .eq(9)
+  //     .click();
 
-  //     cy.get("[data-cypress=newProgPurchaseAuth]")
-  //       .parent()
-  //       .click();
+  //   cy.get("[data-cypress=newProgPurchaseAuth]")
+  //     .parent()
+  //     .click();
 
-  //     cy.get(".v-list-item")
-  //       .eq(12)
-  //       .click();
+  //   cy.get(".v-list-item")
+  //     .eq(12)
+  //     .click();
 
-  //     cy.get("[data-cypress=newProgrammeTitle]").type("Cypress");
-  //     cy.get("[data-cypresss=newProgrammeTeam]").type("Cypress Team");
-  //     cy.get("[data-cypress=budgetValue]").type("1000000.00");
+  //   cy.get("[data-cypress=newProgrammeTitle]").type("Cypress");
+  //   cy.get("[data-cypresss=newProgrammeTeam]").type("Cypress Team");
+  //   cy.get("[data-cypress=budgetValue]").type("1000000.00");
 
-  //     cy.get("[data-cypress=newProgrammeAddBtn]").click();
+  //   cy.get("[data-cypress=newProgrammeAddBtn]").click();
 
-  //     cy.wait(1000);
-  //     cy.get("[data-cypress=ProgrammeCard]").contains("Cypress");
-  //   });
+  //   cy.wait(1000);
+  //   cy.get("[data-cypress=ProgrammeCard]").contains("Cypress");
+  // });
 
   it("Test if error show with validation rules", () => {
     cy.get("[data-cypress=addNewProgrammeBtn]").click();

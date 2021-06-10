@@ -2,20 +2,26 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as fb from "../firebase";
 import router from "../router/index";
-import createPersistedState from "vuex-persistedstate";
+// import createPersistedState from "vuex-persistedstate";
+
+// Modules import
+import notifications from "@/store/modules/notifications";
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
+  modules: {
+    notifications,
+  },
   state: {
     links: [
       { icon: "dashboard", text: "Programmes", route: "/" },
       { icon: "people", text: "Teams", route: "/teams" },
       { icon: "account_circle", text: "Profile", route: "/profile" },
+      { icon: "folder", text: "Admin", route: "/admin" },
     ],
     programmes: [],
     products: [],
-    lists: [],
     cards: [],
     suppliers: [],
     comments: [],
@@ -26,7 +32,6 @@ const store = new Vuex.Store({
     users: [],
     teams: [],
     lineItems: [],
-    notifications: [],
   },
   getters: {
     user(state) {
@@ -51,10 +56,6 @@ const store = new Vuex.Store({
 
     getProductById: (state) => (id) => {
       return state.products.find((product) => product.id === id);
-    },
-
-    getLists(state) {
-      return state.lists;
     },
 
     getCards(state) {
@@ -108,10 +109,6 @@ const store = new Vuex.Store({
     getLineItemsByCardId: (state) => (id) => {
       return state.lineItems.filter((lineItem) => lineItem.card_id == id);
     },
-
-    getNotifications(state) {
-      return state.notifications;
-    },
   },
   mutations: {
     setUserProfile(state, val) {
@@ -127,10 +124,6 @@ const store = new Vuex.Store({
 
     setProducts(state, value) {
       state.products = value;
-    },
-
-    setLists(state, value) {
-      state.lists = value;
     },
 
     setCards(state, value) {
@@ -155,10 +148,6 @@ const store = new Vuex.Store({
 
     setLineItems(state, value) {
       state.lineItems = value;
-    },
-
-    setNotifications(state, value) {
-      state.notifications = value;
     },
   },
   actions: {
@@ -194,7 +183,7 @@ const store = new Vuex.Store({
       let userColProf = await fb.usersCollection.doc(user.uid).get();
 
       let userProfile = {
-        id: userColProf.data().id,
+        id: user.uid,
         name: userColProf.data().name,
         surname: userColProf.data().surname,
         email: user.email,
@@ -202,6 +191,7 @@ const store = new Vuex.Store({
         admin: userColProf.data().admin,
         slack_id: userColProf.data().slack_id,
       };
+
       commit("setUserProfile", userProfile);
     },
 
@@ -294,27 +284,6 @@ const store = new Vuex.Store({
         person: product.person,
         status: product.status,
       });
-    },
-
-    async getLists({ commit }) {
-      fb.listsCollection.onSnapshot(
-        (lists) => {
-          let lists_array = [];
-          lists.forEach((doc) => {
-            let object = {
-              id: doc.id,
-              name: doc.data().name,
-              status: doc.data().status,
-              number: doc.data().number,
-            };
-            lists_array.push(object);
-          });
-          commit("setLists", lists_array);
-        },
-        (err) => {
-          console.log(`Encountered error: ${err}`);
-        }
-      );
     },
 
     async getCards({ commit }) {
@@ -493,32 +462,8 @@ const store = new Vuex.Store({
         }
       );
     },
-
-    async getNotifications({ commit }) {
-      fb.notificationsCollection.onSnapshot(
-        (notifications) => {
-          let notifications_array = [];
-          notifications.forEach((doc) => {
-            let object = {
-              id: doc.id,
-              createdOn: doc.data().createdOn,
-              programme: doc.data().programme,
-              product: doc.data().product,
-              card_id: doc.data().card_id,
-              status: doc.data().status,
-              user_id: doc.data().user_id,
-            };
-            notifications_array.push(object);
-          });
-          commit("setNotifications", notifications_array);
-        },
-        (err) => {
-          console.log(`Encountered error: ${err}`);
-        }
-      );
-    },
   },
-  plugins: [createPersistedState({})],
+  // plugins: [createPersistedState({})],
 });
 
 export default store;
