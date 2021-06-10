@@ -1,10 +1,11 @@
 <template>
-  <v-row>
+  <v-row data-cypress="lineItem">
     <v-col cols="12" md="3">
       <v-text-field
         label="Item Number"
         v-model="newItem.supplier_item_num"
         :rules="inputRules"
+        data-cypress="newCardLineItemNumber"
       >
       </v-text-field>
     </v-col>
@@ -13,6 +14,7 @@
         label="Item Name"
         v-model="newItem.supplier_item_name"
         :rules="inputRules"
+        data-cypress="newCardLineItemName"
       >
       </v-text-field>
     </v-col>
@@ -24,6 +26,7 @@
         v-model="newItem.quantity"
         :rules="inputRulesQuan"
         @input="quantityTimesPrice"
+        data-cypress="newCardLineItemQuantity"
       >
       </v-text-field>
     </v-col>
@@ -35,6 +38,7 @@
         :rules="inputRulesMoney"
         :prefix="currency"
         @input="quantityTimesPrice"
+        data-cypress="newCardLineItemPrice"
       >
       </v-text-field>
     </v-col>

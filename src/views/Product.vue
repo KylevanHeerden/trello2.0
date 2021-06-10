@@ -11,6 +11,7 @@
           v-for="list in this.Array"
           :key="list.list_name"
           :class="`list-group mx-2 ${list.list_status}`"
+          :data-cypress="`column-${list.list_status}`"
         >
           <!--Runs through the local3000 array of list populated according to the product-->
           {{ list.list_name }}
@@ -20,6 +21,7 @@
             class="list-group list-col my-3"
             group="cards"
             @change="cardMoved(list.id, $event)"
+            :data-cypress="`dragZone-${list.list_status}`"
           >
             <!--Makes the child component draggable. Require :list and group properties to work.-->
             <Card
@@ -31,6 +33,7 @@
               :cardComments="commentsByCard(card.id)"
               :team="team"
               :productName="product.name"
+              data-cypress="card"
             ></Card>
           </Draggable>
           <div v-if="list.id === 1" class="text-right">

@@ -1,5 +1,11 @@
 <template>
-  <v-dialog v-model="newCardDialog" scrollable persistent max-width="1000">
+  <v-dialog
+    v-model="newCardDialog"
+    scrollable
+    persistent
+    max-width="1000"
+    data-cypress="addNewCardDialog"
+  >
     <template v-slot:activator="{ on, attrs }">
       <v-btn
         class="ma-2"
@@ -10,6 +16,7 @@
         color="#26a69a"
         v-bind="attrs"
         v-on="on"
+        data-cypress="addNewCardBtn1"
       >
         <v-icon dark> mdi-plus </v-icon>
       </v-btn>
@@ -27,6 +34,7 @@
                   label="Card Name"
                   v-model="newCard.name"
                   :rules="inputRules"
+                  data-cypress="newCardName"
                 >
                 </v-text-field>
               </v-col>
@@ -42,6 +50,7 @@
                   hint="Select Supplier or create new one"
                   persistent-hint
                   :search-input.sync="search"
+                  data-cypress="newCardSupplier"
                 >
                   <template v-slot:no-data>
                     <v-list-item>
@@ -60,6 +69,7 @@
                   label="Contact Person"
                   v-model="newCard.contact_person"
                   :rules="inputRules"
+                  data-cypress="newCardContactPerson"
                 >
                 </v-text-field>
               </v-col>
@@ -68,6 +78,7 @@
                   label="Contact Number"
                   v-model="newCard.contact_number"
                   :rules="inputRulesConNum"
+                  data-cypress="newCardContactNum"
                 >
                 </v-text-field>
               </v-col>
@@ -76,6 +87,7 @@
                   label="Contact Email"
                   v-model="newCard.supplier_email"
                   :rules="inputRulesEmail"
+                  data-cypress="newCardSuppEmail"
                 >
                 </v-text-field>
               </v-col>
@@ -84,6 +96,7 @@
                   label="Quote Ref Number"
                   v-model="newCard.supplier_quote_num"
                   :rules="inputRules"
+                  data-cypress="newCardQuoteRef"
                 >
                 </v-text-field>
               </v-col>
@@ -94,6 +107,7 @@
                   v-model="newCard.nano_item_description"
                   :rules="inputRules"
                   :counter="100"
+                  data-cypress="newCardItemDescrp"
                 >
                 </v-text-field>
               </v-col>
@@ -125,6 +139,7 @@
                   x-small
                   @click="numOfLineItems += 1"
                   class="backgroundColorPrimary"
+                  data-cypress="addLineItemBtn"
                 >
                   + Line Item
                 </v-btn>
@@ -132,6 +147,7 @@
                   x-small
                   @click="numOfLineItems -= 1"
                   class="backgroundColorPrimary paddingleft1rem"
+                  data-cypress="removeLineItemBtn"
                 >
                   - Line Item
                 </v-btn>
@@ -152,6 +168,7 @@
                   v-model="newCard.lead_time"
                   suffix="days"
                   :rules="inputRulesQuan"
+                  data-cypress="newCardLeadTime"
                 >
                 </v-text-field>
               </v-col>
@@ -160,6 +177,7 @@
                   label="Payment Terms"
                   v-model="newCard.payment_terms"
                   :rules="inputRules"
+                  data-cypress="newCardPaymentTerms"
                 >
                 </v-text-field>
               </v-col>
@@ -168,6 +186,7 @@
                   v-model="VATexclude"
                   label="Exclude VAT"
                   @change="updateTotal()"
+                  data-cypress="newCardExcludeVAT"
                 ></v-checkbox>
               </v-col>
               <v-col cols="12" sm="6" md="2">
@@ -177,6 +196,7 @@
                   v-model="newCard.VAT"
                   :rules="inputRulesVAT"
                   :prefix="newCard.currency"
+                  data-cypress="newCardVAT"
                 >
                 </v-text-field>
               </v-col>
@@ -187,6 +207,7 @@
                   v-model="newCard.total_exc_vat"
                   :rules="inputRulesMoney"
                   :prefix="newCard.currency"
+                  data-cypress="newCardTotalExcVAT"
                 >
                 </v-text-field>
               </v-col>
@@ -196,6 +217,7 @@
                   v-model="newCard.total_inc_vat"
                   :rules="inputRulesMoney"
                   :prefix="newCard.currency"
+                  data-cypress="newCardTotalInclVAT"
                 >
                 </v-text-field>
               </v-col>
@@ -228,6 +250,7 @@
           text
           @click="newCardDialog = false"
           v-if="!loading"
+          data-cypress="cancelNewCardBtn"
         >
           Cancel
         </v-btn>
@@ -236,6 +259,7 @@
           text
           @click="submit"
           :loading="loading"
+          data-cypress="addNewCardBtn2"
         >
           Create
         </v-btn>
@@ -330,6 +354,7 @@ export default {
         payment_terms: "",
         currency: "R",
         hubdoc: false,
+        creator: "",
       },
       priceArray: [{ componentId: 0, price: 0 }],
       componentIdArray: [],

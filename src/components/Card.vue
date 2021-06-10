@@ -1,6 +1,12 @@
 <template>
   <div class="card">
-    <v-dialog v-model="cardDialog" persistent max-width="1000" scrollable>
+    <v-dialog
+      v-model="cardDialog"
+      persistent
+      max-width="1000"
+      scrollable
+      data-cypress="cardDialog"
+    >
       <template v-slot:activator="{ on, attrs }">
         <v-card class="ma-2 border d-flex" v-bind="attrs" v-on="on">
           <v-card-subtitle>
@@ -11,13 +17,21 @@
             :value="progressbarColor(listId)[1]"
             size="24"
             class="mt-4 mr-5 ml-auto"
+            data-cypress="progressCircle"
           ></v-progress-circular>
         </v-card>
       </template>
-      <v-card>
+      <v-card data-cypress="cardInfo">
         <v-card-actions class="pt-2 pr-2 align-right backgroundColorPrimary">
           <v-spacer></v-spacer>
-          <v-btn color="white" icon x-small text @click="cardDialog = false">
+          <v-btn
+            color="white"
+            icon
+            x-small
+            text
+            @click="cardDialog = false"
+            data-cypress="cardDialogCloseBtn"
+          >
             <v-icon>clear</v-icon>
           </v-btn>
         </v-card-actions>
@@ -34,7 +48,12 @@
               {{ card.supplier_name }}.
             </v-stepper-content>
 
-            <v-stepper-step @click="counter += 1" step="2" editable>
+            <v-stepper-step
+              @click="counter += 1"
+              step="2"
+              editable
+              data-cypress="quoteInfoBtn"
+            >
               Quote Information
             </v-stepper-step>
 
@@ -48,6 +67,7 @@
                         v-model="newCard.supplier_name"
                         :readonly="editCardInfo"
                         :rules="inputRules"
+                        data-cypress="quoteSupplierName"
                       >
                       </v-text-field>
                     </v-col>
@@ -57,6 +77,7 @@
                         v-model="newCard.contact_person"
                         :readonly="editCardInfo"
                         :rules="inputRules"
+                        data-cypress="quoteContactPerson"
                       >
                       </v-text-field>
                     </v-col>
@@ -66,6 +87,7 @@
                         v-model="newCard.contact_number"
                         :readonly="editCardInfo"
                         :rules="inputRulesConNum"
+                        data-cypress="quoteContactNumber"
                       >
                       </v-text-field>
                     </v-col>
@@ -75,6 +97,7 @@
                         v-model="newCard.supplier_email"
                         :readonly="editCardInfo"
                         :rules="inputRulesEmail"
+                        data-cypress="quoteContactEmail"
                       >
                       </v-text-field>
                     </v-col>
@@ -84,6 +107,7 @@
                         v-model="newCard.supplier_quote_num"
                         :readonly="editCardInfo"
                         :rules="inputRules"
+                        data-cypress="quoteNum"
                       >
                       </v-text-field>
                     </v-col>
@@ -101,6 +125,7 @@
                         :close="closeChip"
                         close-icon="mdi-delete"
                         @click:close="deleteFile(file.file_name)"
+                        data-cypress="quoteFiles"
                       >
                         {{ file.file_name }}
                       </v-chip>
@@ -129,6 +154,7 @@
                         v-model="newCard.nano_item_description"
                         :readonly="editCardInfo"
                         :rules="inputRules"
+                        data-cypress="quoteDesciption"
                       >
                       </v-text-field>
                     </v-col>
@@ -154,6 +180,7 @@
                                 lineItem.item_number
                               )
                             "
+                            data-cypress="lineItemName"
                           >
                           </v-text-field>
                         </v-col>
@@ -170,6 +197,7 @@
                                 lineItem.item_name
                               )
                             "
+                            data-cypress="lineItemNum"
                           >
                           </v-text-field>
                         </v-col>
@@ -189,6 +217,7 @@
                               )
                             "
                             @focus="thisLineItem_quantity = lineItem.quantity"
+                            data-cypress="lineItemQuantity"
                           >
                           </v-text-field>
                         </v-col>
@@ -210,6 +239,7 @@
                             @focus="
                               thisLineItem_unit_price = lineItem.unit_price
                             "
+                            data-cypress="lineItemUnitPrice"
                           >
                           </v-text-field>
                         </v-col>
@@ -222,6 +252,7 @@
                         :readonly="editCardInfo"
                         suffix="days"
                         :rules="inputRulesQuan"
+                        data-cypress="quoteLeadTime"
                       >
                       </v-text-field>
                     </v-col>
@@ -231,6 +262,7 @@
                         v-model="newCard.payment_terms"
                         :readonly="editCardInfo"
                         :rules="inputRules"
+                        data-cypress="quotePaymentTerms"
                       >
                       </v-text-field>
                     </v-col>
@@ -241,6 +273,7 @@
                         :readonly="editCardInfo"
                         :prefix="newCard.currency"
                         :rules="inputRulesVAT"
+                        data-cypress="quoteVAT"
                       >
                       </v-text-field>
                     </v-col>
@@ -251,6 +284,7 @@
                         :readonly="editCardInfo"
                         :prefix="newCard.currency"
                         :rules="inputRulesMoney"
+                        data-cypress="quoteTotalIncVAT"
                       >
                       </v-text-field>
                     </v-col>
@@ -261,6 +295,7 @@
                         :readonly="editCardInfo"
                         :prefix="newCard.currency"
                         :rules="inputRulesMoney"
+                        data-cypress="quoteExclVAT"
                       >
                       </v-text-field>
                     </v-col>
@@ -278,8 +313,10 @@
                         small
                         @click="deleteCard"
                         class="deleteBtn"
-                        >Delete</v-btn
+                        data-cypress="cardDeleteBtn"
                       >
+                        Delete
+                      </v-btn>
                       <v-btn
                         v-if="!cardInfoEditingButtons"
                         color="primary"
@@ -287,8 +324,10 @@
                         small
                         @click="editCard"
                         class="editBtn"
-                        >Edit</v-btn
+                        data-cypress="cardEditBtn"
                       >
+                        Edit
+                      </v-btn>
                       <v-btn
                         v-if="cardInfoEditingButtons"
                         color="primary"
@@ -296,8 +335,10 @@
                         small
                         @click="cancelCardInfoEdit"
                         class="deleteBtn"
-                        >Cancel</v-btn
+                        data-cypress="cardEditCancelBtn"
                       >
+                        Cancel
+                      </v-btn>
                       <v-btn
                         v-if="cardInfoEditingButtons"
                         color="primary"
@@ -305,15 +346,21 @@
                         small
                         @click="saveCardInfoEdit"
                         class="editBtn"
-                        >Save</v-btn
+                        data-cypress="cardEditSaveBtn"
                       >
+                        Save
+                      </v-btn>
                     </v-col>
                   </v-row>
                 </v-container>
               </v-form>
             </v-stepper-content>
 
-            <v-stepper-step step="3" :editable="listId >= 2">
+            <v-stepper-step
+              step="3"
+              :editable="listId >= 2"
+              data-cypress="technicalInfo"
+            >
               Technical Approval Information
             </v-stepper-step>
 
@@ -351,10 +398,15 @@
                                 ).boolean
                               "
                               v-model="newCard.technical_approval"
+                              data-cypress="techApprovalBtn"
                             >
                               <template v-slot:label>
                                 Technical Approval:
-                                <span class="ml-3" style="color: #37474f">
+                                <span
+                                  class="ml-3"
+                                  style="color: #37474f"
+                                  data-cypress="techApprovalStatus"
+                                >
                                   {{
                                     approvedStatus(newCard.technical_approval)
                                   }}
@@ -579,7 +631,11 @@
               </v-form>
             </v-stepper-content>
 
-            <v-stepper-step step="6" :editable="listId >= 5">
+            <v-stepper-step
+              step="6"
+              :editable="listId >= 5"
+              data-cypress="qualityInfo"
+            >
               Quality Approval Information
             </v-stepper-step>
             <v-stepper-content step="6">
@@ -599,6 +655,7 @@
                         chips
                         return-object
                         @change="receiver_selected = true"
+                        data-cypress="receiverSelect"
                       ></v-select>
                     </v-col>
                     <v-col cols="12" sm="4" md="4" v-else>
@@ -647,6 +704,7 @@
                         v-model="newCard.hubdoc"
                         :label="'Attached to Hubdoc'"
                         @click="handleClick3()"
+                        data-cypress="hubdocCheck"
                       ></v-checkbox>
                     </v-col>
                   </v-row>
@@ -664,6 +722,7 @@
                         chips
                         return-object
                         @change="quality_selected = true"
+                        data-cypress="qualitySelect"
                       ></v-select>
                     </v-col>
                     <v-col cols="12" sm="6" md="6" v-else>
@@ -671,6 +730,7 @@
                         v-model="newCard.quality_approver.text"
                         label="Quality Approver"
                         readonly
+                        data-cypress="qualityApprove"
                       >
                       </v-text-field>
                     </v-col>
@@ -815,6 +875,7 @@
       color="red"
       timeout="-1"
       content-class="center"
+      data-cypress="editCardSnackBar"
     >
       <v-icon>create</v-icon>
       You are editing the card now.
@@ -824,6 +885,7 @@
       color="green"
       timeout="2000"
       class="text-center"
+      data-cypress="updatedCardSnackbar"
     >
       <v-icon>check_circle</v-icon>
       Card updated!

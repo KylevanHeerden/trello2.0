@@ -15,6 +15,14 @@
 //
 // -- This is a child command --
 // Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
+Cypress.Commands.add(
+  "dragTo",
+  { prevSubject: "element" },
+  (subject, targetEl) => {
+    cy.wrap(subject).trigger("dragstart");
+    cy.get(targetEl).trigger("drop");
+  }
+);
 //
 //
 // -- This is a dual command --
