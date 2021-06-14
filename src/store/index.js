@@ -8,6 +8,9 @@ import router from "../router/index";
 import notifications from "@/store/modules/notifications";
 import home from "@/store/modules/home";
 import programmes from "@/store/modules/programmes";
+import users from "@/store/modules/users";
+import profile from "@/store/modules/profile";
+import products from "@/store/modules/products";
 
 Vue.use(Vuex);
 
@@ -16,6 +19,9 @@ const store = new Vuex.Store({
     notifications,
     home,
     programmes,
+    users,
+    profile,
+    products,
   },
   state: {
     links: [
@@ -24,26 +30,25 @@ const store = new Vuex.Store({
       { icon: "account_circle", text: "Profile", route: "/profile" },
       { icon: "folder", text: "Admin", route: "/admin" },
     ],
-    products: [],
     cards: [],
     suppliers: [],
     comments: [],
-    userProfile: {},
+    // userProfile: {},
     user: {
       loggedIn: null,
     },
-    users: [],
+    // users: [],
     teams: [],
     lineItems: [],
   },
   getters: {
-    user(state) {
-      return state.user;
-    },
+    // user(state) {
+    //   return state.user;
+    // },
 
-    getUserProfile(state) {
-      return state.userProfile;
-    },
+    // getUserProfile(state) {
+    //   return state.userProfile;
+    // },
 
     // getProgrammes(state) {
     //   return state.programmes;
@@ -53,13 +58,13 @@ const store = new Vuex.Store({
     //   return state.programmes.find((programme) => programme.id === id);
     // },
 
-    getProducts(state) {
-      return state.products;
-    },
+    // getProducts(state) {
+    //   return state.products;
+    // },
 
-    getProductById: (state) => (id) => {
-      return state.products.find((product) => product.id === id);
-    },
+    // getProductById: (state) => (id) => {
+    //   return state.products.find((product) => product.id === id);
+    // },
 
     getCards(state) {
       return state.cards;
@@ -114,9 +119,9 @@ const store = new Vuex.Store({
     },
   },
   mutations: {
-    setUserProfile(state, val) {
-      state.userProfile = val;
-    },
+    // setUserProfile(state, val) {
+    //   state.userProfile = val;
+    // },
     SetLoggedIn(state, value) {
       state.user.loggedIn = value;
     },
@@ -125,9 +130,9 @@ const store = new Vuex.Store({
     //   state.programmes = value;
     // },
 
-    setProducts(state, value) {
-      state.products = value;
-    },
+    // setProducts(state, value) {
+    //   state.products = value;
+    // },
 
     setCards(state, value) {
       state.cards = value;
@@ -145,9 +150,9 @@ const store = new Vuex.Store({
       state.teams = value;
     },
 
-    setUsers(state, value) {
-      state.users = value;
-    },
+    // setUsers(state, value) {
+    //   state.users = value;
+    // },
 
     setLineItems(state, value) {
       state.lineItems = value;
@@ -182,21 +187,21 @@ const store = new Vuex.Store({
         });
     },
 
-    async fetchUserProfile({ commit }, user) {
-      let userColProf = await fb.usersCollection.doc(user.uid).get();
+    // async fetchUserProfile({ commit }, user) {
+    //   let userColProf = await fb.usersCollection.doc(user.uid).get();
 
-      let userProfile = {
-        id: user.uid,
-        name: userColProf.data().name,
-        surname: userColProf.data().surname,
-        email: user.email,
-        teams: userColProf.data().teams,
-        admin: userColProf.data().admin,
-        slack_id: userColProf.data().slack_id,
-      };
+    //   let userProfile = {
+    //     id: user.uid,
+    //     name: userColProf.data().name,
+    //     surname: userColProf.data().surname,
+    //     email: user.email,
+    //     teams: userColProf.data().teams,
+    //     admin: userColProf.data().admin,
+    //     slack_id: userColProf.data().slack_id,
+    //   };
 
-      commit("setUserProfile", userProfile);
-    },
+    //   commit("setUserProfile", userProfile);
+    // },
 
     async signup({ dispatch }, form) {
       // sign user up
@@ -253,41 +258,29 @@ const store = new Vuex.Store({
     //   );
     // },
 
-    async getProducts({ commit }) {
-      fb.productsCollection.onSnapshot(
-        (products) => {
-          let products_array = [];
-          products.forEach((doc) => {
-            let object = {
-              createdOn: doc.data().createdOn,
-              updatedOn: doc.data().updatedOn,
-              id: doc.id,
-              name: doc.data().name,
-              programme: doc.data().programme,
-              person: doc.data().person,
-              status: doc.data().status,
-            };
-            products_array.push(object);
-          });
-          commit("setProducts", products_array);
-        },
-        (err) => {
-          console.log(`Encountered error: ${err}`);
-        }
-      );
-    },
-
-    async createProduct(product) {
-      await fb.productsCollection.add({
-        createdOn: new Date(),
-        updatedOn: new Date(),
-        name: product.name,
-        programme_id: product.programme_id,
-        programme_name: product.programme_name,
-        person: product.person,
-        status: product.status,
-      });
-    },
+    // async getProducts({ commit }) {
+    //   fb.productsCollection.onSnapshot(
+    //     (products) => {
+    //       let products_array = [];
+    //       products.forEach((doc) => {
+    //         let object = {
+    //           createdOn: doc.data().createdOn,
+    //           updatedOn: doc.data().updatedOn,
+    //           id: doc.id,
+    //           name: doc.data().name,
+    //           programme: doc.data().programme,
+    //           person: doc.data().person,
+    //           status: doc.data().status,
+    //         };
+    //         products_array.push(object);
+    //       });
+    //       commit("setProducts", products_array);
+    //     },
+    //     (err) => {
+    //       console.log(`Encountered error: ${err}`);
+    //     }
+    //   );
+    // },
 
     async getCards({ commit }) {
       fb.cardsCollection.onSnapshot(
@@ -416,29 +409,29 @@ const store = new Vuex.Store({
       );
     },
 
-    async getUsers({ commit }) {
-      fb.usersCollection.onSnapshot(
-        (users) => {
-          let users_array = [];
-          users.forEach((doc) => {
-            let object = {
-              id: doc.id,
-              createdOn: doc.data().createdOn,
-              name: doc.data().name,
-              surname: doc.data().surname,
-              updatedOn: doc.data().updatedOn,
-              teams: doc.data().teams,
-              slack_id: doc.data().slack_id,
-            };
-            users_array.push(object);
-          });
-          commit("setUsers", users_array);
-        },
-        (err) => {
-          console.log(`Encountered error: ${err}`);
-        }
-      );
-    },
+    // async getUsers({ commit }) {
+    //   fb.usersCollection.onSnapshot(
+    //     (users) => {
+    //       let users_array = [];
+    //       users.forEach((doc) => {
+    //         let object = {
+    //           id: doc.id,
+    //           createdOn: doc.data().createdOn,
+    //           name: doc.data().name,
+    //           surname: doc.data().surname,
+    //           updatedOn: doc.data().updatedOn,
+    //           teams: doc.data().teams,
+    //           slack_id: doc.data().slack_id,
+    //         };
+    //         users_array.push(object);
+    //       });
+    //       commit("setUsers", users_array);
+    //     },
+    //     (err) => {
+    //       console.log(`Encountered error: ${err}`);
+    //     }
+    //   );
+    // },
 
     async getLineItems({ commit }) {
       fb.lineItemsCollection.onSnapshot(

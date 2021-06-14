@@ -128,6 +128,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from "vuex";
 import NewProduct from "@/components/NewProduct.vue";
 
 export default {
@@ -184,25 +185,25 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      products: (state) => state.products.products,
+    }),
+    ...mapGetters({}),
     fetchedProgrammeId() {
       let fetchedId = this.$route.params.id;
       return fetchedId;
     },
 
-    programmeBoardLink() {
-      let link = `/programme_board/${this.fetchedProgrammeId}`;
-      return link;
-    },
-
-    products() {
-      let products = this.$store.getters.getProducts;
-      return products;
-    },
     programme() {
       let programme = this.$store.getters.getProgrammeById(
         this.fetchedProgrammeId
       );
       return programme;
+    },
+
+    programmeBoardLink() {
+      let link = `/programme_board/${this.fetchedProgrammeId}`;
+      return link;
     },
 
     budgetPercentage() {

@@ -20,7 +20,7 @@
         New Product
       </v-card-title>
       <v-card-text class="mt-6">
-        <v-form class="px-3" ref="form">
+        <v-form class="px-3" ref="newProductForm">
           <v-row>
             <v-col cols="12" sm="6" md="6">
               <v-text-field label="User" v-model="nameSurname" readonly>
@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from "vuex";
 import { db } from "@/firebase";
 
 export default {
@@ -97,12 +98,13 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["createNewProduct"]),
     async submit() {
-      if (this.$refs.form.validate()) {
+      if (this.$refs.newProductForm.validate()) {
         //Validates form before allowed to submit
         this.loading = true;
 
-        let product = await db.collection("products").add({});
+        // let product = await db.collection("products").add({});
 
         let productData = {
           name: this.newProduct.name,
@@ -117,25 +119,27 @@ export default {
           updatedOn: new Date(),
         };
 
-        db.collection("products")
-          .doc(product.id)
-          .set(productData);
+        // db.collection("products")
+        //   .doc(product.id)
+        //   .set(productData);
 
-        let programme = await db
-          .collection("programmes")
-          .doc(this.newProduct.programme_id)
-          .get();
+        // let programme = await db
+        //   .collection("programmes")
+        //   .doc(this.newProduct.programme_id)
+        //   .get();
 
-        let programmeData = programme.data();
+        // let programmeData = programme.data();
 
-        programmeData.products.push({
-          product_name: this.newProduct.name,
-          product_id: product.id,
-        });
+        // programmeData.products.push({
+        //   product_name: this.newProduct.name,
+        //   product_id: product.id,
+        // });
 
-        db.collection("programmes")
-          .doc(programme.id)
-          .set(programmeData);
+        // db.collection("programmes")
+        //   .doc(programme.id)
+        //   .set(programmeData);
+
+        this.createNewProduct(productData);
 
         this.loading = false;
         this.newProduct.name = "";
@@ -147,10 +151,10 @@ export default {
   },
 
   computed: {
-    currentUser() {
-      let user = this.$store.getters.getUserProfile;
-      return user;
-    },
+    ...mapState({
+      currentUser: (state) => state.profile.userProfile,
+    }),
+    ...mapGetters({}),
 
     nameSurname() {
       return this.currentUser.name + " " + this.currentUser.surname;

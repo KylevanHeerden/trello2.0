@@ -109,6 +109,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from "vuex";
 import { db } from "@/firebase";
 
 export default {
@@ -227,6 +228,7 @@ export default {
           );
         });
 
+        //Reset data-fields after submit
         this.newTeam = {
           name: "",
           programme_id: "",
@@ -247,20 +249,6 @@ export default {
           budget: "",
         };
       }
-    },
-
-    generateString(length) {
-      const characters =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      let result = " ";
-      const charactersLength = characters.length;
-      for (let i = 0; i < length; i++) {
-        result += characters.charAt(
-          Math.floor(Math.random() * charactersLength)
-        );
-      }
-
-      return result;
     },
 
     async setAddTeamtoUsersTeams(user_id, team_id, team_name, programmeName) {
@@ -310,9 +298,10 @@ export default {
   },
 
   computed: {
-    users() {
-      return this.$store.getters.getUsers;
-    },
+    ...mapState({
+      users: (state) => state.users.users,
+      currentUser: (state) => state.profile.userProfile,
+    }),
 
     mapUsersArray() {
       // make an array where the keys for each user object is changed to text & value for the select
@@ -326,10 +315,6 @@ export default {
         mapUsersArray.push(map);
       });
       return mapUsersArray;
-    },
-
-    currentUser() {
-      return this.$store.getters.getUserProfile;
     },
   },
 
