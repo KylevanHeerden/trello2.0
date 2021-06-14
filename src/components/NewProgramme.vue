@@ -20,7 +20,7 @@
         New Programme
       </v-card-title>
       <v-card-text class="mt-6">
-        <v-form class="px-3" ref="form">
+        <v-form class="px-3" ref="newProgrammeForm">
           <v-text-field
             label="Title"
             v-model="newProgramme.name"
@@ -155,8 +155,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["createNewProgramme"]),
     async submit() {
-      if (this.$refs.form.validate()) {
+      if (this.$refs.newProgrammeForm.validate()) {
         //Validates form before allowed to submit
         this.loading = true;
 
@@ -175,15 +176,11 @@ export default {
           total: "0",
         };
 
-        db.collection("programmes")
-          .doc(programme.id)
-          .set(progData);
-
         const teamData = {
-          name: this.newProgramme.team.team_name,
+          name: progData.team.team_name,
           programme: {
             programme_id: programme.id,
-            programme_name: this.newProgramme.name,
+            programme_name: progData.name,
           },
           technical_approver: this.newTeam.technical_approver,
           purchase_approver: this.newTeam.purchase_approver,
@@ -194,105 +191,11 @@ export default {
           updatedOn: new Date(),
         };
 
-        const teamRef = await db.collection("teams").doc(team.id);
-
-        teamRef.set(teamData);
+        this.createNewProgramme({ progData, teamData });
 
         this.newProgrammeDialog = false;
         this.loading = false;
-
-        this.newTeam.technical_approver.users.forEach((user) => {
-          this.setAddTeamtoUsersTeams(
-            user.value,
-            team.id,
-            this.newProgramme.team.team_name,
-            this.newProgramme.name
-          );
-        });
-
-        this.newTeam.purchase_approver.users.forEach((user) => {
-          this.setAddTeamtoUsersTeams(
-            user.value,
-            team.id,
-            this.newProgramme.team.team_name,
-            this.newProgramme.name
-          );
-        });
-
-        this.newTeam.procurer.users.forEach((user) => {
-          this.setAddTeamtoUsersTeams(
-            user.value,
-            team.id,
-            this.newProgramme.team.team_name,
-            this.newProgramme.name
-          );
-        });
-
-        //Reset data-fields after submit
-        this.newTeam = {
-          name: "",
-          programme_id: "",
-          technical_approver: [],
-          purchase_approver: [],
-          procurer: [],
-          quality_approver: [],
-          createdOn: new Date(),
-          updatedOn: new Date(),
-        };
-
-        this.newProgramme = {
-          name: "",
-          team: {
-            team_name: "",
-            team_id: team.id,
-          },
-          budget: "",
-        };
-      }
-    },
-
-    async setAddTeamtoUsersTeams(user_id, team_id, team_name, programmeName) {
-      const user = await db
-        .collection("users")
-        .doc(user_id)
-        .get();
-
-      const userData = user.data();
-
-      let user_teams_array = userData.teams;
-
-      if (user_teams_array.length == 0) {
-        user_teams_array.push({
-          //add the map of the team id and name to the user
-          team_id: team_id,
-          team_name: team_name,
-          programme_name: programmeName,
-        });
-
-        userData.updatedOn = new Date();
-
-        db.collection("users") //write the updated fields to the user doc
-          .doc(user_id)
-          .set(userData);
-      } else {
-        user_teams_array.forEach(function(k) {
-          if (k.team_id == team_id) {
-            ("");
-          } else {
-            user_teams_array.push({
-              //add the map of the team id and name to the user
-              team_id: team_id,
-              team_name: team_name,
-              programme_name: programmeName,
-            });
-
-            userData.updatedOn = new Date();
-
-            db.collection("users") //write the updated fields to the user doc
-              .doc(user_id)
-              .set(userData);
-          }
-        });
+        this.$refs.newProgrammeForm.reset();
       }
     },
   },

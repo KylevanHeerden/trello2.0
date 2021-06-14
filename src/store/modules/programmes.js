@@ -53,5 +53,86 @@ export default {
         }
       );
     },
+
+    async createNewProgramme({ commit, state }, payload) {
+      await fb.programmesCollection
+        .doc(payload.teamData.programme.programme_id)
+        .set(payload.progData);
+
+      const teamRef = await fb.teamsCollection.doc(
+        payload.progData.team.team_id
+      );
+
+      await teamRef.set(payload.teamData);
+
+      payload.teamData.technical_approver.users.forEach((user) => {
+        this.setAddTeamtoUsersTeams(
+          user.value,
+          payload.progData.team.team_id,
+          payload.progData.team.team_name,
+          payload.progData.name
+        );
+      });
+
+      payload.teamData.purchase_approver.users.forEach((user) => {
+        this.setAddTeamtoUsersTeams(
+          user.value,
+          payload.progData.team.team_id,
+          payload.progData.team.team_name,
+          payload.progData.name
+        );
+      });
+
+      payload.teamData.procurer.users.forEach((user) => {
+        this.setAddTeamtoUsersTeams(
+          user.value,
+          progammeData.team.team_id,
+          programmeData.team.team_name,
+          programmeData.name
+        );
+      });
+    },
+  },
+
+  async setAddTeamtoUsersTeams(user_id, team_id, team_name, programmeName) {
+    const user = await fb.usersCollection.doc(user_id).get();
+
+    const userData = user.data();
+
+    let user_teams_array = userData.teams;
+
+    if (user_teams_array.length == 0) {
+      user_teams_array.push({
+        //add the map of the team id and name to the user
+        team_id: team_id,
+        team_name: team_name,
+        programme_name: programmeName,
+      });
+
+      userData.updatedOn = new Date();
+
+      fb.usersCollection //write the updated fields to the user doc
+        .doc(user_id)
+        .set(userData);
+    } else {
+      user_teams_array.forEach(function(k) {
+        if (k.team_id == team_id) {
+          ("");
+        } else {
+          user_teams_array.push({
+            //add the map of the team id and name to the user
+            team_id: team_id,
+            team_name: team_name,
+            programme_name: programmeName,
+          });
+
+          userData.updatedOn = new Date();
+
+          fb.usersCollection //write the updated fields to the user doc
+            .doc(user_id)
+            .set(userData);
+        }
+      });
+    }
   },
 };
