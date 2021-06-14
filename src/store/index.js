@@ -7,7 +7,7 @@ import router from "../router/index";
 // Modules import
 import notifications from "@/store/modules/notifications";
 import home from "@/store/modules/home";
-import dashboard from "@/store/modules/dashboard";
+import programmes from "@/store/modules/programmes";
 
 Vue.use(Vuex);
 
@@ -15,7 +15,7 @@ const store = new Vuex.Store({
   modules: {
     notifications,
     home,
-    dashboard,
+    programmes,
   },
   state: {
     links: [
@@ -24,7 +24,6 @@ const store = new Vuex.Store({
       { icon: "account_circle", text: "Profile", route: "/profile" },
       { icon: "folder", text: "Admin", route: "/admin" },
     ],
-    programmes: [],
     products: [],
     cards: [],
     suppliers: [],
@@ -46,13 +45,13 @@ const store = new Vuex.Store({
       return state.userProfile;
     },
 
-    getProgrammes(state) {
-      return state.programmes;
-    },
+    // getProgrammes(state) {
+    //   return state.programmes;
+    // },
 
-    getProgrammeById: (state) => (id) => {
-      return state.programmes.find((programme) => programme.id === id);
-    },
+    // getProgrammeById: (state) => (id) => {
+    //   return state.programmes.find((programme) => programme.id === id);
+    // },
 
     getProducts(state) {
       return state.products;
@@ -122,9 +121,9 @@ const store = new Vuex.Store({
       state.user.loggedIn = value;
     },
 
-    setProgrammes(state, value) {
-      state.programmes = value;
-    },
+    // setProgrammes(state, value) {
+    //   state.programmes = value;
+    // },
 
     setProducts(state, value) {
       state.products = value;
@@ -228,31 +227,31 @@ const store = new Vuex.Store({
       commit("SetLoggedIn", user !== null);
     },
 
-    async getProgrammes({ commit }) {
-      fb.programmesCollection.onSnapshot(
-        (programmes) => {
-          let programmes_array = [];
-          programmes.forEach((doc) => {
-            let object = {
-              id: doc.id,
-              name: doc.data().name,
-              team: {
-                team_id: doc.data().team.team_id,
-                team_name: doc.data().team.team_name,
-              },
-              products: doc.data().products,
-              budget: doc.data().budget,
-              total: doc.data().total,
-            };
-            programmes_array.push(object);
-          });
-          commit("setProgrammes", programmes_array);
-        },
-        (err) => {
-          console.log(`Encountered error: ${err}`);
-        }
-      );
-    },
+    // async getProgrammes({ commit }) {
+    //   fb.programmesCollection.onSnapshot(
+    //     (programmes) => {
+    //       let programmes_array = [];
+    //       programmes.forEach((doc) => {
+    //         let object = {
+    //           id: doc.id,
+    //           name: doc.data().name,
+    //           team: {
+    //             team_id: doc.data().team.team_id,
+    //             team_name: doc.data().team.team_name,
+    //           },
+    //           products: doc.data().products,
+    //           budget: doc.data().budget,
+    //           total: doc.data().total,
+    //         };
+    //         programmes_array.push(object);
+    //       });
+    //       commit("setProgrammes", programmes_array);
+    //     },
+    //     (err) => {
+    //       console.log(`Encountered error: ${err}`);
+    //     }
+    //   );
+    // },
 
     async getProducts({ commit }) {
       fb.productsCollection.onSnapshot(

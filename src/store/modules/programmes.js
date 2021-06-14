@@ -15,6 +15,10 @@ export default {
     getProgrammes(state) {
       return state.programmes;
     },
+
+    getProgrammeById: (state) => (id) => {
+      return state.programmes.find((programme) => programme.id === id);
+    },
   },
 
   mutations: {
