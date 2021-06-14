@@ -196,19 +196,24 @@ export default {
         this.newProgrammeDialog = false;
         this.loading = false;
 
-        this.newProgramme = {
-          name: "",
-          team: {},
-          budget: "",
-        };
-
         this.newTeam = {
           name: "",
           programme_id: "",
-          technical_approver: {},
-          purchase_approver: {},
-          procurer: {},
-          quality_approver: {},
+          technical_approver: [],
+          purchase_approver: [],
+          procurer: [],
+          quality_approver: [],
+          createdOn: new Date(),
+          updatedOn: new Date(),
+        };
+
+        this.newProgramme = {
+          name: "",
+          team: {
+            team_name: "",
+            team_id: team.id,
+          },
+          budget: "",
         };
       }
     },

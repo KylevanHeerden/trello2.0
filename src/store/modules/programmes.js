@@ -54,7 +54,7 @@ export default {
       );
     },
 
-    async createNewProgramme({ commit, state }, payload) {
+    async createNewProgramme({ dispatch }, payload) {
       await fb.programmesCollection
         .doc(payload.teamData.programme.programme_id)
         .set(payload.progData);
@@ -66,74 +66,76 @@ export default {
       await teamRef.set(payload.teamData);
 
       payload.teamData.technical_approver.users.forEach((user) => {
-        this.setAddTeamtoUsersTeams(
-          user.value,
-          payload.progData.team.team_id,
-          payload.progData.team.team_name,
-          payload.progData.name
-        );
+        let teamPayload = {
+          user_id: user.value,
+          team_id: payload.progData.team.team_id,
+          team_name: payload.progData.team.team_name,
+          programmeName: payload.progData.name,
+        };
+        dispatch("setAddTeamtoUsersTeams", teamPayload);
       });
 
       payload.teamData.purchase_approver.users.forEach((user) => {
-        this.setAddTeamtoUsersTeams(
-          user.value,
-          payload.progData.team.team_id,
-          payload.progData.team.team_name,
-          payload.progData.name
-        );
+        let teamPayload = {
+          user_id: user.value,
+          team_id: payload.progData.team.team_id,
+          team_name: payload.progData.team.team_name,
+          programmeName: payload.progData.name,
+        };
+        dispatch("setAddTeamtoUsersTeams", teamPayload);
       });
 
       payload.teamData.procurer.users.forEach((user) => {
-        this.setAddTeamtoUsersTeams(
-          user.value,
-          payload.progData.team.team_id,
-          payload.progData.team.team_name,
-          payload.progData.name
-        );
+        let teamPayload = {
+          user_id: user.value,
+          team_id: payload.progData.team.team_id,
+          team_name: payload.progData.team.team_name,
+          programmeName: payload.progData.name,
+        };
+        dispatch("setAddTeamtoUsersTeams", teamPayload);
       });
     },
-  },
 
-  async setAddTeamtoUsersTeams(user_id, team_id, team_name, programmeName) {
-    console.log(user_id, team_id, team_name, programmeName);
-    const user = await fb.usersCollection.doc(user_id).get();
+    async setAddTeamtoUsersTeams({ dispatch }, payload) {
+      const user = await fb.usersCollection.doc(payload.user_id).get();
 
-    const userData = user.data();
+      const userData = user.data();
 
-    let user_teams_array = userData.teams;
+      let user_teams_array = userData.teams;
 
-    if (user_teams_array.length == 0) {
-      user_teams_array.push({
-        //add the map of the team id and name to the user
-        team_id: team_id,
-        team_name: team_name,
-        programme_name: programmeName,
-      });
+      if (user_teams_array.length === 0) {
+        user_teams_array.push({
+          //add the map of the team id and name to the user
+          team_id: payload.team_id,
+          team_name: payload.team_name,
+          programme_name: payload.programmeName,
+        });
 
-      userData.updatedOn = new Date();
+        userData.updatedOn = new Date();
 
-      fb.usersCollection //write the updated fields to the user doc
-        .doc(user_id)
-        .set(userData);
-    } else {
-      user_teams_array.forEach((k) => {
-        if (k.team_id == team_id) {
-          ("");
-        } else {
-          user_teams_array.push({
-            //add the map of the team id and name to the user
-            team_id: team_id,
-            team_name: team_name,
-            programme_name: programmeName,
-          });
+        fb.usersCollection //write the updated fields to the user doc
+          .doc(payload.user_id)
+          .set(userData);
+      } else {
+        user_teams_array.forEach((k) => {
+          if (k.team_id == payload.team_id) {
+            ("");
+          } else {
+            user_teams_array.push({
+              //add the map of the team id and name to the user
+              team_id: payload.team_id,
+              team_name: payload.team_name,
+              programme_name: payload.programmeName,
+            });
 
-          userData.updatedOn = new Date();
+            userData.updatedOn = new Date();
 
-          fb.usersCollection //write the updated fields to the user doc
-            .doc(user_id)
-            .set(userData);
-        }
-      });
-    }
+            fb.usersCollection //write the updated fields to the user doc
+              .doc(payload.user_id)
+              .set(userData);
+          }
+        });
+      }
+    },
   },
 };
