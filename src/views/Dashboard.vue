@@ -53,6 +53,8 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from "vuex";
+
 import NewProgramme from "@/components/NewProgramme.vue";
 
 export default {
@@ -82,9 +84,8 @@ export default {
   },
 
   computed: {
-    programmes() {
-      return this.$store.getters.getProgrammes;
-    },
+    ...mapState({ programmes: (state) => state.dashboard.programmes }),
+    ...mapGetters(),
   },
 
   mounted() {

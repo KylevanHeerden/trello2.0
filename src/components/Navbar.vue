@@ -193,16 +193,13 @@ export default {
     forward(productId) {
       this.$router.push(`/product/${productId}`);
     },
-    logout() {
-      this.$store.dispatch("logout");
-    },
   },
 
   computed: {
     ...mapState({
       links: (state) => state.links,
-      notifications() {
-        let notifications = this.$store.state.notifications.notifications;
+      notifications(state) {
+        let notifications = state.notifications.notifications;
 
         let filteredNotifications = notifications.filter(
           (notification) => notification.user_id == this.user.id

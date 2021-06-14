@@ -6,12 +6,16 @@ import router from "../router/index";
 
 // Modules import
 import notifications from "@/store/modules/notifications";
+import home from "@/store/modules/home";
+import dashboard from "@/store/modules/dashboard";
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
   modules: {
     notifications,
+    home,
+    dashboard,
   },
   state: {
     links: [
