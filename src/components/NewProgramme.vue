@@ -195,7 +195,21 @@ export default {
 
         this.newProgrammeDialog = false;
         this.loading = false;
-        this.$refs.newProgrammeForm.reset();
+
+        this.newProgramme = {
+          name: "",
+          team: {},
+          budget: "",
+        };
+
+        this.newTeam = {
+          name: "",
+          programme_id: "",
+          technical_approver: {},
+          purchase_approver: {},
+          procurer: {},
+          quality_approver: {},
+        };
       }
     },
   },

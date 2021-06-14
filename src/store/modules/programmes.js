@@ -86,15 +86,16 @@ export default {
       payload.teamData.procurer.users.forEach((user) => {
         this.setAddTeamtoUsersTeams(
           user.value,
-          progammeData.team.team_id,
-          programmeData.team.team_name,
-          programmeData.name
+          payload.progData.team.team_id,
+          payload.progData.team.team_name,
+          payload.progData.name
         );
       });
     },
   },
 
   async setAddTeamtoUsersTeams(user_id, team_id, team_name, programmeName) {
+    console.log(user_id, team_id, team_name, programmeName);
     const user = await fb.usersCollection.doc(user_id).get();
 
     const userData = user.data();
@@ -115,7 +116,7 @@ export default {
         .doc(user_id)
         .set(userData);
     } else {
-      user_teams_array.forEach(function(k) {
+      user_teams_array.forEach((k) => {
         if (k.team_id == team_id) {
           ("");
         } else {
