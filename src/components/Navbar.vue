@@ -210,13 +210,14 @@ export default {
         });
       },
       logInStatus: (state) => state.user.loggedIn,
-      user: (state) => state.userProfile,
+      user: (state) => state.profile.userProfile,
     }),
     ...mapGetters({}),
   },
 
   created() {
     this.$store.dispatch("getNotifications");
+    console.log(this.user);
   },
 };
 </script>

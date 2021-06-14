@@ -73,7 +73,7 @@ import Draggable from "vuedraggable";
 import Card from "@/components/Card.vue";
 import NewCard from "@/components/NewCard.vue";
 import { db } from "@/firebase";
-import { mapGetters } from "vuex";
+import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
   name: "Products",
@@ -171,7 +171,6 @@ export default {
         "purchase_approver", // Nanodyn doctrine is set that purchase approver is notified if item is awaiting
       ];
       const toCall = person_array[listId - 2];
-      console.log(listId - 2);
 
       if (this.team[toCall] == undefined) {
         // card creator notified when card is in quality
@@ -263,6 +262,20 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      cards(state) {
+        let unfilteredCards = state.Cards;
+        let cards = unfilteredCards.filter(
+          (card) => card.product_id === this.productId
+        );
+        let sortedCards = cards.sort((a, b) => a.createdOn - b.createdOn);
+        //This method is to populate lists.cards of Array
+        sortedCards.map((card) =>
+          this.Array[card.list_id - 1].cards.push(card)
+        );
+        return cards;
+      },
+    }),
     ...mapGetters({
       suppliers: "getSuppliers",
       comments: "getComments",
@@ -283,16 +296,7 @@ export default {
       );
       return programme;
     },
-    cards() {
-      let unfilteredCards = this.$store.getters.getCards;
-      let cards = unfilteredCards.filter(
-        (card) => card.product_id === this.productId
-      );
-      let sortedCards = cards.sort((a, b) => a.createdOn - b.createdOn);
-      //This method is to populate lists.cards of Array
-      sortedCards.map((card) => this.Array[card.list_id - 1].cards.push(card));
-      return cards;
-    },
+
     team() {
       let team = this.$store.getters.getTeamsByProgrammeId(this.programme.id);
       return team;

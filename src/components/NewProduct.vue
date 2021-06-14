@@ -104,8 +104,6 @@ export default {
         //Validates form before allowed to submit
         this.loading = true;
 
-        // let product = await db.collection("products").add({});
-
         let productData = {
           name: this.newProduct.name,
           programme: {
@@ -118,26 +116,6 @@ export default {
           createdOn: new Date(),
           updatedOn: new Date(),
         };
-
-        // db.collection("products")
-        //   .doc(product.id)
-        //   .set(productData);
-
-        // let programme = await db
-        //   .collection("programmes")
-        //   .doc(this.newProduct.programme_id)
-        //   .get();
-
-        // let programmeData = programme.data();
-
-        // programmeData.products.push({
-        //   product_name: this.newProduct.name,
-        //   product_id: product.id,
-        // });
-
-        // db.collection("programmes")
-        //   .doc(programme.id)
-        //   .set(programmeData);
 
         this.createNewProduct(productData);
 

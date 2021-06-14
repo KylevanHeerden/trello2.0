@@ -899,6 +899,7 @@ import Comments from "@/components/Comments";
 import vue2Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 import FileUploadDialog from "@/components/FileUploadDialog";
+import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
   components: { Comments, vueDropzone: vue2Dropzone, FileUploadDialog },
@@ -1448,18 +1449,16 @@ export default {
   },
 
   computed: {
-    currentUser() {
-      let user = this.$store.getters.getUserProfile;
-      return user;
-    },
+    ...mapState({
+      users: (state) => state.users.users,
+      currentUser: (state) => state.profile.userProfile,
+    }),
+    ...mapGetters(["getUsers"]),
+
     lineItemsFiltered() {
       let FBlineItems = this.$store.getters.getLineItemsByCardId(this.card.id);
 
       return FBlineItems;
-    },
-
-    users() {
-      return this.$store.getters.getUsers;
     },
 
     mapUsersArray() {
@@ -1486,7 +1485,7 @@ export default {
   },
 
   created() {
-    this.$store.dispatch("getUsers");
+    this.getUsers;
   },
 
   mounted() {},
