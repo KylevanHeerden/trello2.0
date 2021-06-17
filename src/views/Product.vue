@@ -252,7 +252,7 @@ export default {
     },
 
     cards1(id) {
-      let unfilteredCards = this.$store.getters.getCards;
+      let unfilteredCards = this.getCards;
       let cards = unfilteredCards.filter(
         (card) => card.product_id === this.productId
       );
@@ -275,11 +275,16 @@ export default {
         );
         return cards;
       },
+      comments: (state) => state.comments,
+      notifications: (state) => state.notifications.notifications,
     }),
-    ...mapGetters({
-      suppliers: "getSuppliers",
-      comments: "getComments",
-    }),
+    ...mapGetters([
+      "getProductById",
+      "getProgrammeById",
+      "getTeams",
+      "getCards",
+      "getNotifications",
+    ]),
 
     fetchedProductId() {
       let fetchedId = this.$route.params.id;
@@ -287,19 +292,23 @@ export default {
     },
 
     product() {
-      let product = this.$store.getters.getProductById(this.fetchedProductId);
+      let product = this.getProductById(this.fetchedProductId);
       return product;
     },
     programme() {
-      let programme = this.$store.getters.getProgrammeById(
+      let programme = this.getProgrammeById(
         this.product.programme.programme_id
       );
+
       return programme;
     },
 
     team() {
-      let team = this.$store.getters.getTeamsByProgrammeId(this.programme.id);
-      return team;
+      let teams = this.getTeams;
+      let team = teams.filter(
+        (team) => team.programme.programme_id === this.programme.id
+      );
+      return team[0];
     },
     links() {
       return [

@@ -217,7 +217,6 @@ export default {
 
   created() {
     this.$store.dispatch("getNotifications");
-    console.log(this.user);
   },
 };
 </script>
