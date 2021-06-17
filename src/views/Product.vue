@@ -335,6 +335,7 @@ export default {
     this.$store.dispatch("getComments");
     this.$store.dispatch("getTeams");
     this.$store.dispatch("getLineItems");
+    this.$store.dispatch("getNotifications");
   },
 
   mounted() {

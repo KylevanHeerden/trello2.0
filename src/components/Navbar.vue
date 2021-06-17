@@ -197,6 +197,8 @@ export default {
 
   computed: {
     ...mapState({
+      logInStatus: (state) => state.user.loggedIn,
+      user: (state) => state.profile.userProfile,
       links: (state) => state.links,
       notifications(state) {
         let notifications = state.notifications.notifications;
@@ -209,8 +211,6 @@ export default {
           return b.createdOn - a.createdOn;
         });
       },
-      logInStatus: (state) => state.user.loggedIn,
-      user: (state) => state.profile.userProfile,
     }),
     ...mapGetters({}),
   },
@@ -218,6 +218,8 @@ export default {
   created() {
     this.$store.dispatch("getNotifications");
   },
+
+  mounted() {},
 };
 </script>
 
