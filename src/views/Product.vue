@@ -81,6 +81,7 @@ export default {
   data() {
     return {
       productId: String(this.$route.params.id),
+      fetchedProductId: this.$route.params.id,
       update: true,
       Array: [
         // Updates this data according to products page you on
@@ -286,21 +287,34 @@ export default {
       "getNotifications",
     ]),
 
-    fetchedProductId() {
-      let fetchedId = this.$route.params.id;
-      return fetchedId;
-    },
+    // fetchedProductId() {
+    //   let fetchedId = this.$route.params.id;
+    //   return fetchedId;
+    // },
 
     product() {
       let product = this.getProductById(this.fetchedProductId);
+      console.log(product);
       return product;
     },
     programme() {
-      let programme = this.getProgrammeById(
-        this.product.programme.programme_id
-      );
+      if (this.product == undefined) {
+        let programme = this.getProgrammeById(
+          this.product.programme.programme_id
+        );
 
-      return programme;
+        console.log(programme);
+
+        return programme;
+      } else {
+        let programme = this.getProgrammeById(
+          this.product.programme.programme_id
+        );
+
+        console.log(programme);
+
+        return programme;
+      }
     },
 
     team() {
@@ -311,20 +325,36 @@ export default {
       return team[0];
     },
     links() {
-      return [
-        {
-          text: "Programmes",
-          to: "/",
-        },
-        {
-          text: `${this.programme.name}`,
-          to: "/programme/" + `${this.programme.id}`,
-        },
-        {
-          text: `${this.product.name}`,
-          to: "/product/" + this.product.id,
-        },
-      ];
+      if (this.product == undefined) {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+        ];
+      } else if (this.programme == undefined) {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+        ];
+      } else {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+          {
+            text: `${this.programme.name}`,
+            to: "/programme/" + `${this.programme.id}`,
+          },
+          {
+            text: `${this.product.name}`,
+            to: "/product/" + this.product.id,
+          },
+        ];
+      }
     },
   },
   created() {

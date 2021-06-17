@@ -68,6 +68,7 @@ export default {
   data() {
     return {
       programmeId: String(this.$route.params.id),
+      fetchedProgrammeId: this.$route.params.id,
       update: true,
       Array: [
         // Updates this data according to products page you on
@@ -214,11 +215,6 @@ export default {
   },
 
   computed: {
-    fetchedProgrammeId() {
-      let fetchedId = this.$route.params.id;
-      return fetchedId;
-    },
-
     products() {
       let products = this.$store.getters.getProducts;
       return products;
@@ -263,16 +259,25 @@ export default {
       return users;
     },
     links() {
-      return [
-        {
-          text: "Programmes",
-          to: "/",
-        },
-        {
-          text: `${this.programme.name}`,
-          to: "/programme/" + `${this.programme.id}`,
-        },
-      ];
+      if (this.programme == undefined) {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+        ];
+      } else {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+          {
+            text: `${this.programme.name}`,
+            to: "/programme/" + `${this.fetchedProgrammeId}`,
+          },
+        ];
+      }
     },
   },
   created() {

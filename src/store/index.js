@@ -11,6 +11,7 @@ import programmes from "@/store/modules/programmes";
 import users from "@/store/modules/users";
 import profile from "@/store/modules/profile";
 import products from "@/store/modules/products";
+import lists from "@/store/modules/lists";
 
 Vue.use(Vuex);
 
@@ -22,6 +23,7 @@ const store = new Vuex.Store({
     users,
     profile,
     products,
+    lists,
   },
   state: {
     links: [

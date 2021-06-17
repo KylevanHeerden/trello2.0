@@ -136,6 +136,7 @@ export default {
   data() {
     return {
       search: "",
+      fetchedProgrammeId: this.$route.params.id,
     };
   },
   methods: {
@@ -188,16 +189,10 @@ export default {
     ...mapState({
       products: (state) => state.products.products,
     }),
-    ...mapGetters({}),
-    fetchedProgrammeId() {
-      let fetchedId = this.$route.params.id;
-      return fetchedId;
-    },
+    ...mapGetters(["getProgrammeById"]),
 
     programme() {
-      let programme = this.$store.getters.getProgrammeById(
-        this.fetchedProgrammeId
-      );
+      let programme = this.getProgrammeById(this.fetchedProgrammeId);
       return programme;
     },
 
@@ -241,16 +236,25 @@ export default {
     },
 
     links() {
-      return [
-        {
-          text: "Programmes",
-          to: "/",
-        },
-        {
-          text: `${this.programme.name}`,
-          to: "/programme/" + `${this.fetchedProgrammeId}`,
-        },
-      ];
+      if (this.programme == undefined) {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+        ];
+      } else {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+          {
+            text: `${this.programme.name}`,
+            to: "/programme/" + `${this.fetchedProgrammeId}`,
+          },
+        ];
+      }
     },
   },
   created() {
@@ -258,6 +262,8 @@ export default {
     this.$store.dispatch("getProducts");
     this.$store.dispatch("getProgrammes");
   },
+
+  mounted() {},
 };
 </script>
 
