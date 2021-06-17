@@ -10,6 +10,7 @@
         v-bind="attrs"
         v-on="on"
         data-cypress="addNewProgrammeBtn"
+        :disabled="!user.admin"
       >
         <v-icon dark> mdi-plus </v-icon>
         Add Programme
@@ -222,6 +223,7 @@ export default {
   computed: {
     ...mapState({
       users: (state) => state.users.users,
+      user: (state) => state.profile.userProfile,
       currentUser: (state) => state.profile.userProfile,
     }),
 

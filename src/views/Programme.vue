@@ -75,7 +75,7 @@
         >
           Programme Board
         </v-btn>
-        <!--NewProduct btn with programme s prop and @getNewProduct as emited function from child-->
+        <!--NewProduct btn with programme as prop and @getNewProduct as emited function from child-->
         <NewProduct :programme="programme"></NewProduct>
       </v-layout>
     </v-container>

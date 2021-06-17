@@ -84,7 +84,9 @@ export default {
   },
 
   computed: {
-    ...mapState({ programmes: (state) => state.programmes.programmes }),
+    ...mapState({
+      programmes: (state) => state.programmes.programmes,
+    }),
     ...mapGetters({}),
   },
 
