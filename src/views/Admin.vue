@@ -94,7 +94,7 @@ export default {
         .then(function(querySnapshot) {
           querySnapshot.forEach(function(doc) {
             doc.ref.update({
-              hubdoc: false,
+              PO: null,
             });
           });
         });

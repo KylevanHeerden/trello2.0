@@ -355,6 +355,7 @@ export default {
         currency: "R",
         hubdoc: false,
         creator: "",
+        PO: null,
       },
       priceArray: [{ componentId: 0, price: 0 }],
       componentIdArray: [],

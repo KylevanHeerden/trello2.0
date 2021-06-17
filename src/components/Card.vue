@@ -518,13 +518,14 @@
               <v-form>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" sm="6" md="6">
+                    <v-col cols="12" sm="4" md="4">
                       <v-text-field
                         label="Purchase Personal:"
                         v-model="team.procurer.users[0].text"
                       >
                       </v-text-field>
                     </v-col>
+                    <v-col cols="12" sm="2" md="2"></v-col>
                     <v-col cols="12" sm="6" md="6">
                       <v-tooltip
                         top
@@ -569,43 +570,88 @@
                         newCard.purchase_order.length == 0 &&
                           newCard.procured == true
                       "
+                      class="purchaseInfoRowPadding"
                     >
-                      <v-col cols="10" sm="10" md="10">
-                        <vue-dropzone
-                          ref="myVueDropzone"
-                          id="customdropzone"
-                          @vdropzone-file-added="fileAddedPurchase"
-                          :options="dropzoneOptions"
-                          :include-styling="false"
-                          :useCustomSlot="true"
-                          v-on:vdropzone-thumbnail="thumbnail"
+                      <v-col cols="12" sm="5" md="5">
+                        <v-text-field
+                          label="Purchase Order Number:"
+                          v-model="newCard.PO"
+                          :rules="inputRules"
                         >
-                          <div class="dropzone-custom-content">
-                            <h3 style="font-weight: 200">
-                              <v-icon medium>backup</v-icon> Drop files here to
-                              upload
-                            </h3>
-                          </div>
-                        </vue-dropzone>
+                        </v-text-field>
                       </v-col>
-                      <v-col cols="2" sm="2" md="2" class="bordertop3rem">
-                        <v-btn
-                          @click="newPurchaseOrder(purchase_order)"
-                          dark
-                          small
-                          text
-                          class="backgroundColorPrimary "
-                        >
-                          Upload
-                        </v-btn>
+
+                      <v-col cols="12" sm="1" md="1"></v-col>
+
+                      <v-col cols="12" sm="6" md="6">
+                        <v-card flat>
+                          <v-card-text>
+                            <vue-dropzone
+                              ref="myVueDropzone"
+                              id="customdropzone"
+                              @vdropzone-file-added="fileAddedPurchase"
+                              :options="dropzoneOptions"
+                              :include-styling="false"
+                              :useCustomSlot="true"
+                              v-on:vdropzone-thumbnail="thumbnail"
+                            >
+                              <div class="dropzone-custom-content">
+                                <h3 style="font-weight: 200">
+                                  <v-icon medium>backup</v-icon> Drop files here
+                                  to upload
+                                </h3>
+                              </div>
+                            </vue-dropzone>
+                          </v-card-text>
+
+                          <v-card-actions class="justify-end">
+                            <v-tooltip left :disabled="newCard.PO != null">
+                              <template v-slot:activator="{ on, attrs }">
+                                <div v-bind="attrs" v-on="on">
+                                  <v-btn
+                                    @click="newPurchaseOrder(purchase_order)"
+                                    dark
+                                    small
+                                    text
+                                    :disabled="newCard.PO == null"
+                                    class="backgroundColorPrimary "
+                                  >
+                                    Upload
+                                  </v-btn>
+                                </div>
+                              </template>
+                              <span>First add Purchase Order Number</span>
+                            </v-tooltip>
+                          </v-card-actions>
+                        </v-card>
                       </v-col>
                     </v-row>
 
                     <v-col
                       v-else-if="newCard.procured == true"
                       cols="12"
-                      sm="12"
-                      md="12"
+                      sm="4"
+                      md="4"
+                    >
+                      <v-text-field
+                        label="Purchase Order Number"
+                        v-model="newCard.PO"
+                        readonly
+                        data-cypress="purchaseOrderNumber"
+                      >
+                      </v-text-field>
+                    </v-col>
+
+                    <v-col cols="12" sm="2" md="2"></v-col>
+
+                    <v-col
+                      v-if="
+                        newCard.purchase_order.length != 0 &&
+                          newCard.procured == true
+                      "
+                      cols="12"
+                      sm="6"
+                      md="6"
                     >
                       <span>Purchase Order: </span>
                       <v-chip
@@ -957,6 +1003,7 @@ export default {
         quality_approver: this.card.team.quality_approver.user,
         receiver: this.card.team.receiver,
         hubdoc: this.card.hubdoc,
+        PO: this.card.PO,
       },
       quality_selected: false,
       receiver_selected: false,
@@ -1154,7 +1201,7 @@ export default {
 
     handleClick3() {
       const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
-      fbCard.update({ hubdoc: this.newCard.hubdoc }); // updates the list id on the firebase card
+      fbCard.update({ hubdoc: this.newCard.hubdoc }); // updates the hubdoc on the firebase card
       fbCard.update({ updatedOn: new Date() });
     },
 
@@ -1192,6 +1239,10 @@ export default {
     },
 
     newPurchaseOrder(files) {
+      const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+      fbCard.update({ PO: this.newCard.PO }); // updates the PO on the firebase card
+      fbCard.update({ updatedOn: new Date() });
+
       var filesArray = [];
 
       files.forEach((file) => {
@@ -1442,7 +1493,9 @@ export default {
     },
 
     fileLinkEncoded(string) {
-      if (string.includes("#")) {
+      if (string == undefined) {
+        return;
+      } else if (string.includes("#")) {
         return string.replace("#", "%23");
       }
     },
@@ -1597,5 +1650,9 @@ export default {
 
 .qualityRejectedTitle {
   color: tomato;
+}
+
+.purchaseInfoRowPadding {
+  padding-left: 0.5rem;
 }
 </style>

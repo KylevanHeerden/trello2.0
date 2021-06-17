@@ -326,6 +326,7 @@ const store = new Vuex.Store({
               payment_terms: doc.data().payment_terms,
               currency: doc.data().currency,
               hubdoc: doc.data().hubdoc,
+              PO: doc.data().PO,
             };
             cards_array.push(object);
           });
