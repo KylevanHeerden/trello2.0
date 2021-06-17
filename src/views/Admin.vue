@@ -1,27 +1,79 @@
 <template>
   <v-container class="adminContainer">
     <v-row align-content="center" justify="center">
-      <v-col cols="12" lg="4" md="4" sm="4" align-self="center"> </v-col>
-      <v-col cols="12" lg="4" md="4" sm="4" align-self="center">
-        Select the programme to export:
-        <v-select v-model="programme" :items="getProgrammes"></v-select>
-      </v-col>
-      <v-col cols="12" lg="4" md="4" sm="4" align-self="center">
-        <v-btn small dark color="primary" :href="url">
-          Export
-        </v-btn>
-      </v-col>
+      <v-card elevation="2" width="50%">
+        <v-card-text class="v-card-text">
+          Search procurement cards by PO number:
+          <v-text-field v-model="search" data-cypress="searchbar">
+          </v-text-field>
+        </v-card-text>
+        <v-card-actions
+          v-if="search.length > 2"
+          class="justify-center v-card-actions"
+        >
+          <v-list width="70%" rounded>
+            <v-list-item-group>
+              <v-list-item
+                v-for="card in searchCards"
+                :key="card.name"
+                class="list-item"
+                router
+                :to="`/product/${card.product_id}`"
+              >
+                <!-- <v-list-item-icon>
+                  <v-icon small>
+                    fiber_manual_record
+                  </v-icon>
+                </v-list-item-icon> -->
+                <v-list-item-content class="text-center">
+                  <v-list-item-title v-text="card.name"></v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-card-actions>
+      </v-card>
     </v-row>
-    <v-row align-content="center" justify="center">
-      <v-btn :disabled="true" @click="addField()" dark class="addFieldBtn">
-        Add Field
-      </v-btn>
+
+    <v-row align-content="center" justify="center" class="adminRow">
+      <v-card elevation="2" width="50%">
+        <v-card-text class="v-card-text">
+          Select the programme to export as CSV:
+          <v-select v-model="programme" :items="getProgrammes"></v-select>
+        </v-card-text>
+
+        <v-card-actions class="justify-end v-card-actions">
+          <v-btn small dark color="primary" :href="url">
+            Export
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-row>
+
+    <!-- <v-row align-content="center" justify="center" class="adminRow">
+      <v-card elevation="2" width="50%">
+        <v-card-text>
+          Add a field to each doc in firebase:
+        </v-card-text>
+        <v-card-actions class="justify-end v-card-actions">
+          <v-btn
+            :disabled="true"
+            @click="addField()"
+            small
+            dark
+            class="addFieldBtn"
+          >
+            Add Field
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-row> -->
   </v-container>
 </template>
 
 <script>
 // @ is an alias to /src
+import { mapActions, mapGetters, mapState } from "vuex";
 import { db } from "@/firebase";
 
 export default {
@@ -31,9 +83,11 @@ export default {
     return {
       programme: "",
       clicked: false,
+      search: "",
     };
   },
   methods: {
+    // The addField function adds a field to all the docs in a firebase collection.
     addField() {
       db.collection("cards")
         .get()
@@ -48,6 +102,10 @@ export default {
     },
   },
   computed: {
+    ...mapState({
+      cards: (state) => state.cards,
+    }),
+
     url() {
       return `https://${process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/${this.programme}`;
     },
@@ -59,10 +117,20 @@ export default {
       });
       return select_options;
     },
+
+    searchCards() {
+      return this.cards.filter((card) => {
+        let cardPO = card.name;
+        if (cardPO.toLowerCase().match(this.search.toLowerCase())) {
+          return card;
+        }
+      });
+    },
   },
 
   mounted() {
     this.$store.dispatch("getProgrammes");
+    this.$store.dispatch("getCards");
   },
 };
 </script>
@@ -94,5 +162,23 @@ export default {
 
 .addFieldBtn {
   background-color: #37474f !important;
+}
+
+.adminRow {
+  margin-top: 2rem;
+}
+
+.v-card-text {
+  padding: 2rem;
+  padding-bottom: 0rem;
+}
+
+.v-card-actions {
+  padding-bottom: 1rem;
+  padding-right: 2rem;
+}
+
+.list-item {
+  border: solid 1px gray;
 }
 </style>
