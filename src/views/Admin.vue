@@ -27,8 +27,11 @@
                 </v-list-item-icon> -->
                 <v-list-item-content class="text-center">
                   <v-list-item-title
-                    v-text="`${card.name} - ${card.PO_number}`"
+                    v-text="`${card.name}`"
                   ></v-list-item-title>
+                  <v-list-item-subtitle
+                    v-text="`PO#: ${card.PO_number}`"
+                  ></v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
