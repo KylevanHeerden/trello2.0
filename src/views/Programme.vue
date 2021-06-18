@@ -91,7 +91,7 @@
         data-cypress="productCard"
       >
         <!--filteredSearchProducts is function to filter products on search-->
-        <router-link :to="{ name: 'Product', params: { id: product.id } }">
+        <!-- <router-link :to="{ name: 'Product', params: { id: product.id } }">
           <v-layout :class="`pa-3 product ${product.status}`">
             <v-flex xs="12" md="6">
               <div class="caption grey--text">Product Name</div>
@@ -117,11 +117,43 @@
               >
                 {{ product.status }}
               </v-chip>
-              <!--Here we bind the class so that the color of chip changes by status-->
+              
             </v-flex>
           </v-layout>
           <v-divider></v-divider>
-        </router-link>
+        </router-link> -->
+
+        <router-link
+          :to="{ name: 'Product', params: { id: product.id } }"
+        ></router-link>
+        <v-row :class="`pa-3 product ${product.status}`">
+          <v-col cols="12" sm="3" md="3">
+            <div class="caption grey--text">Product Name</div>
+            <div class="card-text-black">{{ product.name }}</div>
+          </v-col>
+          <v-col cols="12" sm="3" md="3">
+            <div class="caption grey--text">Person</div>
+            <div class="card-text-black">{{ product.person }}</div>
+          </v-col>
+          <v-col cols="12" sm="3" md="3">
+            <div class="caption grey--text">Edit date</div>
+            <div class="card-text-black">
+              {{ dateOnly(product.updatedOn) }}
+            </div>
+          </v-col>
+          <v-col cols="12" sm="3" md="3">
+            <v-chip
+              small
+              :color="`${chipColor(product.status)}`"
+              :class="
+                `${product.status} white--text caption my-2 fixedSize justify-center`
+              "
+            >
+              {{ product.status }}
+            </v-chip>
+            <!--Here we bind the class so that the color of chip changes by status-->
+          </v-col>
+        </v-row>
       </v-card>
     </v-container>
   </div>

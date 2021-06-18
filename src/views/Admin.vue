@@ -8,7 +8,7 @@
           </v-text-field>
         </v-card-text>
         <v-card-actions
-          v-if="search.length > 0"
+          v-if="search.length > 2"
           class="justify-center v-card-actions"
         >
           <v-list width="70%" rounded>
@@ -99,7 +99,7 @@ export default {
         .then(function(querySnapshot) {
           querySnapshot.forEach(function(doc) {
             doc.ref.update({
-              PO_number: null,
+              POP: [],
             });
           });
         });
