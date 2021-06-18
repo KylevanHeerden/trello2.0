@@ -8,7 +8,7 @@
           </v-text-field>
         </v-card-text>
         <v-card-actions
-          v-if="search.length > 2"
+          v-if="search.length > 0"
           class="justify-center v-card-actions"
         >
           <v-list width="70%" rounded>
@@ -26,7 +26,9 @@
                   </v-icon>
                 </v-list-item-icon> -->
                 <v-list-item-content class="text-center">
-                  <v-list-item-title v-text="card.name"></v-list-item-title>
+                  <v-list-item-title
+                    v-text="`${card.name} - ${card.PO_number}`"
+                  ></v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
@@ -94,7 +96,7 @@ export default {
         .then(function(querySnapshot) {
           querySnapshot.forEach(function(doc) {
             doc.ref.update({
-              PO: null,
+              PO_number: null,
             });
           });
         });
@@ -120,8 +122,10 @@ export default {
 
     searchCards() {
       return this.cards.filter((card) => {
-        let cardPO = card.name;
-        if (cardPO.toLowerCase().match(this.search.toLowerCase())) {
+        let cardPO = card.PO_number;
+        if (cardPO == null) {
+          return;
+        } else if (cardPO.toLowerCase().match(this.search.toLowerCase())) {
           return card;
         }
       });

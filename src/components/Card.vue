@@ -575,7 +575,7 @@
                       <v-col cols="12" sm="5" md="5">
                         <v-text-field
                           label="Purchase Order Number:"
-                          v-model="newCard.PO"
+                          v-model="newCard.PO_number"
                           :rules="inputRules"
                         >
                         </v-text-field>
@@ -597,15 +597,18 @@
                             >
                               <div class="dropzone-custom-content">
                                 <h3 style="font-weight: 200">
-                                  <v-icon medium>backup</v-icon> Drop files here
-                                  to upload
+                                  <v-icon medium>backup</v-icon> Drop PO here to
+                                  upload
                                 </h3>
                               </div>
                             </vue-dropzone>
                           </v-card-text>
 
                           <v-card-actions class="justify-end">
-                            <v-tooltip left :disabled="newCard.PO != null">
+                            <v-tooltip
+                              left
+                              :disabled="newCard.PO_number != null"
+                            >
                               <template v-slot:activator="{ on, attrs }">
                                 <div v-bind="attrs" v-on="on">
                                   <v-btn
@@ -613,7 +616,7 @@
                                     dark
                                     small
                                     text
-                                    :disabled="newCard.PO == null"
+                                    :disabled="newCard.PO_number == null"
                                     class="backgroundColorPrimary "
                                   >
                                     Upload
@@ -635,7 +638,7 @@
                     >
                       <v-text-field
                         label="Purchase Order Number"
-                        v-model="newCard.PO"
+                        v-model="newCard.PO_number"
                         readonly
                         data-cypress="purchaseOrderNumber"
                       >
@@ -667,6 +670,83 @@
                         {{ file.file_name }}
                       </v-chip>
                     </v-col>
+                    <v-row
+                      justify="center"
+                      align-content="center"
+                      v-if="
+                        newCard.PO_number != null &&
+                          newCard.purchase_order.length != 0
+                      "
+                    >
+                      <v-col
+                        cols="12"
+                        sm="12"
+                        md="12"
+                        class="text-center"
+                        v-if="newCard.POP.length == 0"
+                      >
+                        <v-btn
+                          color="primary"
+                          small
+                          dark
+                          @click="addPOPtoggle = !addPOPtoggle"
+                        >
+                          Add POP
+                        </v-btn>
+
+                        <v-card flat v-if="addPOPtoggle">
+                          <v-card-text>
+                            <vue-dropzone
+                              ref="myVueDropzone"
+                              id="customdropzone"
+                              @vdropzone-file-added="fileAddedPOP"
+                              :options="dropzoneOptions"
+                              :include-styling="false"
+                              :useCustomSlot="true"
+                              v-on:vdropzone-thumbnail="thumbnail"
+                            >
+                              <div class="dropzone-custom-content">
+                                <h3 style="font-weight: 200">
+                                  <v-icon medium>backup</v-icon> Drop POP here
+                                  to upload
+                                </h3>
+                              </div>
+                            </vue-dropzone>
+                          </v-card-text>
+
+                          <v-card-actions class="justify-end">
+                            <v-btn
+                              @click="newPOP(POP)"
+                              dark
+                              small
+                              text
+                              class="backgroundColorPrimary "
+                            >
+                              Upload
+                            </v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-col>
+
+                      <v-row v-if="newCard.POP.length != 0">
+                        <v-col cols="12" sm="3" md="3"></v-col>
+                        <v-col cols="12" sm="9" md="9" class="text-center">
+                          <span>Proof of payment: </span>
+                          <v-chip
+                            v-for="file in newCard.POP"
+                            :key="fileLinkEncoded(file.link)"
+                            :href="fileLinkEncoded(file.link)"
+                            target="_blank"
+                            color="primary"
+                            dark
+                            class="mx-1"
+                            small
+                          >
+                            {{ file.file_name }}
+                          </v-chip>
+                        </v-col>
+                      </v-row>
+                    </v-row>
                   </v-row>
                   <Comments
                     :cardComments="cardComments"
@@ -1003,12 +1083,15 @@ export default {
         quality_approver: this.card.team.quality_approver.user,
         receiver: this.card.team.receiver,
         hubdoc: this.card.hubdoc,
-        PO: this.card.PO,
+        PO_number: this.card.PO_number,
+        POP: this.card.POP,
       },
       quality_selected: false,
       receiver_selected: false,
       confirmationDialog: false,
       purchase_order: [],
+      addPOPtoggle: false,
+      POP: [],
       lineItemsArray: this.lineItemsFiltered,
       thisLineItem_unit_price: "",
       thisLineItem_quantity: "",
@@ -1240,7 +1323,7 @@ export default {
 
     newPurchaseOrder(files) {
       const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
-      fbCard.update({ PO: this.newCard.PO }); // updates the PO on the firebase card
+      fbCard.update({ PO_number: this.newCard.PO_number }); // updates the PO_number on the firebase card
       fbCard.update({ updatedOn: new Date() });
 
       var filesArray = [];
@@ -1259,6 +1342,29 @@ export default {
       });
 
       this.newCard.purchase_order = filesArray;
+    },
+
+    fileAddedPOP(file) {
+      this.POP.push(file);
+    },
+
+    newPOP(files) {
+      const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+
+      var filesArray = [];
+
+      files.forEach((file) => {
+        var fileName = file.name;
+        var fileref = storage
+          .ref()
+          .child(`POP/${this.card.product_id}/${this.card.id}/${fileName}`);
+
+        fileref.put(file);
+        let fileObjt = { file_name: fileName, file_doc: file };
+        filesArray.push(fileObjt);
+      });
+
+      this.newCard.POP = filesArray;
     },
 
     fileAddedQuality(file) {
@@ -1497,6 +1603,8 @@ export default {
         return;
       } else if (string.includes("#")) {
         return string.replace("#", "%23");
+      } else {
+        return string;
       }
     },
   },

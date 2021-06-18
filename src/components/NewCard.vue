@@ -355,7 +355,8 @@ export default {
         currency: "R",
         hubdoc: false,
         creator: "",
-        PO: null,
+        PO_number: null,
+        POP: [],
       },
       priceArray: [{ componentId: 0, price: 0 }],
       componentIdArray: [],
@@ -435,6 +436,8 @@ export default {
           currency: this.newCard.currency,
           files_count: this.newCard.files.length,
           hubdoc: this.newCard.hubdoc,
+          PO_number: this.newCard.PO_number,
+          POP: this.newCard.POP,
         };
 
         await db

@@ -224,6 +224,13 @@ exports.addFilesToCard2 = functions.storage.object().onFinalize((object) => {
           link: `https://storage.googleapis.com/purchase-app-staging.appspot.com/${filePath}`,
         }),
       });
+    } else if (filePathArray[0] == "POP") {
+      cardRef.update({
+        POP: admin.firestore.FieldValue.arrayUnion({
+          file_name: filename,
+          link: `https://storage.googleapis.com/purchase-app-staging.appspot.com/${filePath}`,
+        }),
+      });
     }
   }
 
