@@ -639,8 +639,8 @@
                       <v-text-field
                         label="Purchase Order Number"
                         v-model="newCard.PO_number"
-                        readonly
                         data-cypress="purchaseOrderNumber"
+                        @change="updatePOnumber()"
                       >
                       </v-text-field>
                     </v-col>
@@ -1606,6 +1606,12 @@ export default {
       } else {
         return string;
       }
+    },
+
+    updatePOnumber() {
+      const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+      fbCard.update({ PO_number: this.newCard.PO_number }); // updates the PO_number on the firebase card
+      fbCard.update({ updatedOn: new Date() });
     },
   },
 

@@ -3,7 +3,11 @@
     <v-row align-content="center" justify="center">
       <v-card elevation="2" width="50%">
         <v-card-text class="v-card-text">
-          Search procurement cards by PO number:
+          Search procurement cards by:
+          <v-radio-group v-model="searchOption" row mandatory>
+            <v-radio label="PO Number" value="PO#"></v-radio>
+            <v-radio label="Supplier" value="Supplier"></v-radio>
+          </v-radio-group>
           <v-text-field v-model="search" data-cypress="searchbar">
           </v-text-field>
         </v-card-text>
@@ -11,31 +15,33 @@
           v-if="search.length > 2"
           class="justify-center v-card-actions"
         >
-          <v-list width="70%" rounded>
-            <v-list-item-group>
-              <v-list-item
-                v-for="card in searchCards"
-                :key="card.name"
-                class="list-item"
-                router
-                :to="`/product/${card.product_id}`"
-              >
-                <!-- <v-list-item-icon>
-                  <v-icon small>
-                    fiber_manual_record
-                  </v-icon>
-                </v-list-item-icon> -->
-                <v-list-item-content class="text-center">
-                  <v-list-item-title
-                    v-text="`${card.name}`"
-                  ></v-list-item-title>
-                  <v-list-item-subtitle
-                    v-text="`PO#: ${card.PO_number}`"
-                  ></v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
+          <v-virtual-scroll height="400" item-height="75" :items="searchCards">
+            <template v-slot:default="{ item }">
+              <v-list width="60%" rounded>
+                <v-list-item-group>
+                  <v-list-item
+                    :key="item.PO_number"
+                    class="list-item"
+                    router
+                    :to="`/product/${item.product_id}`"
+                  >
+                    <v-list-item-content class="text-center">
+                      <v-list-item-title
+                        v-text="`${item.name}`"
+                      ></v-list-item-title>
+                      <v-list-item-subtitle v-if="searchOption === 'PO#'"
+                        >PO#: {{ item.PO_number }}</v-list-item-subtitle
+                      >
+                      <v-list-item-subtitle v-else
+                        >Supplier:
+                        {{ item.supplier_name }}</v-list-item-subtitle
+                      >
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+            </template>
+          </v-virtual-scroll>
         </v-card-actions>
       </v-card>
     </v-row>
@@ -89,6 +95,7 @@ export default {
       programme: "",
       clicked: false,
       search: "",
+      searchOption: null,
     };
   },
   methods: {
@@ -124,14 +131,27 @@ export default {
     },
 
     searchCards() {
-      return this.cards.filter((card) => {
-        let cardPO = card.PO_number;
-        if (cardPO == null) {
-          return;
-        } else if (cardPO.toLowerCase().match(this.search.toLowerCase())) {
-          return card;
-        }
-      });
+      if (this.searchOption == "PO#") {
+        return this.cards.filter((card) => {
+          let cardPO = card.PO_number;
+          if (cardPO == null) {
+            return;
+          } else if (cardPO.toLowerCase().match(this.search.toLowerCase())) {
+            return card;
+          }
+        });
+      } else {
+        return this.cards.filter((card) => {
+          let cardSupplierName = card.supplier_name;
+          if (cardSupplierName == null) {
+            return;
+          } else if (
+            cardSupplierName.toLowerCase().match(this.search.toLowerCase())
+          ) {
+            return card;
+          }
+        });
+      }
     },
   },
 
@@ -185,7 +205,18 @@ export default {
   padding-right: 2rem;
 }
 
+.v-list {
+  position: absolute;
+  left: 20%;
+}
+
 .list-item {
-  border: solid 1px gray;
+  border: solid 1px #cfd8dc;
+  background-color: #cfd8dc;
+  color: white;
+}
+
+.list-item:hover {
+  border: solid 2px #37474f;
 }
 </style>
