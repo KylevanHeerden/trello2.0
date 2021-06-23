@@ -306,9 +306,11 @@ export default {
       ],
       inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
       inputRulesConNum: [
-        (v) =>
-          v.match(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/) ||
-          "Invalid contact number",
+        // (v) =>
+        //   v.match(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/) ||
+        //   "Invalid contact number",
+        (v) => v.match(/^[0-9]*$/) || "Invalid contact number",
+        (v) => v.length >= 10 || "Invalid contact number",
       ],
       inputRulesEmail: [
         (v) =>
