@@ -140,16 +140,19 @@
             <v-icon>clear</v-icon>
           </v-btn>
         </v-card-actions>
-        <v-card-title class="cardTitle" @click="forward(n.product.product_id)">
+        <v-card-title
+          class="cardTitle"
+          @click="forward(n.id, n.product.product_id)"
+        >
           {{ n.product.product_name }}
         </v-card-title>
         <v-card-subtitle
           class="cardSubtitle"
-          @click="forward(n.product.product_id)"
+          @click="forward(n.id, n.product.product_id)"
         >
           {{ n.programme.programme_name }}
         </v-card-subtitle>
-        <v-card-text @click="forward(n.product.product_id)">
+        <v-card-text @click="forward(n.id, n.product.product_id)">
           The purchase request for {{ n.product.product_name }} is awaiting
           <em v-if="n.status == 'Waiting'" class="emColor">Delivery</em>
           <em v-else-if="n.status == 'Procured'" class="emColor">
@@ -190,8 +193,10 @@ export default {
         this.drawer2 = !this.drawer2;
       }
     },
-    forward(productId) {
+    forward(notificationId, productId) {
       this.$router.push(`/product/${productId}`);
+
+      this.removeNotification(notificationId);
     },
   },
 
