@@ -107,14 +107,14 @@ export default {
         },
         {
           id: 4,
-          list_name: "Purchasing",
+          list_name: "Activate Purchase",
 
           list_status: "Procurement",
           cards: [],
         },
         {
           id: 5,
-          list_name: "Awaiting Delivery",
+          list_name: "Follow Up",
           list_status: "Waiting",
           cards: [],
         },
