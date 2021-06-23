@@ -59,11 +59,32 @@
           <template v-slot:activator="{ on }">
             <v-btn small text color="grey" @click="sortByStatus" v-on="on">
               <!--Sort by status btn-->
-              <v-icon left small>person</v-icon>
+              <v-icon left small>info</v-icon>
               <span class="caption text-lowercase">By status</span>
             </v-btn>
           </template>
           <span>Sort by status</span>
+        </v-tooltip>
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-btn
+              small
+              text
+              color="grey"
+              @click="myProductsClicked = !myProductsClicked"
+              v-on="on"
+              :class="{ activeBtn: myProductsClicked }"
+            >
+              <!--Sort by status btn-->
+              <v-icon left small>person</v-icon>
+              <span
+                class="caption text-lowercase "
+                :class="{ activeBtnText: myProductsClicked }"
+                >By My Products</span
+              >
+            </v-btn>
+          </template>
+          <span>Sort by users products</span>
         </v-tooltip>
         <v-spacer></v-spacer>
         <v-btn
@@ -131,6 +152,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import NewProduct from "@/components/NewProduct.vue";
+import products from "../store/modules/products";
 
 export default {
   components: { NewProduct },
@@ -138,6 +160,7 @@ export default {
     return {
       search: "",
       fetchedProgrammeId: this.$route.params.id,
+      myProductsClicked: false,
     };
   },
   methods: {
@@ -189,6 +212,7 @@ export default {
   computed: {
     ...mapState({
       products: (state) => state.products.products,
+      currentUser: (state) => state.profile.userProfile,
     }),
     ...mapGetters(["getProgrammeById"]),
 
@@ -226,14 +250,31 @@ export default {
       );
       return filteredProducts;
     },
+
+    filteredProducts2() {
+      let filteredProducts2 = this.filteredProducts.filter(
+        (product) => product.person_id === this.currentUser.id
+      );
+      return filteredProducts2;
+    },
     //Filters the filtered products based on the input
     filteredSearchProducts() {
-      return this.filteredProducts.filter((product) => {
-        let productName = product.name;
-        if (productName.toLowerCase().match(this.search.toLowerCase())) {
-          return product;
-        }
-      });
+      this.filteredProducts2;
+      if (this.myProductsClicked) {
+        return this.filteredProducts2.filter((product) => {
+          let productName = product.name;
+          if (productName.toLowerCase().match(this.search.toLowerCase())) {
+            return product;
+          }
+        });
+      } else {
+        return this.filteredProducts.filter((product) => {
+          let productName = product.name;
+          if (productName.toLowerCase().match(this.search.toLowerCase())) {
+            return product;
+          }
+        });
+      }
     },
 
     links() {
@@ -262,6 +303,7 @@ export default {
     // This fires the action to fire the mutation to fill the store
     this.$store.dispatch("getProducts");
     this.$store.dispatch("getProgrammes");
+    this.$store.dispatch("getUsers");
   },
 
   mounted() {},
@@ -291,6 +333,10 @@ export default {
 
 .product.Quality {
   border-left: 4px solid #5c6bc0;
+}
+
+.activeBtn {
+  border: solid 2px #37474f;
 }
 
 .fixedSize {

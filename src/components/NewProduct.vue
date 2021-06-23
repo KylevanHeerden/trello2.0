@@ -112,6 +112,7 @@ export default {
           },
           status: "Quotes",
           person: this.currentUser.name + " " + this.currentUser.surname,
+          person_id: this.currentUser.id,
           cards: [],
           createdOn: new Date(),
           updatedOn: new Date(),

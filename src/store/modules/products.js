@@ -34,6 +34,7 @@ export default {
               name: doc.data().name,
               programme: doc.data().programme,
               person: doc.data().person,
+              person_id: doc.data().person_id,
               status: doc.data().status,
             };
             products_array.push(object);
