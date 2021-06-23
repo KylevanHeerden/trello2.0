@@ -77,11 +77,7 @@
             >
               <!--Sort by status btn-->
               <v-icon left small>person</v-icon>
-              <span
-                class="caption text-lowercase "
-                :class="{ activeBtnText: myProductsClicked }"
-                >By My Products</span
-              >
+              <span class="caption text-lowercase ">By My Products</span>
             </v-btn>
           </template>
           <span>Sort by users products</span>
