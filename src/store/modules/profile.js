@@ -29,6 +29,8 @@ export default {
         teams: userColProf.data().teams,
         admin: userColProf.data().admin,
         slack_id: userColProf.data().slack_id,
+        slackNotify: userColProf.data().slackNotify,
+        emailNotify: userColProf.data().emailNotify,
       };
 
       commit("setUserProfile", userProfile);

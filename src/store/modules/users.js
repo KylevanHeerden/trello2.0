@@ -31,6 +31,8 @@ export default {
               updatedOn: doc.data().updatedOn,
               teams: doc.data().teams,
               slack_id: doc.data().slack_id,
+              slackNotify: doc.data().slackNotify,
+              emailNotify: doc.data().emailNotify,
             };
             users_array.push(object);
           });

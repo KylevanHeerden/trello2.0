@@ -35,24 +35,59 @@
         </v-col>
         <v-col> </v-col>
       </v-row>
+
+      <v-row align="center">
+        <v-col cols="4"></v-col>
+        <v-col cols="2">
+          <v-checkbox
+            v-model="emailNotify"
+            :label="`Email notifications`"
+            @click="saveEmailNotify"
+          ></v-checkbox>
+        </v-col>
+        <v-col cols="2">
+          <v-checkbox
+            v-model="slackNotify"
+            :label="`Slack notifications`"
+            @click="saveSlackNotify"
+          ></v-checkbox>
+        </v-col>
+        <v-col cols="4"></v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
+import { db } from "@/firebase";
 
 export default {
   name: "Profile",
   components: {},
   data() {
-    return {};
+    return {
+      emailNotify: null,
+      slackNotify: null,
+    };
   },
-  methods: {},
   computed: {
     user() {
       let user = this.$store.getters.getUserProfile;
+      this.emailNotify = user.emailNotify;
+      this.slackNotify = user.slackNotify;
       return user;
+    },
+  },
+  methods: {
+    saveEmailNotify() {
+      const fbUser = db.collection("users").doc(this.user.id); // gets the firebase card
+      fbUser.update({ emailNotify: this.emailNotify });
+    },
+
+    saveSlackNotify() {
+      const fbUser = db.collection("users").doc(this.user.id); // gets the firebase card
+      fbUser.update({ slackNotify: this.slackNotify });
     },
   },
 

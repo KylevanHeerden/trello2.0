@@ -434,18 +434,20 @@ exports.sendSlack = functions.firestore
         ],
       };
 
-      axios
-        .post("https://slack.com/api/chat.postMessage", messageData, {
-          headers: {
-            Authorization: `Bearer ${bot_token}`,
-          },
-        })
-        .then((rep) => {
-          console.log(rep);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      if (userData.slackNotify === true) {
+        axios
+          .post("https://slack.com/api/chat.postMessage", messageData, {
+            headers: {
+              Authorization: `Bearer ${bot_token}`,
+            },
+          })
+          .then((rep) => {
+            console.log(rep);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     }
   });
 
@@ -476,18 +478,45 @@ exports.sendSlack2 = functions.firestore
     const productData = productSnap.data();
     const productName = productData.name;
 
+    let users = [];
+
+    const usersRef = db.collection("users");
+    const usersSnap = await usersRef.get();
+
+    usersSnap.forEach((doc) => {
+      let user_objt = {
+        email: doc.data().email,
+        slack_id: doc.data().slack_id,
+        emailNotify: doc.data().emailNotify,
+        slackNotify: doc.data().slackNotify,
+      };
+
+      if (doc.data().slackNotify === true) {
+        users.push(user_objt);
+      }
+    });
+
     let slackIdArray = [];
 
     techApprovers.forEach((user) => {
-      slackIdArray.push(user.slack_id);
+      if (users.some((e) => e.slack_id === user.slack_id)) {
+        /* users contains the element we're looking for */
+        slackIdArray.push(user.slack_id);
+      }
     });
 
     purchaseApprovers.forEach((user) => {
-      slackIdArray.push(user.slack_id);
+      if (users.some((e) => e.slack_id === user.slack_id)) {
+        /* users contains the element we're looking for */
+        slackIdArray.push(user.slack_id);
+      }
     });
 
     procures.forEach((user) => {
-      slackIdArray.push(user.slack_id);
+      if (users.some((e) => e.slack_id === user.slack_id)) {
+        /* users contains the element we're looking for */
+        slackIdArray.push(user.slack_id);
+      }
     });
 
     var unique = slackIdArray.filter((v, i, a) => a.indexOf(v) === i);
@@ -580,54 +609,65 @@ exports.sendEmailNotification = functions.firestore
   .onCreate(async (snapshot) => {
     const data = snapshot.data();
 
-    const cardRef = db.doc(`cards/${data.card_id}`);
-    const cardSnap = await cardRef.get();
-    const cardData = cardSnap.data();
-    const cardName = cardData.name;
-    cardName;
+    const userRef = db.doc(`users/${data.user_id}`);
+    const userSnap = await userRef.get();
+    const userData = userSnap.data();
 
-    // Create the transporter with the required configuration for Outlook
-    // change the user and pass !
-    var transporter = nodemailer.createTransport({
-      host: "smtp-mail.outlook.com", // hostname
-      secureConnection: false, // TLS requires secureConnection to be false
-      port: 587, // port for secure SMTP
-      tls: {
-        ciphers: "SSLv3",
-      },
-      auth: {
-        user: functions.config().outlook.email,
-        pass: functions.config().outlook.password,
-      },
-    });
+    if (userData.emailNotify) {
+      const cardRef = db.doc(`cards/${data.card_id}`);
+      const cardSnap = await cardRef.get();
+      const cardData = cardSnap.data();
+      const cardName = cardData.name;
 
-    const handlebarOptions = {
-      viewEngine: {
+      // Create the transporter with the required configuration for Outlook
+      // change the user and pass !
+      var transporter = nodemailer.createTransport({
+        host: "smtp-mail.outlook.com", // hostname
+        secureConnection: false, // TLS requires secureConnection to be false
+        port: 587, // port for secure SMTP
+        tls: {
+          ciphers: "SSLv3",
+        },
+        auth: {
+          user: functions.config().outlook.email,
+          pass: functions.config().outlook.password,
+        },
+      });
+
+      const handlebarOptions = {
+        viewEngine: {
+          extName: ".html",
+          partialsDir: path.resolve("./views/"),
+          defaultLayout: false,
+        },
+        viewPath: path.resolve("./views/"),
         extName: ".html",
-        partialsDir: path.resolve("./views/"),
-        defaultLayout: false,
-      },
-      viewPath: path.resolve("./views/"),
-      extName: ".html",
-    };
+      };
 
-    // tell transporter to use template compiler
-    transporter.use("compile", hbs(handlebarOptions));
+      // tell transporter to use template compiler
+      transporter.use("compile", hbs(handlebarOptions));
 
-    // setup e-mail data, even with unicode symbols
-    var mailOptions = {
-      from: '"RaptorApp" <dc@nanodyn.co.za>', // sender address (who sends)
-      to: "kylevh@nanodyn.co.za", // list of receivers (who receives)
-      subject: `RaptorApp Notification - Programme`, // Subject line
-      template: "emailNotification",
-    };
+      // setup e-mail data, even with unicode symbols
+      var mailOptions = {
+        from: '"RaptorApp" <dc@nanodyn.co.za>', // sender address (who sends)
+        to: `${userData.email}`, // list of receivers (who receives)
+        subject: "RaptorApp Notification", // Subject line
+        template: "emailNotification",
+        context: {
+          programmeName: `${data.programme.programme_name}`,
+          cardName: `${cardName}`,
+          action: `${data.status}`,
+          cardLink: `https://purchase-app-staging.web.app/product/${data.product.product_id}`,
+        },
+      };
 
-    // send mail with defined transport object
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        return console.log(error);
-      }
+      // send mail with defined transport object
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          return console.log(error);
+        }
 
-      console.log("Message sent: " + info.response);
-    });
+        console.log("Message sent: " + info.response);
+      });
+    }
   });

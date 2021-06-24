@@ -61,14 +61,14 @@
       </v-card>
     </v-row>
 
-    <!-- <v-row align-content="center" justify="center" class="adminRow">
+    <v-row align-content="center" justify="center" class="adminRow">
       <v-card elevation="2" width="50%">
         <v-card-text>
           Add a field to each doc in firebase:
         </v-card-text>
         <v-card-actions class="justify-end v-card-actions">
           <v-btn
-            :disabled="true"
+            :disabled="false"
             @click="addField()"
             small
             dark
@@ -78,7 +78,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-row> -->
+    </v-row>
   </v-container>
 </template>
 
@@ -101,12 +101,12 @@ export default {
   methods: {
     // The addField function adds a field to all the docs in a firebase collection.
     addField() {
-      db.collection("cards")
+      db.collection("users")
         .get()
         .then(function(querySnapshot) {
           querySnapshot.forEach(function(doc) {
             doc.ref.update({
-              POP: [],
+              slackNotify: true,
             });
           });
         });

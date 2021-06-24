@@ -217,6 +217,7 @@ const store = new Vuex.Store({
         name: form.name,
         surname: form.surname,
         id: user.uid,
+        email: user.email,
         createdOn: new Date(),
         updatedOn: new Date(),
         teams: [],

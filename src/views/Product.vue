@@ -294,7 +294,7 @@ export default {
 
     product() {
       let product = this.getProductById(this.fetchedProductId);
-      console.log(product);
+
       return product;
     },
     programme() {
@@ -303,15 +303,11 @@ export default {
           this.product.programme.programme_id
         );
 
-        console.log(programme);
-
         return programme;
       } else {
         let programme = this.getProgrammeById(
           this.product.programme.programme_id
         );
-
-        console.log(programme);
 
         return programme;
       }
