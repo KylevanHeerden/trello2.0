@@ -1,7 +1,11 @@
 const functions = require("firebase-functions");
 // const gcs = require("@google-cloud/storage");
+const path = require("path");
 const axios = require("axios");
 const admin = require("firebase-admin");
+const nodemailer = require("nodemailer");
+const cors = require("cors")({ origin: true });
+const hbs = require("nodemailer-express-handlebars");
 
 admin.initializeApp();
 
@@ -569,3 +573,61 @@ exports.docsChange = functions.https.onRequest((request, response) => {
   //   });
   return response.status(200).send("Done!");
 });
+
+// Send email notification when new notification is added to firestore
+exports.sendEmailNotification = functions.firestore
+  .document("notifications/{notificationId}")
+  .onCreate(async (snapshot) => {
+    const data = snapshot.data();
+
+    const cardRef = db.doc(`cards/${data.card_id}`);
+    const cardSnap = await cardRef.get();
+    const cardData = cardSnap.data();
+    const cardName = cardData.name;
+    cardName;
+
+    // Create the transporter with the required configuration for Outlook
+    // change the user and pass !
+    var transporter = nodemailer.createTransport({
+      host: "smtp-mail.outlook.com", // hostname
+      secureConnection: false, // TLS requires secureConnection to be false
+      port: 587, // port for secure SMTP
+      tls: {
+        ciphers: "SSLv3",
+      },
+      auth: {
+        user: functions.config().outlook.email,
+        pass: functions.config().outlook.password,
+      },
+    });
+
+    const handlebarOptions = {
+      viewEngine: {
+        extName: ".html",
+        partialsDir: path.resolve("./views/"),
+        defaultLayout: false,
+      },
+      viewPath: path.resolve("./views/"),
+      extName: ".html",
+    };
+
+    // tell transporter to use template compiler
+    transporter.use("compile", hbs(handlebarOptions));
+
+    // setup e-mail data, even with unicode symbols
+    var mailOptions = {
+      from: '"RaptorApp" <dc@nanodyn.co.za>', // sender address (who sends)
+      to: "kylevh@nanodyn.co.za", // list of receivers (who receives)
+      subject: `RaptorApp Notification - Programme`, // Subject line
+      template: "emailNotification",
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, function(error, info) {
+      if (error) {
+        return console.log(error);
+      }
+
+      console.log("Message sent: " + info.response);
+    });
+  });
