@@ -661,7 +661,7 @@ exports.sendEmailNotification = functions.firestore
           programmeName: `${data.programme.programme_name}`,
           cardName: `${cardName}`,
           action: `${data.status}`,
-          cardLink: `https://purchase-app-staging.web.app/product/${data.product.product_id}`,
+          cardLink: `https://purchase-app-f14b0.web.app/product/${data.product.product_id}`,
         },
       };
 
