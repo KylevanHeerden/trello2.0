@@ -257,7 +257,7 @@ exports.sendSlack = functions.firestore
     const cardData = cardSnap.data();
     const cardName = cardData.name;
 
-    if (data.status == "Waiting") {
+    if (data.status == "FollowUp") {
       const userRef = db.doc(`users/${data.user_id}`);
 
       const userSnap = await userRef.get();
@@ -280,7 +280,7 @@ exports.sendSlack = functions.firestore
             type: "section",
             text: {
               type: "plain_text",
-              text: `The following card ${cardName} is awaiting delivery. Please follow the link below to complete the approval action.`,
+              text: `The following card ${cardName} is awaiting follow up. Please follow the link below to complete the approval action.`,
               emoji: true,
             },
           },
@@ -308,18 +308,20 @@ exports.sendSlack = functions.firestore
         ],
       };
 
-      axios
-        .post("https://slack.com/api/chat.postMessage", messageData, {
-          headers: {
-            Authorization: `Bearer ${bot_token}`,
-          },
-        })
-        .then((rep) => {
-          console.log(rep);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      if (userData.slackNotify === true) {
+        axios
+          .post("https://slack.com/api/chat.postMessage", messageData, {
+            headers: {
+              Authorization: `Bearer ${bot_token}`,
+            },
+          })
+          .then((rep) => {
+            console.log(rep);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     } else if (data.status == "Quality") {
       const userRef = db.doc(`users/${cardData.creator}`);
 
@@ -371,18 +373,20 @@ exports.sendSlack = functions.firestore
         ],
       };
 
-      axios
-        .post("https://slack.com/api/chat.postMessage", messageData, {
-          headers: {
-            Authorization: `Bearer ${bot_token}`,
-          },
-        })
-        .then((rep) => {
-          console.log(rep);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      if (userData.slackNotify === true) {
+        axios
+          .post("https://slack.com/api/chat.postMessage", messageData, {
+            headers: {
+              Authorization: `Bearer ${bot_token}`,
+            },
+          })
+          .then((rep) => {
+            console.log(rep);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     } else {
       const userRef = db.doc(`users/${data.user_id}`);
 

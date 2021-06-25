@@ -116,6 +116,7 @@ export default {
           cards: [],
           createdOn: new Date(),
           updatedOn: new Date(),
+          archived: false,
         };
 
         this.createNewProduct(productData);

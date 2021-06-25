@@ -43,6 +43,7 @@ export default {
               products: doc.data().products,
               budget: doc.data().budget,
               total: doc.data().total,
+              programme_type: doc.data().programme_type,
             };
             programmes_array.push(object);
           });

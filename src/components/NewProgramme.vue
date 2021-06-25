@@ -37,6 +37,15 @@
           >
           </v-text-field>
           <v-select
+            v-model="newProgramme.programme_type"
+            label="Programme Type"
+            :items="programmeTypeOptions"
+            item-text="text"
+            item-value="value"
+            return-object
+            data-cypress="newProgType"
+          ></v-select>
+          <v-select
             v-model="newTeam.technical_approver.users"
             label="Technical Authority"
             :items="mapUsersArray"
@@ -117,6 +126,11 @@ export default {
   data() {
     return {
       newProgrammeDialog: false,
+      programmeTypeOptions: [
+        { text: "Capability Domain", value: "CD" },
+        { text: "X - Programmes", value: "X" },
+        { text: "Y - Programmes", value: "Y" },
+      ],
       loading: false,
       newProgramme: {
         name: "",
@@ -124,6 +138,7 @@ export default {
           team_name: "",
         },
         budget: "",
+        programme_type: "",
       },
       newTeam: {
         name: "",
@@ -174,6 +189,7 @@ export default {
           },
           products: [],
           budget: this.newProgramme.budget,
+          programme_type: this.newProgramme.programme_type.value,
           total: "0",
         };
 

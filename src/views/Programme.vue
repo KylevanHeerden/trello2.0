@@ -83,6 +83,7 @@
           <span>Sort by users products</span>
         </v-tooltip>
         <v-spacer></v-spacer>
+        <Archived></Archived>
         <v-btn
           small
           color="primary"
@@ -119,13 +120,13 @@
               <div class="caption grey--text">Person</div>
               <div class="card-text-black">{{ product.person }}</div>
             </v-col>
-            <v-col cols="12" sm="3" md="3">
+            <v-col cols="12" sm="2" md="2">
               <div class="caption grey--text">Edit date</div>
               <div class="card-text-black">
                 {{ dateOnly(product.updatedOn) }}
               </div>
             </v-col>
-            <v-col cols="12" sm="3" md="3">
+            <v-col cols="12" sm="2" md="2">
               <v-chip
                 small
                 :color="`${chipColor(product.status)}`"
@@ -137,9 +138,23 @@
               </v-chip>
               <!--Here we bind the class so that the color of chip changes by status-->
             </v-col>
+            <v-col cols="12" sm="2" md="2">
+              <v-btn
+                small
+                text
+                color="grey"
+                @click.prevent="Archive(product.id)"
+                class="archiveBtn"
+                :disabled="product.status != 'Quality'"
+              >
+                <v-icon left small>archive</v-icon>
+                <span class="caption text-lowercase">Archive</span>
+              </v-btn>
+            </v-col>
           </v-row>
           <v-divider></v-divider>
         </router-link>
+        <div></div>
       </v-card>
     </v-container>
   </div>
@@ -148,10 +163,11 @@
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
 import NewProduct from "@/components/NewProduct.vue";
-import products from "../store/modules/products";
+import Archived from "@/components/Archived.vue";
+import { db } from "@/firebase";
 
 export default {
-  components: { NewProduct },
+  components: { NewProduct, Archived },
   data() {
     return {
       search: "",
@@ -167,7 +183,7 @@ export default {
         Technical: "amber accent-2",
         Purchase: "orange",
         Procurement: "red",
-        Waiting: "light-green lighten-1",
+        FollowUp: "light-green lighten-1",
         Quality: "indigo lighten-1",
       };
 
@@ -185,7 +201,7 @@ export default {
           "Technical",
           "Purchase",
           "Procurement",
-          "Waiting",
+          "FollowUp",
           "Quality",
         ];
       for (var i = 0; i < sortOrder.length; i++) ordering[sortOrder[i]] = i;
@@ -202,6 +218,11 @@ export default {
       let date = year + "-" + month + "-" + day;
 
       return date;
+    },
+
+    Archive(productId) {
+      const fbProduct = db.collection("products").doc(productId);
+      fbProduct.update({ archived: true });
     },
   },
 
@@ -242,7 +263,9 @@ export default {
     //Filter the products based on the programme id
     filteredProducts() {
       let filteredProducts = this.products.filter(
-        (product) => product.programme.programme_id === this.fetchedProgrammeId
+        (product) =>
+          product.programme.programme_id === this.fetchedProgrammeId &&
+          product.archived === false
       );
       return filteredProducts;
     },
@@ -323,7 +346,7 @@ export default {
   border-left: 4px solid tomato;
 }
 
-.product.Waiting {
+.product.FollowUp {
   border-left: 4px solid #9ccc65;
 }
 
@@ -387,5 +410,9 @@ export default {
 ::-webkit-scrollbar-thumb {
   background: #d4d4d4;
   border-radius: 5px;
+}
+
+.archiveBtn {
+  z-index: 2;
 }
 </style>

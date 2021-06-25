@@ -115,7 +115,7 @@ export default {
         {
           id: 5,
           list_name: "Follow Up",
-          list_status: "Waiting",
+          list_status: "FollowUp",
           cards: [],
         },
         {
@@ -393,7 +393,7 @@ export default {
   border-top: 4px solid tomato;
 }
 
-.col.Waiting {
+.col.FollowUp {
   border-top: 4px solid #9ccc65;
 }
 

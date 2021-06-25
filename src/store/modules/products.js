@@ -36,6 +36,7 @@ export default {
               person: doc.data().person,
               person_id: doc.data().person_id,
               status: doc.data().status,
+              archived: doc.data().archived,
             };
             products_array.push(object);
           });

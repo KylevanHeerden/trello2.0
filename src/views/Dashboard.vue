@@ -24,13 +24,86 @@
         <v-spacer></v-spacer>
         <NewProgramme></NewProgramme>
       </v-layout>
-      <v-layout row wrap>
+      <v-row
+        justify="center"
+        align-content="center"
+        class="programmeTypeTitleRow"
+      >
+        <div class="programmeTypeTitle">CAPABILITY DOMAIN</div>
+      </v-row>
+      <v-layout row wrap class="programmeTypeRow">
         <v-flex
           xs12
           s6
           m3
           lg3
-          v-for="programme in programmes"
+          v-for="programme in CD_programmes"
+          :key="programme.name"
+        >
+          <router-link
+            class="card-text-black"
+            :to="{ name: 'Programme', params: { id: programme.id } }"
+          >
+            <v-card flat class="ma-3 border" data-cypress="ProgrammeCard">
+              <v-card-text class="text-center">
+                <div class="subheading">{{ programme.name }}</div>
+                <div class="grey--text">
+                  {{ programme.team.team_name }}
+                </div>
+              </v-card-text>
+            </v-card>
+          </router-link>
+        </v-flex>
+      </v-layout>
+
+      <v-row
+        justify="center"
+        align-content="center"
+        class="programmeTypeTitleRow"
+      >
+        <div class="programmeTypeTitle">X - PROGRAMMES</div>
+      </v-row>
+
+      <v-layout row wrap class="programmeTypeRow">
+        <v-flex
+          xs12
+          s6
+          m3
+          lg3
+          v-for="programme in X_programmes"
+          :key="programme.name"
+        >
+          <router-link
+            class="card-text-black"
+            :to="{ name: 'Programme', params: { id: programme.id } }"
+          >
+            <v-card flat class="ma-3 border" data-cypress="ProgrammeCard">
+              <v-card-text class="text-center">
+                <div class="subheading">{{ programme.name }}</div>
+                <div class="grey--text">
+                  {{ programme.team.team_name }}
+                </div>
+              </v-card-text>
+            </v-card>
+          </router-link>
+        </v-flex>
+      </v-layout>
+
+      <v-row
+        justify="center"
+        align-content="center"
+        class="programmeTypeTitleRow"
+      >
+        <div class="programmeTypeTitle">Y - PROGRAMMES</div>
+      </v-row>
+
+      <v-layout row wrap class="programmeTypeRow">
+        <v-flex
+          xs12
+          s6
+          m3
+          lg3
+          v-for="programme in Y_programmes"
           :key="programme.name"
         >
           <router-link
@@ -88,6 +161,22 @@ export default {
       programmes: (state) => state.programmes.programmes,
     }),
     ...mapGetters({}),
+
+    CD_programmes() {
+      return this.programmes.filter(
+        (programme) => programme.programme_type === "CD"
+      );
+    },
+    X_programmes() {
+      return this.programmes.filter(
+        (programme) => programme.programme_type === "X"
+      );
+    },
+    Y_programmes() {
+      return this.programmes.filter(
+        (programme) => programme.programme_type === "Y"
+      );
+    },
   },
 
   mounted() {
@@ -99,5 +188,19 @@ export default {
 <style scoped>
 .border {
   border-left: 3px solid #78909c !important;
+}
+
+.programmeTypeTitle {
+  font-size: 12px;
+  color: #bdbdbd;
+}
+
+.programmeTypeTitleRow {
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.programmeTypeRow {
+  padding-bottom: 2rem;
 }
 </style>
