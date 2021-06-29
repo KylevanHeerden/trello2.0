@@ -1,6 +1,6 @@
 <template>
   <v-row data-cypress="lineItem">
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="2">
       <v-text-field
         label="Item Number"
         v-model="newItem.supplier_item_num"
@@ -9,7 +9,7 @@
       >
       </v-text-field>
     </v-col>
-    <v-col cols="12" md="4">
+    <v-col cols="12" md="3">
       <v-text-field
         label="Item Name"
         v-model="newItem.supplier_item_name"
@@ -29,6 +29,14 @@
         data-cypress="newCardLineItemQuantity"
       >
       </v-text-field>
+    </v-col>
+    <v-col cols="12" md="2">
+      <v-checkbox
+        v-model="newItem.exc_VAT"
+        ref="ItemExcVAT"
+        @input="quantityTimesPrice"
+        :label="`Exc VAT ${newItem.exc_VAT}`"
+      ></v-checkbox>
     </v-col>
     <v-col cols="12" md="3">
       <v-text-field
@@ -83,6 +91,7 @@ export default {
           unit_price: this.newItem.unit_price,
           updatedOn: new Date(),
           createdOn: new Date(),
+          exc_VAT: this.newItem.exc_VAT,
         };
 
         this.$emit("lineItemData", LineItemData);
@@ -114,6 +123,7 @@ export default {
         supplier_item_name: "",
         quantity: "",
         unit_price: "",
+        exc_VAT: false,
       },
     };
   },
@@ -121,12 +131,21 @@ export default {
   methods: {
     quantityTimesPrice() {
       if (this.$refs.UnitPrice.validate() && this.$refs.Quantity.validate()) {
-        let answer = {
-          componentId: this.componentId,
-          price:
-            Number(this.newItem.quantity) * Number(this.newItem.unit_price),
-        };
-        this.$emit("quantityTimesUnitPrice", answer);
+        if (this.newItem.exc_VAT === true) {
+          let answer = {
+            componentId: this.componentId,
+            price: 0,
+          };
+          this.$emit("quantityTimesUnitPrice", answer);
+        } else {
+          console.log(this.newItem.exc_VAT);
+          let answer = {
+            componentId: this.componentId,
+            price:
+              Number(this.newItem.quantity) * Number(this.newItem.unit_price),
+          };
+          this.$emit("quantityTimesUnitPrice", answer);
+        }
       }
     },
 
