@@ -353,6 +353,7 @@ export default {
         purchase_order: [],
         team: {},
         price: 0,
+        price_noVAT: 0,
         payment_terms: "",
         currency: "R",
         hubdoc: false,
@@ -360,7 +361,7 @@ export default {
         PO_number: null,
         POP: [],
       },
-      priceArray: [{ componentId: 0, price: 0 }],
+      priceArray: [{ componentId: 0, price: 0, exc_VAT: false }],
       componentIdArray: [],
       lineItemsArray: [],
       VATexclude: false,
@@ -515,41 +516,63 @@ export default {
         );
 
         oldPrice.price = answer.price;
+        oldPrice.exc_VAT = answer.exc_VAT;
 
-        var priceSum = this.priceArray.reduce(function(a, b) {
+        let priceSum = this.priceArray.reduce(function(a, b) {
           return a + b.price;
         }, 0);
 
+        let noVAT = 0;
+
+        this.priceArray.forEach((objt) => {
+          if (objt.exc_VAT == true) {
+            priceSum -= objt.price;
+            noVAT += objt.price;
+          }
+        });
+
         this.newCard.price = Number(priceSum);
+        this.newCard.price_noVAT = Number(noVAT);
       } else {
         this.componentIdArray.push(answer.componentId);
 
         this.priceArray.push({
           componentId: answer.componentId,
           price: answer.price,
+          exc_VAT: answer.exc_VAT,
         });
 
-        priceSum = this.priceArray.reduce(function(a, b) {
+        let priceSum = this.priceArray.reduce(function(a, b) {
           return a + b.price;
         }, 0);
 
+        let noVAT = 0;
+
+        this.priceArray.forEach((objt) => {
+          if (objt.exc_VAT == true) {
+            priceSum -= objt.price;
+            noVAT += objt.price;
+          }
+        });
+
         this.newCard.price = Number(priceSum);
+        this.newCard.price_noVAT = Number(noVAT);
       }
 
-      this.updateVat();
+      this.updateVat(this.newCard.price);
       this.updateTotal();
     },
 
-    updateVat() {
+    updateVat(incVAT) {
       if (this.VATexclude) {
         this.newCard.VAT = 0.0;
       } else {
-        this.newCard.VAT = (this.newCard.price * 0.15).toFixed(2);
+        this.newCard.VAT = (incVAT * 0.15).toFixed(2);
       }
     },
 
     updateTotal() {
-      this.updateVat();
+      this.updateVat(this.newCard.price);
       if (this.VATexclude) {
         this.newCard.VAT = 0.0;
 
@@ -558,9 +581,13 @@ export default {
           parseFloat(this.newCard.price) + parseFloat(this.newCard.VAT)
         ).toFixed(2);
       } else {
-        this.newCard.total_exc_vat = this.newCard.price.toFixed(2);
+        this.newCard.total_exc_vat = (
+          parseFloat(this.newCard.price) + parseFloat(this.newCard.price_noVAT)
+        ).toFixed(2);
         this.newCard.total_inc_vat = (
-          parseFloat(this.newCard.price) + parseFloat(this.newCard.VAT)
+          parseFloat(this.newCard.price) +
+          parseFloat(this.newCard.price_noVAT) +
+          parseFloat(this.newCard.VAT)
         ).toFixed(2);
       }
     },

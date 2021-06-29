@@ -453,6 +453,7 @@ const store = new Vuex.Store({
               unit_price: doc.data().unit_price,
               programme_id: doc.data().programme_id,
               card_id: doc.data().card_id,
+              exc_VAT: doc.data().exc_VAT,
             };
             items_array.push(object);
           });

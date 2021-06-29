@@ -30,14 +30,6 @@
       >
       </v-text-field>
     </v-col>
-    <v-col cols="12" md="2">
-      <v-checkbox
-        v-model="newItem.exc_VAT"
-        ref="ItemExcVAT"
-        @input="quantityTimesPrice"
-        :label="`Exc VAT ${newItem.exc_VAT}`"
-      ></v-checkbox>
-    </v-col>
     <v-col cols="12" md="3">
       <v-text-field
         ref="UnitPrice"
@@ -49,6 +41,14 @@
         data-cypress="newCardLineItemPrice"
       >
       </v-text-field>
+    </v-col>
+    <v-col cols="12" md="2">
+      <v-checkbox
+        v-model="newItem.exc_VAT"
+        ref="ItemExcVAT"
+        @change="quantityTimesPrice"
+        label="Exc VAT"
+      ></v-checkbox>
     </v-col>
   </v-row>
 </template>
@@ -131,21 +131,13 @@ export default {
   methods: {
     quantityTimesPrice() {
       if (this.$refs.UnitPrice.validate() && this.$refs.Quantity.validate()) {
-        if (this.newItem.exc_VAT === true) {
-          let answer = {
-            componentId: this.componentId,
-            price: 0,
-          };
-          this.$emit("quantityTimesUnitPrice", answer);
-        } else {
-          console.log(this.newItem.exc_VAT);
-          let answer = {
-            componentId: this.componentId,
-            price:
-              Number(this.newItem.quantity) * Number(this.newItem.unit_price),
-          };
-          this.$emit("quantityTimesUnitPrice", answer);
-        }
+        let answer = {
+          componentId: this.componentId,
+          price:
+            Number(this.newItem.quantity) * Number(this.newItem.unit_price),
+          exc_VAT: this.newItem.exc_VAT,
+        };
+        this.$emit("quantityTimesUnitPrice", answer);
       }
     },
 
