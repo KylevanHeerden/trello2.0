@@ -37,6 +37,8 @@ export default {
               person_id: doc.data().person_id,
               status: doc.data().status,
               archived: doc.data().archived,
+              POP_date: doc.data().POP_date,
+              leadTime: doc.data().leadTime,
             };
             products_array.push(object);
           });

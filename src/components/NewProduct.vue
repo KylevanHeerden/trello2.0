@@ -117,6 +117,8 @@ export default {
           createdOn: new Date(),
           updatedOn: new Date(),
           archived: false,
+          POP_date: null,
+          leadTime: null,
         };
 
         this.createNewProduct(productData);

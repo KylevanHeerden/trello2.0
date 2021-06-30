@@ -83,16 +83,19 @@
           <span>Sort by users products</span>
         </v-tooltip>
         <v-spacer></v-spacer>
-        <Archived></Archived>
+        <Calendar></Calendar>
         <v-btn
           small
           color="primary"
           dark
           :href="programmeBoardLink"
           data-cypress="programmeBoardLink"
+          class="mx-8"
         >
           Programme Board
         </v-btn>
+        <Archived></Archived>
+
         <!--NewProduct btn with programme as prop and @getNewProduct as emited function from child-->
         <NewProduct :programme="programme"></NewProduct>
       </v-layout>
@@ -164,10 +167,11 @@
 import { mapActions, mapGetters, mapState } from "vuex";
 import NewProduct from "@/components/NewProduct.vue";
 import Archived from "@/components/Archived.vue";
+import Calendar from "@/components/Calendar.vue";
 import { db } from "@/firebase";
 
 export default {
-  components: { NewProduct, Archived },
+  components: { NewProduct, Archived, Calendar },
   data() {
     return {
       search: "",

@@ -14,7 +14,6 @@
         data-cypress="archivedDialogBtn"
         v-bind="attrs"
         v-on="on"
-        class="mx-8"
       >
         Archived
       </v-btn>

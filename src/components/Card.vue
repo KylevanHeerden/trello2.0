@@ -1369,6 +1369,7 @@ export default {
 
     newPOP(files) {
       const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+      const fbProduct = db.collection("products").doc(this.card.product_id);
 
       var filesArray = [];
 
@@ -1384,6 +1385,10 @@ export default {
       });
 
       this.newCard.POP = filesArray;
+
+      fbCard.update({ POP_date: new Date() });
+      fbProduct.update({ POP_date: new Date() });
+      fbProduct.update({ leadTime: this.card.lead_time });
     },
 
     fileAddedQuality(file) {

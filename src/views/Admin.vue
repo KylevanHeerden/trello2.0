@@ -106,7 +106,7 @@ export default {
         .then(function(querySnapshot) {
           querySnapshot.forEach(function(doc) {
             doc.ref.update({
-              archived: false,
+              leadTime: null,
             });
           });
         });
