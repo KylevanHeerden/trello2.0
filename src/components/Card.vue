@@ -177,8 +177,7 @@
                               lineItemEdit(
                                 lineItem.id,
                                 'item_number',
-                                lineItem.item_number,
-                                lineItem.exc_VAT
+                                lineItem.item_number
                               )
                             "
                             data-cypress="lineItemName"
@@ -195,8 +194,7 @@
                               lineItemEdit(
                                 lineItem.id,
                                 'item_name',
-                                lineItem.item_name,
-                                lineItem.exc_VAT
+                                lineItem.item_name
                               )
                             "
                             data-cypress="lineItemNum"
@@ -215,8 +213,7 @@
                               lineItemEdit(
                                 lineItem.id,
                                 'quantity',
-                                lineItem.quantity,
-                                lineItem.exc_VAT
+                                lineItem.quantity
                               )
                             "
                             @focus="thisLineItem_quantity = lineItem.quantity"
@@ -236,8 +233,7 @@
                               lineItemEdit(
                                 lineItem.id,
                                 'unit_price',
-                                lineItem.unit_price,
-                                lineItem.exc_VAT
+                                lineItem.unit_price
                               )
                             "
                             @focus="
@@ -257,7 +253,6 @@
                               lineItemEdit(
                                 lineItem.id,
                                 'exc_VAT',
-                                lineItem.exc_VAT,
                                 lineItem.exc_VAT
                               )
                             "
@@ -300,17 +295,6 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        label="Total Price Inc VAT"
-                        v-model="newCard.total_inc_vat"
-                        :readonly="editCardInfo"
-                        :prefix="newCard.currency"
-                        :rules="inputRulesMoney"
-                        data-cypress="quoteTotalIncVAT"
-                      >
-                      </v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
                         label="Total Price Exc VAT"
                         v-model="newCard.total_exc_vat"
                         :readonly="editCardInfo"
@@ -320,6 +304,18 @@
                       >
                       </v-text-field>
                     </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Total Price Inc VAT"
+                        v-model="newCard.total_inc_vat"
+                        :readonly="editCardInfo"
+                        :prefix="newCard.currency"
+                        :rules="inputRulesMoney"
+                        data-cypress="quoteTotalIncVAT"
+                      >
+                      </v-text-field>
+                    </v-col>
+
                     <v-col
                       v-if="!newCard.procured"
                       cols="12"
@@ -1515,73 +1511,87 @@ export default {
       });
     },
 
-    lineItemEdit(id, changeKey, changeValue, lineItemExcVAT) {
+    async lineItemEdit(id, changeKey, changeValue) {
       if (this.$refs.form.validate()) {
         const fbCard = db.collection("line_items").doc(id); // gets the firebase card
 
+        // Set value of thisLineItem_unit_price & quantity by focusing
         if (changeKey == "unit_price") {
           this.$refs[`${id}_quantity`][0].focus();
         } else if (changeKey == "quantity") {
           this.$refs[`${id}_unitPrice`][0].focus();
         }
 
-        let oldQuantityTimeUinitPrice =
-          this.thisLineItem_quantity * this.thisLineItem_unit_price;
-        // console.log(oldQuantityTimeUinitPrice);
-        this.newCard.total_exc_vat =
-          this.newCard.total_exc_vat - oldQuantityTimeUinitPrice;
-        // console.log(this.newCard.total_exc_vat);
-
-        fbCard.update({
+        // Update fb card
+        await fbCard.update({
           [changeKey]: changeValue,
         });
 
+        // get new values of lineItem quantity and unit price
         let newQuantity = this.$refs[`${id}_quantity`][0].value;
         let newUnitPrice = this.$refs[`${id}_unitPrice`][0].value;
 
-        if (lineItemExcVAT == false) {
-          // add new lineItem to total_exc_VAT
-          let newQuantityTimesPrice = newQuantity * newUnitPrice;
-          console.log(newQuantityTimesPrice);
-          this.newCard.total_exc_vat = (
-            Number(this.newCard.total_exc_vat) + Number(newQuantityTimesPrice)
-          ).toFixed(2);
-          console.log("exec_vat = " + this.newCard.total_exc_vat);
+        let priceArray = [];
 
-          // calculate VAT
-          this.newCard.VAT = (
-            Number(this.newCard.total_exc_vat) * 0.15
-          ).toFixed(2);
-          console.log("vat = " + this.newCard.VAT);
+        // Set new quantity and unit price values tpo relevant lineItem and make new array with price = quantity*unitprice for all lineItems
+        this.lineItemsFiltered.forEach((lineItem) => {
+          if (lineItem.id == id) {
+            lineItem.unit_price = newUnitPrice;
+            lineItem.quantity = newQuantity;
+          }
 
-          // add VAT to total_exc_VAT and get total_inc_VAT
-          this.newCard.total_inc_vat = (
-            Number(this.newCard.total_exc_vat) + Number(this.newCard.VAT)
-          ).toFixed(2);
-          console.log("inc_vat = " + this.newCard.total_inc_vat);
-        } else {
-          // first calculate new total_exc_VAT without line item
-          this.newCard.VAT = (
-            Number(this.newCard.total_exc_vat) * 0.15
-          ).toFixed(2);
-          console.log("vat = " + this.newCard.VAT);
+          priceArray.push({
+            id: lineItem.id,
+            price: Number(lineItem.quantity) * Number(lineItem.unit_price),
+            exc_VAT: lineItem.exc_VAT,
+          });
+        });
 
-          // add new lineItem to total_exc_vat
-          let newQuantityTimesPrice = newQuantity * newUnitPrice;
-          console.log(newQuantityTimesPrice);
-          this.newCard.total_exc_vat = (
-            Number(this.newCard.total_exc_vat) + Number(newQuantityTimesPrice)
-          ).toFixed(2);
-          console.log("exec_vat = " + this.newCard.total_exc_vat);
+        // Calculate the total price of all lineItems
+        let priceSum = priceArray.reduce(function(a, b) {
+          return Number(a) + Number(b.price);
+        }, 0);
 
-          // add VAT to total_exc_VAT to get total_inc_VAT
-          this.newCard.total_inc_vat = (
-            Number(this.newCard.total_exc_vat) + Number(this.newCard.VAT)
-          ).toFixed(2);
-          console.log("inc_vat = " + this.newCard.total_inc_vat);
-        }
+        // console.log(`priceSUm: ${priceSum}`);
+
+        let noVAT = 0;
+        let yesVAT = 0;
+
+        // Remove from priceSum values that has excVAT == True and add them to noVAt others go to yesVAT
+        priceArray.forEach((objt) => {
+          if (objt.exc_VAT == true) {
+            priceSum -= Number(objt.price);
+            noVAT += Number(objt.price);
+          } else {
+            yesVAT += Number(objt.price);
+          }
+        });
+
+        // console.log(`noVAT: ${noVAT}`);
+        // console.log(`yesVAT: ${yesVAT}`);
+
+        // Calculate the desired values
+        let finalVAT = (yesVAT * 0.15).toFixed(2);
+        let totalExcVAT = Number(yesVAT) + Number(noVAT);
+        let finalTotalExc = totalExcVAT.toFixed(2);
+        let totalIncVAT = Number(yesVAT) + Number(noVAT) + Number(finalVAT);
+        let finalTotalInc = totalIncVAT.toFixed(2);
+
+        // console.log(`finalVAT: ${finalVAT}`);
+        // console.log(`finalTotalExc: ${finalTotalExc}`);
+        // console.log(`finalTotalInc: ${finalTotalInc}`);
+
+        // Set newCard value to update UI and fb thereafter
+        this.newCard.VAT = finalVAT;
+        this.newCard.total_exc_vat = finalTotalExc;
+        this.newCard.total_inc_vat = finalTotalInc;
+
+        // console.log(this.newCard.VAT);
+        // console.log(this.newCard.total_exc_vat);
+        // console.log(this.newCard.total_inc_vat);
       }
     },
+
     saveCardInfoEdit() {
       this.cardInfoEditingButtons = false;
       this.editCardInfo = true;
@@ -1667,8 +1677,13 @@ export default {
     ...mapState({
       users: (state) => state.users.users,
       currentUser: (state) => state.profile.userProfile,
+      cards: (state) => state.cards,
     }),
     ...mapGetters(["getUsers"]),
+
+    card2() {
+      return this.cards.find((card) => card.id == this.card.id);
+    },
 
     lineItemsFiltered() {
       let FBlineItems = this.$store.getters.getLineItemsByCardId(this.card.id);

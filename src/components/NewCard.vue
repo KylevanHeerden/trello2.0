@@ -518,12 +518,14 @@ export default {
         oldPrice.price = answer.price;
         oldPrice.exc_VAT = answer.exc_VAT;
 
+        // Calculate the total price of all lineItems
         let priceSum = this.priceArray.reduce(function(a, b) {
           return a + b.price;
         }, 0);
 
         let noVAT = 0;
 
+        // Remove from priceSum values that has excVAT == True
         this.priceArray.forEach((objt) => {
           if (objt.exc_VAT == true) {
             priceSum -= objt.price;
@@ -531,6 +533,7 @@ export default {
           }
         });
 
+        // Use the one to caluculate total VAT and second just to add
         this.newCard.price = Number(priceSum);
         this.newCard.price_noVAT = Number(noVAT);
       } else {
