@@ -221,7 +221,7 @@
                           >
                           </v-text-field>
                         </v-col>
-                        <v-col cols="12" md="3">
+                        <v-col cols="12" md="2">
                           <v-text-field
                             :ref="`${lineItem.id}_unitPrice`"
                             label="Unit Price Exc VAT"
@@ -243,12 +243,13 @@
                           >
                           </v-text-field>
                         </v-col>
-                        <v-col cols="12" md="2">
+                        <v-col cols="12" md="3">
                           <v-checkbox
                             v-model="lineItem.exc_VAT"
                             :readonly="editCardInfo"
                             :ref="`${lineItem.id}_exc_VAT`"
-                            :label="`Exc VAT: ${lineItem.exc_VAT}`"
+                            label="Excl Item VAT"
+                            small
                             @change="
                               lineItemEdit(
                                 lineItem.id,

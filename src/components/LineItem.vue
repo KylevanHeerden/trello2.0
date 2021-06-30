@@ -30,7 +30,7 @@
       >
       </v-text-field>
     </v-col>
-    <v-col cols="12" md="3">
+    <v-col cols="12" md="2">
       <v-text-field
         ref="UnitPrice"
         label="Unit Price Exc VAT"
@@ -42,12 +42,12 @@
       >
       </v-text-field>
     </v-col>
-    <v-col cols="12" md="2">
+    <v-col cols="12" md="3">
       <v-checkbox
         v-model="newItem.exc_VAT"
         ref="ItemExcVAT"
         @change="quantityTimesPrice"
-        label="Exc VAT"
+        label="Excl Item VAT"
       ></v-checkbox>
     </v-col>
   </v-row>
