@@ -157,6 +157,7 @@
                 <v-select
                   ref="currency"
                   label="Currency"
+                  @change="updateTotal()"
                   v-model="newCard.currency"
                   :items="currency_options"
                   :value="currency_options.value"
@@ -184,7 +185,7 @@
               <v-col cols="12" sm="6" md="2">
                 <v-checkbox
                   v-model="VATexclude"
-                  label="Exclude VAT"
+                  :label="`Exclude ${nonVAT}`"
                   @change="updateTotal()"
                   data-cypress="newCardExcludeVAT"
                 ></v-checkbox>
@@ -192,8 +193,9 @@
               <v-col cols="12" sm="6" md="2">
                 <v-text-field
                   v-if="!VATexclude"
-                  label="VAT at 15%"
+                  :label="`${nonVAT}`"
                   v-model="newCard.VAT"
+                  @change="updateTotal()"
                   :rules="inputRulesVAT"
                   :prefix="newCard.currency"
                   data-cypress="newCardVAT"
@@ -203,7 +205,7 @@
               <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   v-if="!VATexclude"
-                  label="Total Price Exc VAT"
+                  :label="`Total Price Exc ${nonVAT}`"
                   v-model="newCard.total_exc_vat"
                   :rules="inputRulesMoney"
                   :prefix="newCard.currency"
@@ -567,10 +569,16 @@ export default {
     },
 
     updateVat(incVAT) {
-      if (this.VATexclude) {
-        this.newCard.VAT = 0.0;
+      if (this.newCard.currency != "R") {
+        if (this.VATexclude) {
+          this.newCard.VAT = 0.0;
+        }
       } else {
-        this.newCard.VAT = (incVAT * 0.15).toFixed(2);
+        if (this.VATexclude) {
+          this.newCard.VAT = 0.0;
+        } else {
+          this.newCard.VAT = (incVAT * 0.15).toFixed(2);
+        }
       }
     },
 
@@ -658,6 +666,14 @@ export default {
     user() {
       let user = this.$store.getters.getUserProfile;
       return user;
+    },
+
+    nonVAT() {
+      if (this.newCard.currency != "R") {
+        return "Customs Duty";
+      } else {
+        return "VAT";
+      }
     },
   },
 

@@ -44,6 +44,7 @@
     </v-col>
     <v-col cols="12" md="3">
       <v-checkbox
+        v-if="this.currency == 'R'"
         v-model="newItem.exc_VAT"
         ref="ItemExcVAT"
         @change="quantityTimesPrice"
