@@ -2,7 +2,12 @@
   <div class="products">
     <v-breadcrumbs :items="links" divider="/"> </v-breadcrumbs>
 
+    <v-spacer> </v-spacer>
+
     <v-container fluid class="my-5">
+      <v-row class="mb-8 mr-8" justify="end" align-content="end">
+        <Archived></Archived>
+      </v-row>
       <v-row class="mx-3" wrap>
         <v-col
           xs12
@@ -60,11 +65,12 @@
 // @ is an alias to /src
 import Draggable from "vuedraggable";
 import Card from "@/components/Card.vue";
+import Archived from "@/components/Archived.vue";
 import { db } from "@/firebase";
 
 export default {
   name: "Products",
-  components: { Draggable, Card },
+  components: { Draggable, Card, Archived },
   data() {
     return {
       programmeId: String(this.$route.params.id),
@@ -232,10 +238,22 @@ export default {
     },
     cards() {
       let cards = this.$store.getters.getCardsByProgrammeId(this.programme.id);
-      let sortedCards = cards.sort((a, b) => a.createdOn - b.createdOn);
+      let notArchived = [];
+
+      cards.forEach((card) => {
+        let product = this.products.find((product) => {
+          return product.id === card.product_id;
+        });
+
+        if (product.archived == false) {
+          notArchived.push(card);
+        } else {
+        }
+      });
+      let sortedCards = notArchived.sort((a, b) => a.createdOn - b.createdOn);
       // //This method is to populate lists.cards of Array
       sortedCards.map((card) => this.Array[card.list_id - 1].cards.push(card));
-      return cards;
+      return notArchived;
     },
 
     suppliers() {
