@@ -36,7 +36,7 @@
         </v-icon>
         <v-icon
           v-if="notifications.length != 0 && logInStatus"
-          color="red"
+          color="deep-orange darken-3"
           small
           class="redDot"
         >

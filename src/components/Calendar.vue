@@ -5,21 +5,94 @@
         <v-btn small color="primary" dark v-bind="attrs" v-on="on">
           Programme Calendar
         </v-btn>
+        <v-avatar
+          v-if="todayArrivals != 0"
+          color="deep-orange darken-3"
+          size="23"
+          class="todayArrivals"
+        >
+          {{ todayArrivals }}
+        </v-avatar>
       </template>
 
       <v-card>
         <v-card-title class="cardTitle text-h5 primary">
-          Programme Calendar
+          Programme {{ programme.name }} Calendar
         </v-card-title>
 
         <v-card-text class="cardText">
+          <v-row class="calendarTitleRow">
+            <v-btn icon @click="prev()">
+              <v-icon>mdi-chevron-left</v-icon>
+            </v-btn>
+            <v-btn icon @click="next()">
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-btn>
+            <v-toolbar-title v-if="$refs.calendar">
+              {{ $refs.calendar.title }}
+            </v-toolbar-title>
+          </v-row>
+
           <v-sheet height="600">
             <v-calendar
+              v-model="focus"
               ref="calendar"
               :weekdays="weekday"
               :type="type"
               :events="events"
+              @click:event="showEvent"
             ></v-calendar>
+            <v-menu
+              v-model="selectedOpen"
+              :close-on-content-click="false"
+              :activator="selectedElement"
+              offset-x
+            >
+              <v-card color="grey lighten-4" width="400px" flat>
+                <v-toolbar :color="selectedEvent.color" dark>
+                  <v-toolbar-title
+                    v-html="selectedEvent.name"
+                  ></v-toolbar-title>
+                  <v-spacer></v-spacer>
+                </v-toolbar>
+                <v-card-text>
+                  <v-row>
+                    <v-col cols="12" sm="6" md="6">
+                      <div class="eventLabel">Supplier:</div>
+                      <div class="eventLabel">Supplier Email:</div>
+                      <div class="eventLabel">Contact Person:</div>
+                      <div class="eventLabel">Contact Number:</div>
+                      <div class="eventLabel">Nanodyn Person:</div>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="6">
+                      <div class="eventAnswer">
+                        {{ selectedEvent.supplier_name }}
+                      </div>
+                      <div class="eventAnswer">
+                        {{ selectedEvent.supplier_email }}
+                      </div>
+                      <div class="eventAnswer">
+                        {{ selectedEvent.contact_person }}
+                      </div>
+                      <div class="eventAnswer">
+                        {{ selectedEvent.contact_number }}
+                      </div>
+                      <div class="eventAnswer">{{ selectedEvent.person }}</div>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+                <v-card-actions>
+                  <router-link
+                    :to="{
+                      name: 'Product',
+                      params: { id: selectedEvent.url },
+                    }"
+                  >
+                    Product Link
+                  </router-link>
+                </v-card-actions>
+              </v-card>
+            </v-menu>
           </v-sheet>
         </v-card-text>
       </v-card>
@@ -28,18 +101,23 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { db } from "@/firebase";
+import { mapState, mapGetters } from "vuex";
 import moment from "moment";
-import products from "../store/modules/products";
 
 export default {
   data() {
     return {
       fetchedProgrammeId: this.$route.params.id,
       calendarDialog: false,
-      weekday: [0, 1, 2, 3, 4, 5, 6],
+      focus: "",
+      weekday: [1, 2, 3, 4, 5, 6, 0],
       type: "month",
       events: [],
+      selectedOpen: false,
+      selectedEvent: {},
+      selectedElement: null,
+      todayArrivals: 0,
     };
   },
 
@@ -47,6 +125,7 @@ export default {
     ...mapState({
       products: (state) => state.products.products,
     }),
+    ...mapGetters(["getProgrammeById"]),
 
     programme() {
       let programme = this.getProgrammeById(this.fetchedProgrammeId);
@@ -64,7 +143,7 @@ export default {
       return filteredProducts;
     },
 
-    getEvents() {
+    async getEvents() {
       let events = [];
 
       this.filteredProducts.forEach((product) => {
@@ -72,13 +151,29 @@ export default {
           .add(parseInt(product.leadTime), "days")
           .format("YYYY-MM-DD");
 
-        let event = {
-          name: product.name,
-          start: expectDate,
-          color: this.getEventColor(expectDate),
-        };
+        let today = moment().format("YYYY-MM-DD");
 
-        events.push(event);
+        if (expectDate == today) {
+          this.todayArrivals += 1;
+        }
+
+        let card = this.getCard(product.cards[0].card_id);
+
+        card.then((r) => {
+          let event = {
+            name: product.name,
+            start: expectDate,
+            color: this.getEventColor(expectDate),
+            url: product.id,
+            supplier_name: r.supplier_name,
+            supplier_email: r.supplier_email,
+            contact_number: r.contact_number,
+            contact_person: r.contact_person,
+            person: product.person,
+          };
+
+          events.push(event);
+        });
       });
 
       this.events = events;
@@ -96,22 +191,16 @@ export default {
     },
 
     getEventColor(receive_date) {
-      let colors = [
-        "blue-grey darken-3",
-        "teal darken-2",
-        "deep-orange darken-3",
-      ];
+      let colors = ["blue-grey darken-3", "#9ccc65", "deep-orange darken-3"];
 
       let today = moment().format("YYYY-MM-DD");
 
-      let days = this.diffOfDates(receive_date, today);
+      let days = this.diffOfDates(today, receive_date);
 
-      console.log(days);
-
-      if (days < 4) {
-        return colors[1];
-      } else if (days < 0) {
+      if (days < 0) {
         return colors[2];
+      } else if (days === 0) {
+        return colors[1];
       } else {
         return colors[0];
       }
@@ -121,11 +210,45 @@ export default {
       let date = moment(param.toDate()).format("YYYY-MM-DD");
       return date;
     },
+
+    prev() {
+      this.$refs.calendar.prev();
+    },
+
+    next() {
+      this.$refs.calendar.next();
+    },
+
+    showEvent({ nativeEvent, event }) {
+      const open = () => {
+        this.selectedEvent = event;
+        this.selectedElement = nativeEvent.target;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => (this.selectedOpen = true))
+        );
+      };
+
+      if (this.selectedOpen) {
+        this.selectedOpen = false;
+        requestAnimationFrame(() => requestAnimationFrame(() => open()));
+      } else {
+        open();
+      }
+
+      nativeEvent.stopPropagation();
+    },
+
+    async getCard(id) {
+      const cityRef = db.collection("cards").doc(id);
+      const doc = await cityRef.get();
+      const docData = doc.data();
+
+      return docData;
+    },
   },
 
   mounted() {
     this.getEvents;
-    console.log(this.events);
   },
 };
 </script>
@@ -137,5 +260,26 @@ export default {
 
 .cardText {
   margin-top: 2rem;
+}
+
+.calendarTitleRow {
+  padding-bottom: 1rem;
+}
+
+.eventLabel {
+  color: grey;
+}
+
+.eventAnswer {
+  color: rgba(37, 37, 37, 0.87);
+}
+
+.todayArrivals {
+  position: relative;
+  right: 15px;
+  bottom: 15px;
+  padding: 0;
+  color: white;
+  font-weight: 1000;
 }
 </style>

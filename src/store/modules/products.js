@@ -39,6 +39,7 @@ export default {
               archived: doc.data().archived,
               POP_date: doc.data().POP_date,
               leadTime: doc.data().leadTime,
+              cards: doc.data().cards,
             };
             products_array.push(object);
           });
