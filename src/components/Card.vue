@@ -224,7 +224,7 @@
                         <v-col cols="12" md="2">
                           <v-text-field
                             :ref="`${lineItem.id}_unitPrice`"
-                            label="Unit Price Exc VAT"
+                            :label="`Unit Price Exc ${nonVAT}`"
                             v-model="lineItem.unit_price"
                             :readonly="editCardInfo"
                             :prefix="newCard.currency"
@@ -245,6 +245,7 @@
                         </v-col>
                         <v-col cols="12" md="3">
                           <v-checkbox
+                            v-if="newCard.currency == 'R'"
                             v-model="lineItem.exc_VAT"
                             :readonly="editCardInfo"
                             :ref="`${lineItem.id}_exc_VAT`"
@@ -285,7 +286,7 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        label="VAT at 15%"
+                        :label="`${nonVAT}`"
                         v-model="newCard.VAT"
                         :readonly="editCardInfo"
                         :prefix="newCard.currency"
@@ -296,7 +297,7 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        label="Total Price Exc VAT"
+                        :label="`Total Price Exc ${nonVAT}`"
                         v-model="newCard.total_exc_vat"
                         :readonly="editCardInfo"
                         :prefix="newCard.currency"
@@ -307,7 +308,7 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        label="Total Price Inc VAT"
+                        :label="`Total Price Inc ${nonVAT}`"
                         v-model="newCard.total_inc_vat"
                         :readonly="editCardInfo"
                         :prefix="newCard.currency"
@@ -1717,6 +1718,14 @@ export default {
       let count = count_array[0] - this.newCard.files.length;
 
       return count;
+    },
+
+    nonVAT() {
+      if (this.newCard.currency != "R") {
+        return "Customs Duty";
+      } else {
+        return "VAT";
+      }
     },
   },
 
