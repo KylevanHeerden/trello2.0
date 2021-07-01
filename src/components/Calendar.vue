@@ -17,7 +17,7 @@
 
       <v-card>
         <v-card-title class="cardTitle text-h5 primary">
-          Programme {{ programme.name }} Calendar
+          {{ programme.name }} Calendar
         </v-card-title>
 
         <v-card-text class="cardText">
@@ -59,7 +59,7 @@
                   <v-row>
                     <v-col cols="12" sm="6" md="6">
                       <div class="eventLabel">Supplier:</div>
-                      <div class="eventLabel">Supplier Email:</div>
+
                       <div class="eventLabel">Contact Person:</div>
                       <div class="eventLabel">Contact Number:</div>
                       <div class="eventLabel">Nanodyn Person:</div>
@@ -68,9 +68,7 @@
                       <div class="eventAnswer">
                         {{ selectedEvent.supplier_name }}
                       </div>
-                      <div class="eventAnswer">
-                        {{ selectedEvent.supplier_email }}
-                      </div>
+
                       <div class="eventAnswer">
                         {{ selectedEvent.contact_person }}
                       </div>

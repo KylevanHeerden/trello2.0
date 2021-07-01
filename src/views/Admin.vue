@@ -98,21 +98,6 @@ export default {
       searchOption: null,
     };
   },
-  methods: {
-    // The addField function adds a field to all the docs in a firebase collection.
-    addField() {
-      db.collection("products")
-        .get()
-        .then(function(querySnapshot) {
-          querySnapshot.forEach(function(doc) {
-            doc.ref.update({
-              leadTime: null,
-            });
-          });
-        });
-      return "Done!";
-    },
-  },
   computed: {
     ...mapState({
       cards: (state) => state.cards,
@@ -152,6 +137,22 @@ export default {
           }
         });
       }
+    },
+  },
+
+  methods: {
+    // The addField function adds a field to all the docs in a firebase collection.
+    async addField() {
+      db.collection("products")
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            doc.ref.update({
+              POP_date: new Date(),
+            });
+          });
+        });
+      return "Done!";
     },
   },
 
