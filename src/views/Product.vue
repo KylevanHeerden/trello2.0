@@ -144,9 +144,21 @@ export default {
 
   methods: {
     checkMove(card, listID) {
-      console.log(card);
-      console.log(listID);
-      return "draggable";
+      const array = [2, 3, 4];
+      const list_array = [
+        { id: 2, approval: "technical_approval" },
+        { id: 3, approval: "purchase_approval" },
+        { id: 4, approval: "procured" },
+      ];
+      if (array.includes(listID)) {
+        let approval = list_array.find((i) => i.id == listID);
+
+        if (card[approval.approval]) {
+          return "draggable";
+        }
+      } else {
+        return "draggable";
+      }
     },
 
     async cardMoved(listId, e) {
