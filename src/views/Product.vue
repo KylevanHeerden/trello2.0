@@ -22,12 +22,14 @@
             group="cards"
             @change="cardMoved(list.id, $event)"
             :data-cypress="`dragZone-${list.list_status}`"
+            draggable=".draggable"
           >
             <!--Makes the child component draggable. Require :list and group properties to work.-->
             <Card
               v-for="card in cards1(list.id)"
               :key="card.id"
               class="list-group-item"
+              :class="checkMove(card, list.id)"
               :card="card"
               :listId="list.id"
               :cardComments="commentsByCard(card.id)"
@@ -141,6 +143,12 @@ export default {
   },
 
   methods: {
+    checkMove(card, listID) {
+      console.log(card);
+      console.log(listID);
+      return "draggable";
+    },
+
     async cardMoved(listId, e) {
       const evt = e.added || e.moved; //the events triggered by draggable
       if (evt == undefined) {
