@@ -384,77 +384,14 @@
             </v-stepper-step>
 
             <v-stepper-content step="3">
-              <v-form>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="6">
-                      <v-text-field
-                        label="Technical Approval Personal:"
-                        v-model="team.technical_approver.users[0].text"
-                      >
-                      </v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="6">
-                      <v-tooltip
-                        top
-                        :disabled="
-                          checkIfUserInAuthorityArray(team.technical_approver)
-                            .boolean
-                        "
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <div v-bind="attrs" v-on="on">
-                            <v-switch
-                              @click="
-                                handleClick(
-                                  team.technical_approver,
-                                  'technical_approval'
-                                )
-                              "
-                              :disabled="
-                                !checkIfUserInAuthorityArray(
-                                  team.technical_approver
-                                ).boolean
-                              "
-                              v-model="newCard.technical_approval"
-                              data-cypress="techApprovalBtn"
-                            >
-                              <template v-slot:label>
-                                Technical Approval:
-                                <span
-                                  class="ml-3"
-                                  style="color: #37474f"
-                                  data-cypress="techApprovalStatus"
-                                >
-                                  {{
-                                    approvedStatus(newCard.technical_approval)
-                                  }}
-                                </span>
-                              </template>
-                            </v-switch>
-                          </div>
-                        </template>
-                        <span>{{
-                          checkIfUserInAuthorityArray(team.technical_approver)
-                            .message
-                        }}</span>
-                      </v-tooltip>
-
-                      <v-dialog
-                        v-model="confirmationDialog"
-                        persistent
-                        max-width="290"
-                      >
-                      </v-dialog>
-                    </v-col>
-                    <Comments
-                      :cardComments="cardComments"
-                      :position="1"
-                      :cardId="card.id"
-                    ></Comments>
-                  </v-row>
-                </v-container>
-              </v-form>
+              <TechPurApproval
+                :stepName="'technical'"
+                :team="team"
+                :card="card"
+                :cardComments="cardComments"
+                :counter="counter"
+                :commentPosition="1"
+              ></TechPurApproval>
             </v-stepper-content>
 
             <v-stepper-step step="4" :editable="listId >= 3">
@@ -462,72 +399,14 @@
             </v-stepper-step>
 
             <v-stepper-content step="4">
-              <v-form>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="6">
-                      <v-text-field
-                        label="Purchase Approval Personal:"
-                        v-model="team.purchase_approver.users[0].text"
-                      >
-                      </v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="6">
-                      <v-tooltip
-                        top
-                        :disabled="
-                          checkIfUserInAuthorityArray(team.purchase_approver)
-                            .boolean
-                        "
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <div v-bind="attrs" v-on="on">
-                            <v-switch
-                              @click="
-                                handleClick(
-                                  team.purchase_approver,
-                                  'purchase_approval'
-                                )
-                              "
-                              :disabled="
-                                !checkIfUserInAuthorityArray(
-                                  team.purchase_approver
-                                ).boolean
-                              "
-                              v-model="newCard.purchase_approval"
-                            >
-                              <template v-slot:label>
-                                Purchase Approval:
-                                <span class="ml-3" style="color: #37474f">
-                                  {{
-                                    approvedStatus(newCard.purchase_approval)
-                                  }}
-                                </span>
-                              </template>
-                            </v-switch>
-                          </div>
-                        </template>
-                        <span>{{
-                          checkIfUserInAuthorityArray(team.purchase_approver)
-                            .message
-                        }}</span>
-                      </v-tooltip>
-
-                      <v-dialog
-                        v-model="confirmationDialog"
-                        persistent
-                        max-width="290"
-                      >
-                      </v-dialog>
-                    </v-col>
-                    <Comments
-                      :cardComments="cardComments"
-                      :position="2"
-                      :cardId="card.id"
-                    ></Comments>
-                  </v-row>
-                </v-container>
-              </v-form>
+              <TechPurApproval
+                :stepName="'purchase'"
+                :team="team"
+                :card="card"
+                :cardComments="cardComments"
+                :counter="counter"
+                :commentPosition="2"
+              ></TechPurApproval>
             </v-stepper-content>
 
             <v-stepper-step step="5" :editable="listId >= 4">
@@ -1041,13 +920,19 @@
 <script>
 import { db, storage } from "@/firebase";
 import Comments from "@/components/Comments";
+import TechPurApproval from "@/components/TechPurApproval";
 import vue2Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 import FileUploadDialog from "@/components/FileUploadDialog";
 import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
-  components: { Comments, vueDropzone: vue2Dropzone, FileUploadDialog },
+  components: {
+    Comments,
+    vueDropzone: vue2Dropzone,
+    FileUploadDialog,
+    TechPurApproval,
+  },
   props: {
     listId: {
       type: Number,
