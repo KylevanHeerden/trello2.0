@@ -17,7 +17,7 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
-                <v-switch
+                <!-- <v-switch
                   ref="switch"
                   v-model="newCard.procured"
                   @click="handleClick(team.procurer, 'procured')"
@@ -31,7 +31,27 @@
                       {{ procurementStatus(newCard.procured) }}
                     </span>
                   </template>
-                </v-switch>
+                </v-switch> -->
+
+                <v-radio-group
+                  v-model="newCard.procured"
+                  row
+                  :label="'Procurement Status:'"
+                  :disabled="
+                    !checkIfUserInAuthorityArray(team.procurer).boolean
+                  "
+                >
+                  <v-radio
+                    label="Accept"
+                    @click="handleClick('procured')"
+                    :value="Boolean(true)"
+                  ></v-radio>
+                  <v-radio
+                    label="Reject"
+                    @click="handleClick('procured')"
+                    :value="Boolean(false)"
+                  ></v-radio>
+                </v-radio-group>
               </div>
             </template>
             <span>{{
@@ -185,7 +205,7 @@
             </v-card>
           </v-col>
 
-          <v-row v-if="newCard.POP.length != 0">
+          <v-row v-if="newCard.POP.length != 0 && newCard.procured == true">
             <v-col cols="12" sm="3" md="3"></v-col>
             <v-col cols="12" sm="9" md="9" class="text-center">
               <span>Proof of payment: </span>
@@ -346,6 +366,10 @@ export default {
                 const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
                 fbCard.update({ purchase_approval: param }); // updates the list id on the firebase card
                 fbCard.update({ updatedOn: new Date() });
+              } else if (statusType == "procured") {
+                const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+                fbCard.update({ procured: param }); // updates the list id on the firebase card
+                fbCard.update({ updatedOn: new Date() });
 
                 if (param == true) {
                   fbCard
@@ -373,10 +397,6 @@ export default {
                     })
                     .catch((error) => console.log(error));
                 }
-              } else if (statusType == "procured") {
-                const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
-                fbCard.update({ procured: param }); // updates the list id on the firebase card
-                fbCard.update({ updatedOn: new Date() });
               } else if (statusType == "quality_approval") {
                 const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
                 fbCard.update({ quality_approval: param }); // updates the list id on the firebase card

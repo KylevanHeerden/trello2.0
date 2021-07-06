@@ -456,7 +456,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .backgroundColorPrimary {
   background-color: #37474f;
   color: white;

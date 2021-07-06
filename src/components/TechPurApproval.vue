@@ -18,27 +18,6 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
-                <!-- <v-switch
-                  @click="
-                    handleClick(
-                      team[stepNameFn(stepName, 2)],
-                      `${stepNameFn(stepName, 1)}`
-                    )
-                  "
-                  :disabled="
-                    !checkIfUserInAuthorityArray(team[stepNameFn(stepName, 2)])
-                      .boolean
-                  "
-                  v-model="newCard[stepNameFn(stepName, 1)]"
-                >
-                  <template v-slot:label>
-                    {{ stepNameFn(stepName, 3) }}:
-                    <span class="ml-3" style="color: #37474f">
-                      {{ approvedStatus(newCard[stepNameFn(stepName, 1)]) }}
-                    </span>
-                  </template>
-                </v-switch> -->
-
                 <v-radio-group
                   v-model="newCard[stepNameFn(stepName, 1)]"
                   row
@@ -56,6 +35,7 @@
                         `${stepNameFn(stepName, 1)}`
                       )
                     "
+                    :value="Boolean(true)"
                   ></v-radio>
                   <v-radio
                     label="Reject"
@@ -65,6 +45,7 @@
                         `${stepNameFn(stepName, 1)}`
                       )
                     "
+                    :value="Boolean(false)"
                   ></v-radio>
                 </v-radio-group>
               </div>
@@ -80,6 +61,7 @@
           <v-dialog v-model="confirmationDialog" persistent max-width="290">
           </v-dialog>
         </v-col>
+
         <Comments
           :cardComments="cardComments"
           :position="commentPosition"
@@ -138,6 +120,12 @@ export default {
     ...mapState({
       currentUser: (state) => state.profile.userProfile,
     }),
+
+    msgClass() {
+      return this.newCard[this.stepNameFn(this.stepName, 1)]
+        ? "acceptMsg"
+        : "rejectMsg";
+    },
   },
   methods: {
     stepNameFn(name, num) {
@@ -157,7 +145,7 @@ export default {
       if (boolean == true) {
         return "Approved";
       } else {
-        return "Not Approved";
+        return "Rejected";
       }
     },
 
@@ -201,6 +189,12 @@ export default {
           },
           callback: (confirm) => {
             let param = this.newCard[statusType];
+
+            if (param == 0) {
+              let paramBoolean = true;
+            } else if (param == 1) {
+              let paramBoolean = false;
+            }
 
             if (confirm) {
               if (statusType == "technical_approval") {
@@ -265,4 +259,12 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.acceptMsg {
+  color: #455a64;
+}
+
+.rejectMsg {
+  color: tomato;
+}
+</style>
