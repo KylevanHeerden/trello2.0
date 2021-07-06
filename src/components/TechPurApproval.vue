@@ -18,7 +18,7 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
-                <v-switch
+                <!-- <v-switch
                   @click="
                     handleClick(
                       team[stepNameFn(stepName, 2)],
@@ -37,7 +37,36 @@
                       {{ approvedStatus(newCard[stepNameFn(stepName, 1)]) }}
                     </span>
                   </template>
-                </v-switch>
+                </v-switch> -->
+
+                <v-radio-group
+                  v-model="newCard[stepNameFn(stepName, 1)]"
+                  row
+                  :label="`${stepNameFn(stepName, 3)}:`"
+                  :disabled="
+                    !checkIfUserInAuthorityArray(team[stepNameFn(stepName, 2)])
+                      .boolean
+                  "
+                >
+                  <v-radio
+                    label="Accept"
+                    @click="
+                      handleClick(
+                        team[stepNameFn(stepName, 2)],
+                        `${stepNameFn(stepName, 1)}`
+                      )
+                    "
+                  ></v-radio>
+                  <v-radio
+                    label="Reject"
+                    @click="
+                      handleClick(
+                        team[stepNameFn(stepName, 2)],
+                        `${stepNameFn(stepName, 1)}`
+                      )
+                    "
+                  ></v-radio>
+                </v-radio-group>
               </div>
             </template>
             <span>

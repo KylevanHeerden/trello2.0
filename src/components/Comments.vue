@@ -30,7 +30,7 @@
         @click="newCommentAction = true"
         data-cypress="newCommentBtn"
       >
-        Comment
+        Notes
       </v-btn>
     </div>
 
@@ -38,7 +38,7 @@
       <v-row>
         <v-col cols="12" sm="12" md="12">
           <v-text-field
-            label="Comment"
+            label="Submit a Note"
             v-model="newComment.text"
             data-cypress="newCommentInput"
           ></v-text-field>

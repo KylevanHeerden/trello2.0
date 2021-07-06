@@ -21,17 +21,13 @@
           >
           </v-text-field>
         </v-col>
-        <v-col cols="12" sm="5" md="5">
+        <v-col cols="12" sm="4" md="4">
           <v-tooltip top :disabled="Object.keys(newCard.receiver).length !== 0">
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
                 <v-switch
                   v-model="newCard.receiver_approval"
-                  :label="
-                    `Receiver Confirmation: ${approvedStatus(
-                      newCard.receiver_approval
-                    )}`
-                  "
+                  :label="`Receiver Confirmation`"
                   @click="handleClick2('receiver_approval')"
                   :disabled="Object.keys(newCard.receiver).length === 0"
                 >
@@ -46,12 +42,12 @@
         </v-col>
 
         <v-col cols="12" sm="3" md="3">
-          <v-checkbox
+          <v-switch
             v-model="newCard.hubdoc"
             :label="'Attached to Hubdoc'"
             @click="handleClick3()"
             data-cypress="hubdocCheck"
-          ></v-checkbox>
+          ></v-switch>
         </v-col>
       </v-row>
       <v-row>
@@ -372,9 +368,22 @@ export default {
     },
 
     handleClick3() {
-      const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
-      fbCard.update({ hubdoc: this.newCard.hubdoc }); // updates the hubdoc on the firebase card
-      fbCard.update({ updatedOn: new Date() });
+      this.$confirm({
+        message: `Are you sure?`,
+        button: {
+          no: "No",
+          yes: "Yes",
+        },
+        callback: (confirm) => {
+          if (confirm) {
+            const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+            fbCard.update({ hubdoc: this.newCard.hubdoc }); // updates the hubdoc on the firebase card
+            fbCard.update({ updatedOn: new Date() });
+          } else {
+            this.newCard.hubdoc = !this.newCard.hubdoc;
+          }
+        },
+      });
     },
 
     newQualityPhoto(files) {
