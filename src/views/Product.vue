@@ -144,11 +144,12 @@ export default {
 
   methods: {
     checkMove(card, listID) {
-      const array = [2, 3, 4];
+      const array = [2, 3, 4, 6];
       const list_array = [
         { id: 2, approval: "technical_approval" },
         { id: 3, approval: "purchase_approval" },
         { id: 4, approval: "procured" },
+        { id: 6, approval: "quality_approval" },
       ];
       if (array.includes(listID)) {
         let approval = list_array.find((i) => i.id == listID);

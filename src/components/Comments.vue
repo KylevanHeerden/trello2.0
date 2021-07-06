@@ -1,7 +1,7 @@
 <template>
   <v-col cols="12" sm="12" md="12">
     <div v-for="comment in commentsPerPosition(position)" :key="comment.id">
-      <v-row data-cypress="comments">
+      <v-row data-cypress="comments" class="commentRow">
         <v-col cols="12" sm="1" md="1">
           <v-avatar size="44">
             <img src="@/assets/avatar.jpg" alt="PersonAvatar" />
@@ -152,5 +152,9 @@ export default {
 
 .smallDate {
   font-size: x-small;
+}
+
+.commentRow {
+  margin-bottom: 1px;
 }
 </style>

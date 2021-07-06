@@ -85,7 +85,7 @@
                         dark
                         small
                         text
-                        :disabled="newCard.PO_number != null"
+                        :disabled="newCard.PO_number == null"
                         class="backgroundColorPrimary "
                       >
                         Upload

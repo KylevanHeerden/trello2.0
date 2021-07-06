@@ -117,7 +117,7 @@
               Quality Approval Information
             </v-stepper-step>
             <v-stepper-content step="6">
-              <v-form>
+              <!-- <v-form>
                 <v-container>
                   <v-row>
                     <v-col
@@ -342,7 +342,14 @@
                     :cardId="card.id"
                   ></Comments>
                 </v-container>
-              </v-form>
+              </v-form> -->
+              <QualityInfo
+                :team="team"
+                :card="card"
+                :cardComments="cardComments"
+                :counter="counter"
+                :commentPosition="4"
+              ></QualityInfo>
             </v-stepper-content>
           </v-stepper>
         </v-card-text>
@@ -377,6 +384,7 @@ import Comments from "@/components/Comments";
 import QuoteInfo from "@/components/QuoteInfo";
 import TechPurApproval from "@/components/TechPurApproval";
 import PurchaseInfo from "@/components/PurchaseInfo";
+import QualityInfo from "@/components/QualityInfo";
 import vue2Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 import FileUploadDialog from "@/components/FileUploadDialog";
@@ -390,6 +398,7 @@ export default {
     QuoteInfo,
     TechPurApproval,
     PurchaseInfo,
+    QualityInfo,
   },
   props: {
     listId: {
