@@ -92,6 +92,7 @@
                 :cardComments="cardComments"
                 :counter="counter"
                 :commentPosition="2"
+                v-on="$listeners"
               ></TechPurApproval>
             </v-stepper-content>
 

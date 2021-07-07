@@ -201,6 +201,8 @@ export default {
                 const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
                 fbCard.update({ technical_approval: param }); // updates the technical approval status on the firebase card
                 fbCard.update({ updatedOn: new Date() });
+
+                this.moveCardAuto(fbCard);
               } else if (statusType == "purchase_approval") {
                 const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
                 fbCard.update({ purchase_approval: param }); // updates the purchase approval status on the firebase card
@@ -252,6 +254,17 @@ export default {
           },
         });
       }
+    },
+
+    moveCardAuto(fbCard) {
+      fbCard.get().then((card) => {
+        let cardData = card.data();
+        let listId = cardData.list_id;
+
+        console.log("hello from grandChild");
+
+        this.$emit("move-Card-Auto", listId);
+      });
     },
   },
 

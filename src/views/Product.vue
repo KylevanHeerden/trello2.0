@@ -36,6 +36,7 @@
               :team="team"
               :productName="product.name"
               data-cypress="card"
+              @card-Move-Auto="cardMoveAuto"
             ></Card>
           </Draggable>
           <div v-if="list.id === 1" class="text-right">
@@ -162,6 +163,11 @@ export default {
       }
     },
 
+    cardMoveAuto() {
+      console.log("hello from product");
+      console.log(listId);
+    },
+
     async cardMoved(listId, e) {
       const evt = e.added || e.moved; //the events triggered by draggable
       if (evt == undefined) {
@@ -263,7 +269,7 @@ export default {
         });
       }
 
-      this.$store.dispatch("getNotifications");
+      this.getNotifications;
     },
 
     commentsByCard(cardId) {

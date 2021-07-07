@@ -51,7 +51,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="12" sm="6" md="6" v-if="newCard.quality_approval == null">
+        <v-col cols="12" sm="4" md="4" v-if="newCard.quality_approval == null">
           <v-select
             v-model="newCard.quality_approver"
             label="Quality Approver"
@@ -62,7 +62,7 @@
             data-cypress="qualitySelect"
           ></v-select>
         </v-col>
-        <v-col cols="12" sm="6" md="6" v-else>
+        <v-col cols="12" sm="4" md="4" v-else>
           <v-text-field
             v-model="newCard.quality_approver.text"
             label="Quality Approver"
@@ -71,6 +71,7 @@
           >
           </v-text-field>
         </v-col>
+        <v-col cols="12" sm="1" md="1"> </v-col>
         <v-col cols="12" sm="6" md="6">
           <v-tooltip
             top
@@ -78,7 +79,7 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
-                <v-select
+                <!-- <v-select
                   v-model="newCard.quality_approval"
                   label="Quality Approval"
                   :items="quality_approval_options"
@@ -87,7 +88,25 @@
                   @change="handleClick2('quality_approval')"
                   :disabled="Object.keys(newCard.quality_approver).length === 0"
                 >
-                </v-select>
+                </v-select> -->
+
+                <v-radio-group
+                  v-model="newCard.quality_approval"
+                  row
+                  :label="'Quality Approval Status:'"
+                  :disabled="Object.keys(newCard.quality_approver).length === 0"
+                >
+                  <v-radio
+                    label="Accept"
+                    @click="handleClick2('quality_approval')"
+                    :value="Boolean(true)"
+                  ></v-radio>
+                  <v-radio
+                    label="Reject"
+                    @click="handleClick2('quality_approval')"
+                    :value="Boolean(false)"
+                  ></v-radio>
+                </v-radio-group>
               </div>
             </template>
             <span>Select Quality Approver first</span>
@@ -167,7 +186,7 @@
           md="12"
           v-else-if="newCard.quality_photos.length !== 0"
         >
-          <span>Quality approval files:</span>
+          <span class="fileLabel">Quality approval files:</span>
           <v-chip
             v-for="file in newCard.quality_photos"
             :key="file.link"
@@ -489,5 +508,9 @@ export default {
 
 .commentsRow {
   margin-top: 1rem;
+}
+
+.fileLabel {
+  color: rgba(0, 0, 0, 0.6);
 }
 </style>

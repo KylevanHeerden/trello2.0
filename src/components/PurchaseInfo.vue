@@ -17,22 +17,6 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
-                <!-- <v-switch
-                  ref="switch"
-                  v-model="newCard.procured"
-                  @click="handleClick(team.procurer, 'procured')"
-                  :disabled="
-                    !checkIfUserInAuthorityArray(team.procurer).boolean
-                  "
-                >
-                  <template v-slot:label>
-                    Procurement Status:
-                    <span class="ml-3" style="color: #37474f">
-                      {{ procurementStatus(newCard.procured) }}
-                    </span>
-                  </template>
-                </v-switch> -->
-
                 <v-radio-group
                   v-model="newCard.procured"
                   row
@@ -43,12 +27,12 @@
                 >
                   <v-radio
                     label="Accept"
-                    @click="handleClick('procured')"
+                    @click="handleClick(team.procurer, 'procured')"
                     :value="Boolean(true)"
                   ></v-radio>
                   <v-radio
                     label="Reject"
-                    @click="handleClick('procured')"
+                    @click="handleClick(team.procurer, 'procured')"
                     :value="Boolean(false)"
                   ></v-radio>
                 </v-radio-group>
@@ -137,7 +121,7 @@
           sm="6"
           md="6"
         >
-          <span>Purchase Order: </span>
+          <span class="fileLabel">Purchase Order: </span>
           <v-chip
             v-for="file in newCard.purchase_order"
             :key="fileLinkEncoded(file.link)"
@@ -208,7 +192,7 @@
           <v-row v-if="newCard.POP.length != 0 && newCard.procured == true">
             <v-col cols="12" sm="3" md="3"></v-col>
             <v-col cols="12" sm="9" md="9" class="text-center">
-              <span>Proof of payment: </span>
+              <span class="fileLabel">Proof of payment: </span>
               <v-chip
                 v-for="file in newCard.POP"
                 :key="fileLinkEncoded(file.link)"
@@ -582,5 +566,9 @@ export default {
 
 .material-icons:before {
   display: none;
+}
+
+.fileLabel {
+  color: rgba(0, 0, 0, 0.6);
 }
 </style>
