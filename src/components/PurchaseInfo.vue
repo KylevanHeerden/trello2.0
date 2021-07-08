@@ -254,6 +254,10 @@ export default {
       type: Number,
       required: true,
     },
+    product: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -380,6 +384,8 @@ export default {
                         .catch((error) => console.log(error));
                     })
                     .catch((error) => console.log(error));
+                } else {
+                  this.moveCardAutoBackward(fbCard);
                 }
               } else if (statusType == "quality_approval") {
                 const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
@@ -396,6 +402,50 @@ export default {
           },
         });
       }
+    },
+
+    async moveCardAutoForward(fbCard) {
+      let card = await fbCard.get();
+      let cardData = card.data();
+
+      // Move card forward is approved
+      fbCard.update({ list_id: 5 });
+
+      // Change the status of product with the moce of card
+      let fbProduct = db.collection("products").doc(cardData.product_id);
+      await fbProduct.update({
+        status: "Procured",
+      });
+
+      // Go up multiple parent components to trigger snackbar
+      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.snackbar = true;
+      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.newListName =
+        "Follow Up";
+
+      // Send notification
+      this.sendNotification(5, "Follow Up");
+    },
+
+    async moveCardAutoBackward(fbCard) {
+      let card = await fbCard.get();
+      let cardData = card.data();
+
+      // Move card forward is approved
+      fbCard.update({ list_id: 3 });
+
+      // Change the status of product with the moce of card
+      let fbProduct = db.collection("products").doc(cardData.product_id);
+      await fbProduct.update({
+        status: "Purchase",
+      });
+
+      // Go up multiple parent components to trigger snackbar
+      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.snackbar = true;
+      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.newListName =
+        "Purchase Approval";
+
+      // Send notification
+      this.sendNotification(3, "Purchase");
     },
 
     newPOP(files) {
@@ -420,6 +470,7 @@ export default {
       fbCard.update({ POP_date: new Date() });
       fbProduct.update({ POP_date: new Date() });
       fbProduct.update({ leadTime: this.card.lead_time });
+      this.moveCardAutoForward(fbCard);
     },
 
     newPurchaseOrder(files) {
@@ -451,6 +502,88 @@ export default {
       } else {
         return "Not Ordered";
       }
+    },
+
+    sendNotification(newListId, status) {
+      const person_array = [
+        "technical_approver",
+        "purchase_approver",
+        "procurer",
+        "purchase_approver",
+      ];
+
+      const toCall = person_array[newListId - 2];
+
+      if (this.team[toCall] == undefined) {
+        // card creator notified when card is in quality
+        db.collection("notifications").add({
+          card_id: this.card.id,
+          product: {
+            product_name: this.product.name,
+            product_id: this.product.id,
+          },
+          programme: {
+            programme_name: this.product.programme.programme_name,
+            programme_id: this.product.programme.programme_id,
+          },
+          user_id: this.card.creator,
+          createdOn: new Date(),
+          status: status,
+        });
+      } else if (newListId - 2 === 3) {
+        // Now purchase approver and card creator is notified when card is in awaiting
+        db.collection("notifications").add({
+          card_id: this.card.id,
+          product: {
+            product_name: this.product.name,
+            product_id: this.product.id,
+          },
+          programme: {
+            programme_name: this.product.programme.programme_name,
+            programme_id: this.product.programme.programme_id,
+          },
+          user_id: this.card.creator,
+          createdOn: new Date(),
+          status: status,
+        });
+
+        this.team[toCall].users.forEach((notify) => {
+          db.collection("notifications").add({
+            card_id: this.card.id,
+            product: {
+              product_name: this.product.name,
+              product_id: this.product.id,
+            },
+            programme: {
+              programme_name: this.product.programme.programme_name,
+              programme_id: this.product.programme.programme_id,
+            },
+            user_id: notify.value,
+            createdOn: new Date(),
+            status: status,
+          });
+        });
+      } else {
+        // nofity relevant party when card moves to column
+        this.team[toCall].users.forEach((notify) => {
+          db.collection("notifications").add({
+            card_id: this.card.id,
+            product: {
+              product_name: this.product.name,
+              product_id: this.product.id,
+            },
+            programme: {
+              programme_name: this.product.programme.programme_name,
+              programme_id: this.product.programme.programme_id,
+            },
+            user_id: notify.value,
+            createdOn: new Date(),
+            status: status,
+          });
+        });
+      }
+
+      this.getNotifications;
     },
 
     template: function() {

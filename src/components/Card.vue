@@ -63,7 +63,7 @@
 
             <v-stepper-step
               step="3"
-              :editable="listId >= 2"
+              :editable="listId >= 2 || card.technical_approval == false"
               data-cypress="technicalInfo"
             >
               Technical Approval Information
@@ -77,10 +77,14 @@
                 :cardComments="cardComments"
                 :counter="counter"
                 :commentPosition="1"
+                :product="product"
               ></TechPurApproval>
             </v-stepper-content>
 
-            <v-stepper-step step="4" :editable="listId >= 3">
+            <v-stepper-step
+              step="4"
+              :editable="listId >= 3 || card.purchase_approval == false"
+            >
               Purchase Approval Information
             </v-stepper-step>
 
@@ -92,6 +96,7 @@
                 :cardComments="cardComments"
                 :counter="counter"
                 :commentPosition="2"
+                :product="product"
               ></TechPurApproval>
             </v-stepper-content>
 
@@ -106,6 +111,7 @@
                 :cardComments="cardComments"
                 :counter="counter"
                 :commentPosition="3"
+                :product="product"
               ></PurchaseInfo>
             </v-stepper-content>
 
@@ -161,6 +167,10 @@ export default {
       required: true,
     },
     team: {
+      type: Object,
+      required: true,
+    },
+    product: {
       type: Object,
       required: true,
     },

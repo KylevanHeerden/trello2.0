@@ -104,6 +104,10 @@ export default {
       type: Number,
       required: true,
     },
+    product: {
+      type: Object,
+      required: true,
+    },
   },
 
   data() {
@@ -191,12 +195,13 @@ export default {
             let param = this.newCard[statusType];
 
             if (confirm) {
+              const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+              this.moveCardAuto(fbCard, param); // Call the cardMoveAuto function with param to decide to move forward or back
+
               if (statusType == "technical_approval") {
                 const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
                 fbCard.update({ technical_approval: param }); // updates the technical approval status on the firebase card
                 fbCard.update({ updatedOn: new Date() });
-
-                this.moveCardAuto(fbCard);
               } else if (statusType == "purchase_approval") {
                 const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
                 fbCard.update({ purchase_approval: param }); // updates the purchase approval status on the firebase card
@@ -250,44 +255,102 @@ export default {
       }
     },
 
-    async moveCardAuto(fbCard) {
+    async moveCardAuto(fbCard, param) {
       let card = await fbCard.get();
       let cardData = card.data();
 
       let listId = cardData.list_id;
-
-      fbCard.update({ list_id: listId + 1 });
 
       const status = [
         "Quotes",
         "Technical",
         "Purchase",
         "Procurement",
-        "Follow Up",
+        "FollowUp",
         "Quality",
       ];
 
-      let fbProduct = db.collection("products").doc(cardData.product_id);
-      await fbProduct.update({
-        status: status[listId],
-      });
-
       let newListName = "";
-      let newListId = listId + 1;
+      let newListId = listId;
 
-      if (newListId == 1 || 5) {
-        console.log("1");
-        newListName = status[listId];
-      } else if (newListId == 4) {
-        console.log("2");
-        newListName = "Activate Purchase";
+      if (param == true) {
+        // Move card forward is approved
+        newListId = Number(listId) + 1;
       } else {
-        console.log("3");
-        newListName = `${status[listId]} Approval`;
+        // Move card back if card rejected
+        newListId = Number(listId) - 1;
       }
 
+      // Move card back if card rejected
+      fbCard.update({ list_id: newListId });
+
+      // Change the status of product with the moce of card
+      let fbProduct = db.collection("products").doc(cardData.product_id);
+      await fbProduct.update({
+        status: status[newListId - 1],
+      });
+
+      // Get the correct list name for snackbar
+      if (newListId == 1 || newListId == 5) {
+        newListName = status[newListId - 1];
+      } else if (newListId == 4) {
+        newListName = "Activate Purchase";
+      } else if (newListId == 2 || newListId == 3 || newListId == 6) {
+        newListName = `${status[newListId - 1]} Approval`;
+      }
+
+      // Go up multiple parent components to trigger snackbar
       this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.snackbar = true;
       this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.newListName = newListName;
+
+      // Send notifications
+      this.sendNotification(newListId, status[newListId - 1]);
+    },
+
+    sendNotification(newListId, status) {
+      const person_array = [
+        "technical_approver",
+        "purchase_approver",
+        "procurer",
+      ];
+
+      const toCall = person_array[newListId - 2];
+
+      if (this.team[toCall] == undefined) {
+        // card creator notified when card is in quality
+        db.collection("notifications").add({
+          card_id: this.card.id,
+          product: {
+            product_name: this.product.name,
+            product_id: this.product.id,
+          },
+          programme: {
+            programme_name: this.product.programme.programme_name,
+            programme_id: this.product.programme.programme_id,
+          },
+          user_id: this.card.creator,
+          createdOn: new Date(),
+          status: status,
+        });
+      } else {
+        // nofity relevant party when card moves to column
+        this.team[toCall].users.forEach((notify) => {
+          db.collection("notifications").add({
+            card_id: this.card.id,
+            product: {
+              product_name: this.product.name,
+              product_id: this.product.id,
+            },
+            programme: {
+              programme_name: this.product.programme.programme_name,
+              programme_id: this.product.programme.programme_id,
+            },
+            user_id: notify.value,
+            createdOn: new Date(),
+            status: status,
+          });
+        });
+      }
     },
   },
 

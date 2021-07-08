@@ -34,7 +34,7 @@
               :listId="list.id"
               :cardComments="commentsByCard(card.id)"
               :team="team"
-              :productName="product.name"
+              :product="product"
               data-cypress="card"
               @snackbar-Fn="snackbarFn"
             ></Card>
@@ -168,11 +168,6 @@ export default {
       "getNotifications",
     ]),
 
-    // fetchedProductId() {
-    //   let fetchedId = this.$route.params.id;
-    //   return fetchedId;
-    // },
-
     product() {
       let product = this.getProductById(this.fetchedProductId);
 
@@ -249,6 +244,8 @@ export default {
 
         if (card[approval.approval]) {
           return "draggable";
+        } else {
+          return;
         }
       } else {
         return "draggable";

@@ -347,7 +347,7 @@ export default {
         files: [],
         updatedOn: new Date(),
         createdOn: new Date(),
-        technical_approval: nulll,
+        technical_approval: null,
         purchase_approval: null,
         procured: null,
         receiver_approval: false,
@@ -380,6 +380,27 @@ export default {
       },
     };
   },
+
+  computed: {
+    suppliers() {
+      let suppliers = this.$store.getters.getSuppliers;
+      return suppliers;
+    },
+
+    user() {
+      let user = this.$store.getters.getUserProfile;
+      return user;
+    },
+
+    nonVAT() {
+      if (this.newCard.currency != "R") {
+        return "Customs Duty";
+      } else {
+        return "VAT";
+      }
+    },
+  },
+
   methods: {
     fileAdded(file) {
       this.newCard.files.push(file);
@@ -654,25 +675,6 @@ export default {
           })(this),
           1
         );
-      }
-    },
-  },
-  computed: {
-    suppliers() {
-      let suppliers = this.$store.getters.getSuppliers;
-      return suppliers;
-    },
-
-    user() {
-      let user = this.$store.getters.getUserProfile;
-      return user;
-    },
-
-    nonVAT() {
-      if (this.newCard.currency != "R") {
-        return "Customs Duty";
-      } else {
-        return "VAT";
       }
     },
   },
