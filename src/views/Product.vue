@@ -36,7 +36,7 @@
               :team="team"
               :productName="product.name"
               data-cypress="card"
-              @card-Move-Auto="cardMoveAuto"
+              @snackbar-Fn="snackbarFn"
             ></Card>
           </Draggable>
           <div v-if="list.id === 1" class="text-right">
@@ -143,6 +143,98 @@ export default {
     },
   },
 
+  computed: {
+    ...mapState({
+      cards(state) {
+        let unfilteredCards = state.Cards;
+        let cards = unfilteredCards.filter(
+          (card) => card.product_id === this.productId
+        );
+        let sortedCards = cards.sort((a, b) => a.createdOn - b.createdOn);
+        //This method is to populate lists.cards of Array
+        sortedCards.map((card) =>
+          this.Array[card.list_id - 1].cards.push(card)
+        );
+        return cards;
+      },
+      comments: (state) => state.comments,
+      notifications: (state) => state.notifications.notifications,
+    }),
+    ...mapGetters([
+      "getProductById",
+      "getProgrammeById",
+      "getTeams",
+      "getCards",
+      "getNotifications",
+    ]),
+
+    // fetchedProductId() {
+    //   let fetchedId = this.$route.params.id;
+    //   return fetchedId;
+    // },
+
+    product() {
+      let product = this.getProductById(this.fetchedProductId);
+
+      return product;
+    },
+    programme() {
+      if (this.product == undefined) {
+        let programme = this.getProgrammeById(
+          this.product.programme.programme_id
+        );
+
+        return programme;
+      } else {
+        let programme = this.getProgrammeById(
+          this.product.programme.programme_id
+        );
+
+        return programme;
+      }
+    },
+
+    team() {
+      let teams = this.getTeams;
+      let team = teams.filter(
+        (team) => team.programme.programme_id === this.programme.id
+      );
+      return team[0];
+    },
+    links() {
+      if (this.product == undefined) {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+        ];
+      } else if (this.programme == undefined) {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+        ];
+      } else {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+          {
+            text: `${this.programme.name}`,
+            to: "/programme/" + `${this.programme.id}`,
+          },
+          {
+            text: `${this.product.name}`,
+            to: "/product/" + this.product.id,
+          },
+        ];
+      }
+    },
+  },
+
   methods: {
     checkMove(card, listID) {
       const array = [2, 3, 4, 6];
@@ -161,11 +253,6 @@ export default {
       } else {
         return "draggable";
       }
-    },
-
-    cardMoveAuto() {
-      console.log("hello from product");
-      console.log(listId);
     },
 
     async cardMoved(listId, e) {
@@ -287,99 +374,12 @@ export default {
       let listCards = cards.filter((card) => card.list_id === id);
       return listCards;
     },
-  },
 
-  computed: {
-    ...mapState({
-      cards(state) {
-        let unfilteredCards = state.Cards;
-        let cards = unfilteredCards.filter(
-          (card) => card.product_id === this.productId
-        );
-        let sortedCards = cards.sort((a, b) => a.createdOn - b.createdOn);
-        //This method is to populate lists.cards of Array
-        sortedCards.map((card) =>
-          this.Array[card.list_id - 1].cards.push(card)
-        );
-        return cards;
-      },
-      comments: (state) => state.comments,
-      notifications: (state) => state.notifications.notifications,
-    }),
-    ...mapGetters([
-      "getProductById",
-      "getProgrammeById",
-      "getTeams",
-      "getCards",
-      "getNotifications",
-    ]),
-
-    // fetchedProductId() {
-    //   let fetchedId = this.$route.params.id;
-    //   return fetchedId;
-    // },
-
-    product() {
-      let product = this.getProductById(this.fetchedProductId);
-
-      return product;
-    },
-    programme() {
-      if (this.product == undefined) {
-        let programme = this.getProgrammeById(
-          this.product.programme.programme_id
-        );
-
-        return programme;
-      } else {
-        let programme = this.getProgrammeById(
-          this.product.programme.programme_id
-        );
-
-        return programme;
-      }
-    },
-
-    team() {
-      let teams = this.getTeams;
-      let team = teams.filter(
-        (team) => team.programme.programme_id === this.programme.id
-      );
-      return team[0];
-    },
-    links() {
-      if (this.product == undefined) {
-        return [
-          {
-            text: "Programmes",
-            to: "/",
-          },
-        ];
-      } else if (this.programme == undefined) {
-        return [
-          {
-            text: "Programmes",
-            to: "/",
-          },
-        ];
-      } else {
-        return [
-          {
-            text: "Programmes",
-            to: "/",
-          },
-          {
-            text: `${this.programme.name}`,
-            to: "/programme/" + `${this.programme.id}`,
-          },
-          {
-            text: `${this.product.name}`,
-            to: "/product/" + this.product.id,
-          },
-        ];
-      }
+    snackbarFn() {
+      console.log("Grandparent Hello");
     },
   },
+
   created() {
     //Methods run before page load complete so that data available in store but also local3000ly in component
     this.$store.dispatch("getProducts");

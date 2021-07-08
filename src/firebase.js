@@ -33,6 +33,7 @@ const commentsCollection = db.collection("comments");
 const teamsCollection = db.collection("teams");
 const lineItemsCollection = db.collection("line_items");
 const notificationsCollection = db.collection("notifications");
+const snackbarsCollection = db.collection("snackbars");
 
 // export utils/refs
 export {
@@ -51,4 +52,5 @@ export {
   teamsCollection,
   lineItemsCollection,
   notificationsCollection,
+  snackbarsCollection,
 };

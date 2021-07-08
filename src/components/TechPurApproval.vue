@@ -108,11 +108,11 @@ export default {
 
   data() {
     return {
+      confirmationDialog: false,
       newCard: {
         purchase_approval: this.card.purchase_approval,
         technical_approval: this.card.technical_approval,
       },
-      confirmationDialog: false,
     };
   },
 
@@ -190,12 +190,6 @@ export default {
           callback: (confirm) => {
             let param = this.newCard[statusType];
 
-            if (param == 0) {
-              let paramBoolean = true;
-            } else if (param == 1) {
-              let paramBoolean = false;
-            }
-
             if (confirm) {
               if (statusType == "technical_approval") {
                 const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
@@ -256,15 +250,44 @@ export default {
       }
     },
 
-    moveCardAuto(fbCard) {
-      fbCard.get().then((card) => {
-        let cardData = card.data();
-        let listId = cardData.list_id;
+    async moveCardAuto(fbCard) {
+      let card = await fbCard.get();
+      let cardData = card.data();
 
-        console.log("hello from grandChild");
+      let listId = cardData.list_id;
 
-        this.$emit("move-Card-Auto", listId);
+      fbCard.update({ list_id: listId + 1 });
+
+      const status = [
+        "Quotes",
+        "Technical",
+        "Purchase",
+        "Procurement",
+        "Follow Up",
+        "Quality",
+      ];
+
+      let fbProduct = db.collection("products").doc(cardData.product_id);
+      await fbProduct.update({
+        status: status[listId],
       });
+
+      let newListName = "";
+      let newListId = listId + 1;
+
+      if (newListId == 1 || 5) {
+        console.log("1");
+        newListName = status[listId];
+      } else if (newListId == 4) {
+        console.log("2");
+        newListName = "Activate Purchase";
+      } else {
+        console.log("3");
+        newListName = `${status[listId]} Approval`;
+      }
+
+      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.snackbar = true;
+      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.newListName = newListName;
     },
   },
 
