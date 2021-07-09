@@ -62,6 +62,18 @@
           </v-dialog>
         </v-col>
 
+        <v-row>
+          <v-container fluid v-if="newCard[stepNameFn(stepName, 1)] == false">
+            <v-row align-content="center" justify="center">
+              <v-col cols="12" sm="6" md="6">
+                <v-card-title class="rejectMsg">
+                  {{ stepNameFn(stepName, 3) }} Rejected
+                </v-card-title>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-row>
+
         <Comments
           :cardComments="cardComments"
           :position="commentPosition"
@@ -278,7 +290,7 @@ export default {
         newListId = Number(listId) + 1;
       } else {
         // Move card back if card rejected
-        newListId = Number(listId) - 1;
+        newListId = 1;
       }
 
       // Move card back if card rejected

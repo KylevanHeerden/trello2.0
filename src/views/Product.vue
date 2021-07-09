@@ -77,6 +77,7 @@ import Card from "@/components/Card.vue";
 import NewCard from "@/components/NewCard.vue";
 import { db } from "@/firebase";
 import { mapState, mapGetters, mapActions } from "vuex";
+import draggable from "vuedraggable";
 
 export default {
   name: "Products",
@@ -232,23 +233,10 @@ export default {
 
   methods: {
     checkMove(card, listID) {
-      const array = [2, 3, 4, 6];
-      const list_array = [
-        { id: 2, approval: "technical_approval" },
-        { id: 3, approval: "purchase_approval" },
-        { id: 4, approval: "procured" },
-        { id: 6, approval: "quality_approval" },
-      ];
-      if (array.includes(listID)) {
-        let approval = list_array.find((i) => i.id == listID);
-
-        if (card[approval.approval]) {
-          return "draggable";
-        } else {
-          return;
-        }
-      } else {
+      if (listID === 1 || listID === 5) {
         return "draggable";
+      } else {
+        return;
       }
     },
 

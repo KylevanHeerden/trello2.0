@@ -46,6 +46,18 @@
           <v-dialog v-model="confirmationDialog" persistent max-width="290">
           </v-dialog>
         </v-col>
+
+        <v-container fluid v-if="newCard.procured == false">
+          <v-row align-content="center" justify="center">
+            <v-col cols="12" sm="2" md="2"></v-col>
+            <v-col cols="12" sm="6" md="6">
+              <v-card-title class="rejectMsg">
+                Procurement Rejected
+              </v-card-title>
+            </v-col>
+          </v-row>
+        </v-container>
+
         <v-row
           v-if="newCard.purchase_order.length == 0 && newCard.procured == true"
           class="purchaseInfoRowPadding"
@@ -431,21 +443,21 @@ export default {
       let cardData = card.data();
 
       // Move card forward is approved
-      fbCard.update({ list_id: 3 });
+      fbCard.update({ list_id: 1 });
 
       // Change the status of product with the moce of card
       let fbProduct = db.collection("products").doc(cardData.product_id);
       await fbProduct.update({
-        status: "Purchase",
+        status: "Quotes",
       });
 
       // Go up multiple parent components to trigger snackbar
       this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.snackbar = true;
       this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.newListName =
-        "Purchase Approval";
+        "Quotes";
 
       // Send notification
-      this.sendNotification(3, "Purchase");
+      this.sendNotification(1, "Quotes");
     },
 
     newPOP(files) {
@@ -703,5 +715,9 @@ export default {
 
 .fileLabel {
   color: rgba(0, 0, 0, 0.6);
+}
+
+.rejectMsg {
+  color: tomato;
 }
 </style>

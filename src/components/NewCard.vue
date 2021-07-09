@@ -325,7 +325,7 @@ export default {
       ],
       inputRulesMoney: [
         (v) => v.match(/^\d+(?:\.\d{0,2})$/) || "Must be in the format R0.00",
-        (v) => v.length >= 5 || "Minimum length is 4 characters",
+        (v) => v.length >= 4 || "Minimum length is 3 characters",
       ],
       inputRulesVAT: [
         (v) => v.match(/^\d+(?:\.\d{0,2})$/) || "Must be in the format R0.00",

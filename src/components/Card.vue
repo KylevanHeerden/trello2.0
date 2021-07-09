@@ -63,7 +63,7 @@
 
             <v-stepper-step
               step="3"
-              :editable="listId >= 2 || card.technical_approval == false"
+              :editable="listId >= 2 || card.technical_approval != null"
               data-cypress="technicalInfo"
             >
               Technical Approval Information
@@ -83,7 +83,7 @@
 
             <v-stepper-step
               step="4"
-              :editable="listId >= 3 || card.purchase_approval == false"
+              :editable="listId >= 3 || card.purchase_approval != null"
             >
               Purchase Approval Information
             </v-stepper-step>
@@ -100,7 +100,10 @@
               ></TechPurApproval>
             </v-stepper-content>
 
-            <v-stepper-step step="5" :editable="listId >= 4">
+            <v-stepper-step
+              step="5"
+              :editable="listId >= 4 || card.procured != null"
+            >
               Purchase Information
             </v-stepper-step>
             <v-stepper-content step="5">
