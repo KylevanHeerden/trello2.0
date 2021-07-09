@@ -147,11 +147,7 @@
             {{ file.file_name }}
           </v-chip>
         </v-col>
-        <v-row
-          justify="center"
-          align-content="center"
-          v-if="newCard.PO_number != null && newCard.purchase_order.length != 0"
-        >
+        <v-row justify="center" align-content="center">
           <v-col
             cols="12"
             sm="12"
@@ -482,7 +478,6 @@ export default {
       fbCard.update({ POP_date: new Date() });
       fbProduct.update({ POP_date: new Date() });
       fbProduct.update({ leadTime: this.card.lead_time });
-      this.moveCardAutoForward(fbCard);
     },
 
     newPurchaseOrder(files) {
@@ -506,6 +501,8 @@ export default {
       });
 
       this.newCard.purchase_order = filesArray;
+
+      this.moveCardAutoForward(fbCard);
     },
 
     procurementStatus(boolean) {
