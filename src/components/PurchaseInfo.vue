@@ -422,7 +422,7 @@ export default {
       // Change the status of product with the moce of card
       let fbProduct = db.collection("products").doc(cardData.product_id);
       await fbProduct.update({
-        status: "Procured",
+        status: "FollowUp",
       });
 
       // Go up multiple parent components to trigger snackbar

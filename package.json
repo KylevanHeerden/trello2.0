@@ -57,9 +57,9 @@
     "firebase-admin": "^9.9.0",
     "node-sass": "^4.12.0",
     "prettier": "^1.19.1",
-    "sass": "^1.29.0",
+    "sass": "~1.29.0",
     "sass-loader": "^8.0.2",
-    "vue-cli-plugin-vuetify": "^2.0.7",
+    "vue-cli-plugin-vuetify": "~2.4.1",
     "vue-template-compiler": "^2.6.11",
     "vuetify-loader": "^1.3.0"
   },
@@ -82,7 +82,9 @@
     },
     "overrides": [
       {
-        "files": ["*.spec.js"]
+        "files": [
+          "*.spec.js"
+        ]
       }
     ]
   },
