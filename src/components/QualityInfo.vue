@@ -278,7 +278,10 @@ export default {
   },
   computed: {
     ...mapState({
-      users: (state) => state.users.users,
+      users: (state) => {
+        let users = state.users.users;
+        return users.sort();
+      },
       currentUser: (state) => state.profile.userProfile,
       cards: (state) => state.cards,
     }),
@@ -295,7 +298,7 @@ export default {
         };
         mapUsersArray.push(map);
       });
-      return mapUsersArray;
+      return mapUsersArray.sort((a, b) => a.text.localeCompare(b.text));
     },
   },
   methods: {

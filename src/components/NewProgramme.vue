@@ -254,7 +254,7 @@ export default {
         };
         mapUsersArray.push(map);
       });
-      return mapUsersArray;
+      return mapUsersArray.sort((a, b) => a.text.localeCompare(b.text));
     },
   },
 

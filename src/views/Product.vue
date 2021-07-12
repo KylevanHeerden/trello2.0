@@ -76,8 +76,7 @@ import Draggable from "vuedraggable";
 import Card from "@/components/Card.vue";
 import NewCard from "@/components/NewCard.vue";
 import { db } from "@/firebase";
-import { mapState, mapGetters, mapActions } from "vuex";
-import draggable from "vuedraggable";
+import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "Products",

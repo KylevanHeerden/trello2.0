@@ -384,7 +384,7 @@ export default {
   computed: {
     suppliers() {
       let suppliers = this.$store.getters.getSuppliers;
-      return suppliers;
+      return suppliers.sort();
     },
 
     user() {
