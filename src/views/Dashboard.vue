@@ -144,7 +144,38 @@ export default {
     };
   },
 
+  computed: {
+    ...mapState({
+      programmes: (state) => state.programmes.programmes,
+    }),
+    ...mapGetters({}),
+
+    // Filters programmes with type CD
+    CD_programmes() {
+      return this.programmes.filter(
+        (programme) => programme.programme_type === "CD"
+      );
+    },
+
+    // Filters programmes with type X
+    X_programmes() {
+      return this.programmes.filter(
+        (programme) => programme.programme_type === "X"
+      );
+    },
+
+    // Filters programmes with type Y
+    Y_programmes() {
+      return this.programmes.filter(
+        (programme) => programme.programme_type === "Y"
+      );
+    },
+  },
+
   methods: {
+    ...mapActions(["getProgrammes"]),
+
+    // Sort the programmes by team alphabetically
     sortBy: function(prop) {
       if (prop == "team") {
         this.programmes.sort((a, b) =>
@@ -156,31 +187,8 @@ export default {
     },
   },
 
-  computed: {
-    ...mapState({
-      programmes: (state) => state.programmes.programmes,
-    }),
-    ...mapGetters({}),
-
-    CD_programmes() {
-      return this.programmes.filter(
-        (programme) => programme.programme_type === "CD"
-      );
-    },
-    X_programmes() {
-      return this.programmes.filter(
-        (programme) => programme.programme_type === "X"
-      );
-    },
-    Y_programmes() {
-      return this.programmes.filter(
-        (programme) => programme.programme_type === "Y"
-      );
-    },
-  },
-
   mounted() {
-    this.$store.dispatch("getProgrammes");
+    this.getProgrammes();
   },
 };
 </script>

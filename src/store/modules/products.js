@@ -22,6 +22,7 @@ export default {
   },
 
   actions: {
+    // Gets the programmes from fb
     async getProducts({ commit }) {
       fb.productsCollection.onSnapshot(
         (products) => {
@@ -51,17 +52,22 @@ export default {
       );
     },
 
+    // Create new Product function fired from newProduct component
     async createNewProduct({ commit, state }, newProductData) {
+      // Create empty product in fb
       let product = await fb.productsCollection.add({});
 
+      // Set new product data in fb
       await fb.productsCollection.doc(product.id).set(newProductData);
 
+      // Get related programme
       let programme = await fb.programmesCollection
         .doc(newProductData.programme.programme_id)
         .get();
 
       let programmeData = programme.data();
 
+      // Update programme data with new product
       programmeData.products.push({
         product_name: newProductData.name,
         product_id: product.id,

@@ -6,8 +6,8 @@ export default {
   },
 
   getters: {
-    user(state) {
-      return state.user;
+    getUsers(state) {
+      return state.users;
     },
   },
 

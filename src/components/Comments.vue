@@ -94,6 +94,20 @@ export default {
       newCommentAction: false,
     };
   },
+  computed: {
+    currentUser() {
+      let user = this.$store.getters.getUserProfile;
+      return user;
+    },
+
+    nameSurname() {
+      return this.currentUser.name + " " + this.currentUser.surname;
+    },
+  },
+
+  mounted() {
+    this.$store.dispatch("getUsers");
+  },
   methods: {
     SubmitComment(position) {
       db.collection("comments").add({
@@ -120,21 +134,6 @@ export default {
       let date = moment(param.toDate()).format("Do MMM YYYY");
       return date;
     },
-  },
-
-  computed: {
-    currentUser() {
-      let user = this.$store.getters.getUserProfile;
-      return user;
-    },
-
-    nameSurname() {
-      return this.currentUser.name + " " + this.currentUser.surname;
-    },
-  },
-
-  mounted() {
-    this.$store.dispatch("getUsers");
   },
 };
 </script>

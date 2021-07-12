@@ -146,7 +146,7 @@ export default {
   computed: {
     ...mapState({
       cards(state) {
-        let unfilteredCards = state.Cards;
+        let unfilteredCards = state.cards.cards;
         let cards = unfilteredCards.filter(
           (card) => card.product_id === this.productId
         );
@@ -157,7 +157,7 @@ export default {
         );
         return cards;
       },
-      comments: (state) => state.comments,
+      comments: (state) => state.comments.comments,
       notifications: (state) => state.notifications.notifications,
     }),
     ...mapGetters([

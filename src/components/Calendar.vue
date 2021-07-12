@@ -104,16 +104,16 @@ import moment from "moment";
 export default {
   data() {
     return {
-      fetchedProgrammeId: this.$route.params.id,
       calendarDialog: false,
-      focus: "",
-      weekday: [1, 2, 3, 4, 5, 6, 0],
-      type: "month",
       events: [],
-      selectedOpen: false,
-      selectedEvent: {},
+      fetchedProgrammeId: this.$route.params.id,
+      focus: "",
       selectedElement: null,
+      selectedEvent: {},
+      selectedOpen: false,
+      type: "month",
       todayArrivals: 0,
+      weekday: [1, 2, 3, 4, 5, 6, 0],
     };
   },
 
@@ -122,11 +122,6 @@ export default {
       products: (state) => state.products.products,
     }),
     ...mapGetters(["getProgrammeById"]),
-
-    programme() {
-      let programme = this.getProgrammeById(this.fetchedProgrammeId);
-      return programme;
-    },
 
     //Filter the products based on the programme id
     filteredProducts() {
@@ -139,22 +134,27 @@ export default {
       return filteredProducts;
     },
 
+    // Gets the events for the calander
     async getEvents() {
       let events = [];
 
+      // Change data from fb to YYYY-MM-DD
       this.filteredProducts.forEach((product) => {
         let expectDate = moment(product.POP_date.toDate())
           .add(parseInt(product.leadTime), "days")
           .format("YYYY-MM-DD");
 
+        // Take todays date
         let today = moment().format("YYYY-MM-DD");
 
+        // Add value if arrives today
         if (expectDate == today) {
           this.todayArrivals += 1;
         }
 
         let card = this.getCard(product.cards[0].card_id);
 
+        // Make an event of each card
         card.then((r) => {
           let event = {
             name: product.name,
@@ -168,15 +168,22 @@ export default {
             person: product.person,
           };
 
+          // Add events to events array
           events.push(event);
         });
       });
 
       this.events = events;
     },
+
+    programme() {
+      let programme = this.getProgrammeById(this.fetchedProgrammeId);
+      return programme;
+    },
   },
 
   methods: {
+    // Function to get the difference in days of dates
     diffOfDates(date1String, date2String) {
       const date1 = new Date(date1String);
       const date2 = new Date(date2String);
@@ -186,6 +193,7 @@ export default {
       return diffDays;
     },
 
+    // Based on difference in dates of today and event, chooses relevant color
     getEventColor(receive_date) {
       let colors = ["blue-grey darken-3", "#9ccc65", "deep-orange darken-3"];
 
@@ -202,19 +210,23 @@ export default {
       }
     },
 
+    // Returns date in YYYY-MM-DD
     dateFormat(param) {
       let date = moment(param.toDate()).format("YYYY-MM-DD");
       return date;
     },
 
+    // Function to change to previous month
     prev() {
       this.$refs.calendar.prev();
     },
 
+    // Function to change to next month
     next() {
       this.$refs.calendar.next();
     },
 
+    // If click on event it opens up with relevant info
     showEvent({ nativeEvent, event }) {
       const open = () => {
         this.selectedEvent = event;
@@ -234,6 +246,7 @@ export default {
       nativeEvent.stopPropagation();
     },
 
+    // Get card by id
     async getCard(id) {
       const cityRef = db.collection("cards").doc(id);
       const doc = await cityRef.get();

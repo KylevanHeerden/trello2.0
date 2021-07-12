@@ -174,62 +174,11 @@ export default {
   components: { NewProduct, Archived, Calendar },
   data() {
     return {
-      search: "",
       fetchedProgrammeId: this.$route.params.id,
       myProductsClicked: false,
+      search: "",
     };
   },
-  methods: {
-    //Function to get the color based on status given to function
-    chipColor: function(status) {
-      const colors = {
-        Quotes: "teal lighten-1",
-        Technical: "amber accent-2",
-        Purchase: "orange",
-        Procurement: "red",
-        FollowUp: "light-green lighten-1",
-        Quality: "indigo lighten-1",
-      };
-
-      return `${colors[status]}`;
-    },
-    //General Sort function
-    sortBy: function(prop) {
-      this.products.sort((a, b) => (a[prop] < b[prop] ? -1 : 1));
-    },
-    //Sort function unique for status. This function gives priority to status based on the order in which it is in the array
-    sortByStatus: function() {
-      var ordering = {},
-        sortOrder = [
-          "Quotes",
-          "Technical",
-          "Purchase",
-          "Procurement",
-          "FollowUp",
-          "Quality",
-        ];
-      for (var i = 0; i < sortOrder.length; i++) ordering[sortOrder[i]] = i;
-
-      this.products.sort(function(a, b) {
-        return ordering[a.status] - ordering[b.status];
-      });
-    },
-    dateOnly: function(timestamp) {
-      let fbDate = new Date(timestamp.seconds * 1000); // date object
-      let day = fbDate.getDate();
-      let month = fbDate.getMonth() + 1;
-      let year = fbDate.getFullYear();
-      let date = year + "-" + month + "-" + day;
-
-      return date;
-    },
-
-    Archive(productId) {
-      const fbProduct = db.collection("products").doc(productId);
-      fbProduct.update({ archived: true });
-    },
-  },
-
   computed: {
     ...mapState({
       products: (state) => state.products.products,
@@ -237,23 +186,7 @@ export default {
     }),
     ...mapGetters(["getProgrammeById"]),
 
-    programme() {
-      let programme = this.getProgrammeById(this.fetchedProgrammeId);
-      return programme;
-    },
-
-    programmeBoardLink() {
-      let link = `/programme_board/${this.fetchedProgrammeId}`;
-      return link;
-    },
-
-    budgetPercentage() {
-      let percentage =
-        (parseFloat(this.programme.total) / parseFloat(this.programme.budget)) *
-        100;
-      return percentage.toFixed(2);
-    },
-
+    // Changes budget color to red if above 90%
     budgetColor() {
       if (this.budgetPercentage > 90) {
         let budgetColor = "#B71C1C";
@@ -264,7 +197,15 @@ export default {
       }
     },
 
-    //Filter the products based on the programme id
+    // Genrates budget percentage
+    budgetPercentage() {
+      let percentage =
+        (parseFloat(this.programme.total) / parseFloat(this.programme.budget)) *
+        100;
+      return percentage.toFixed(2);
+    },
+
+    // Filter the products based on the programme id
     filteredProducts() {
       let filteredProducts = this.products.filter(
         (product) =>
@@ -274,12 +215,14 @@ export default {
       return filteredProducts;
     },
 
+    // Filters the products based of the user who created the product
     filteredProducts2() {
       let filteredProducts2 = this.filteredProducts.filter(
         (product) => product.person_id === this.currentUser.id
       );
       return filteredProducts2;
     },
+
     //Filters the filtered products based on the input
     filteredSearchProducts() {
       this.filteredProducts2;
@@ -300,6 +243,7 @@ export default {
       }
     },
 
+    // Generates links for breadcrumbs
     links() {
       if (this.programme == undefined) {
         return [
@@ -321,12 +265,80 @@ export default {
         ];
       }
     },
+
+    programme() {
+      let programme = this.getProgrammeById(this.fetchedProgrammeId);
+      return programme;
+    },
+
+    programmeBoardLink() {
+      let link = `/programme_board/${this.fetchedProgrammeId}`;
+      return link;
+    },
   },
+  methods: {
+    ...mapActions(["getProducts", "getProgrammes", "getUsers"]),
+
+    // Changes product to acrhived
+    Archive(productId) {
+      const fbProduct = db.collection("products").doc(productId);
+      fbProduct.update({ archived: true });
+    },
+
+    // Function to get the color based on status given to function
+    chipColor: function(status) {
+      const colors = {
+        Quotes: "teal lighten-1",
+        Technical: "amber accent-2",
+        Purchase: "orange",
+        Procurement: "red",
+        FollowUp: "light-green lighten-1",
+        Quality: "indigo lighten-1",
+      };
+
+      return `${colors[status]}`;
+    },
+
+    // Formats fb timstamp to normal date without time
+    dateOnly: function(timestamp) {
+      let fbDate = new Date(timestamp.seconds * 1000); // date object
+      let day = fbDate.getDate();
+      let month = fbDate.getMonth() + 1;
+      let year = fbDate.getFullYear();
+      let date = year + "-" + month + "-" + day;
+
+      return date;
+    },
+
+    //General Sort function
+    sortBy: function(prop) {
+      this.products.sort((a, b) => (a[prop] < b[prop] ? -1 : 1));
+    },
+
+    //Sort function unique for status. This function gives priority to status based on the order in which it is in the array
+    sortByStatus: function() {
+      var ordering = {},
+        sortOrder = [
+          "Quotes",
+          "Technical",
+          "Purchase",
+          "Procurement",
+          "FollowUp",
+          "Quality",
+        ];
+      for (var i = 0; i < sortOrder.length; i++) ordering[sortOrder[i]] = i;
+
+      this.products.sort(function(a, b) {
+        return ordering[a.status] - ordering[b.status];
+      });
+    },
+  },
+
   created() {
     // This fires the action to fire the mutation to fill the store
-    this.$store.dispatch("getProducts");
-    this.$store.dispatch("getProgrammes");
-    this.$store.dispatch("getUsers");
+    this.getProducts();
+    this.getProgrammes();
+    this.getUsers();
   },
 
   mounted() {},

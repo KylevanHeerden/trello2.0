@@ -28,6 +28,7 @@ export default {
   },
 
   actions: {
+    // Gets the programmes from fb
     async getProgrammes({ commit }) {
       fb.programmesCollection.onSnapshot(
         (programmes) => {
@@ -56,16 +57,19 @@ export default {
     },
 
     async createNewProgramme({ dispatch }, payload) {
+      // Set the programme doc with payload data from newProgramme component
       await fb.programmesCollection
         .doc(payload.teamData.programme.programme_id)
         .set(payload.progData);
 
+      // Set the team doc with payload data from newProgramme component
       const teamRef = await fb.teamsCollection.doc(
         payload.progData.team.team_id
       );
 
       await teamRef.set(payload.teamData);
 
+      // For technical approval user add this team to their team array
       payload.teamData.technical_approver.users.forEach((user) => {
         let teamPayload = {
           user_id: user.value,
@@ -76,6 +80,7 @@ export default {
         dispatch("setAddTeamtoUsersTeams", teamPayload);
       });
 
+      // For purchase approval user add this team to their team array
       payload.teamData.purchase_approver.users.forEach((user) => {
         let teamPayload = {
           user_id: user.value,
@@ -86,6 +91,7 @@ export default {
         dispatch("setAddTeamtoUsersTeams", teamPayload);
       });
 
+      // For procurer user add this team to their team array
       payload.teamData.procurer.users.forEach((user) => {
         let teamPayload = {
           user_id: user.value,

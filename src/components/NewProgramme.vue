@@ -170,16 +170,43 @@ export default {
       ],
     };
   },
+
+  computed: {
+    ...mapState({
+      user: (state) => state.profile.userProfile,
+      users: (state) => state.users.users,
+      currentUser: (state) => state.profile.userProfile,
+    }),
+
+    mapUsersArray() {
+      // make an array where the keys for each user object is changed to text & value for the select
+      let mapUsersArray = [];
+      this.users.forEach((user) => {
+        let map = {
+          text: user.name + " " + user.surname,
+          value: user.id,
+          slack_id: user.slack_id,
+        };
+        mapUsersArray.push(map);
+      });
+      return mapUsersArray.sort((a, b) => a.text.localeCompare(b.text));
+    },
+  },
+
   methods: {
-    ...mapActions(["createNewProgramme"]),
+    ...mapActions(["createNewProgramme", "getUsers"]),
+
+    // Submits form and creates new programe in fb
     async submit() {
       if (this.$refs.newProgrammeForm.validate()) {
         //Validates form before allowed to submit
         this.loading = true;
 
+        // Add new programme and team in fb
         let programme = await db.collection("programmes").add({});
         let team = await db.collection("teams").add({});
 
+        // Setup new programme data
         const progData = {
           name: this.newProgramme.name,
           createdOn: new Date(),
@@ -193,6 +220,7 @@ export default {
           total: "0",
         };
 
+        // Setup new team data
         const teamData = {
           name: progData.team.team_name,
           programme: {
@@ -208,6 +236,7 @@ export default {
           updatedOn: new Date(),
         };
 
+        // Triggers createNewProgramme defined in vuex
         this.createNewProgramme({ progData, teamData });
 
         this.newProgrammeDialog = false;
@@ -236,30 +265,8 @@ export default {
     },
   },
 
-  computed: {
-    ...mapState({
-      users: (state) => state.users.users,
-      user: (state) => state.profile.userProfile,
-      currentUser: (state) => state.profile.userProfile,
-    }),
-
-    mapUsersArray() {
-      // make an array where the keys for each user object is changed to text & value for the select
-      let mapUsersArray = [];
-      this.users.forEach((user) => {
-        let map = {
-          text: user.name + " " + user.surname,
-          value: user.id,
-          slack_id: user.slack_id,
-        };
-        mapUsersArray.push(map);
-      });
-      return mapUsersArray.sort((a, b) => a.text.localeCompare(b.text));
-    },
-  },
-
   mounted() {
-    this.$store.dispatch("getUsers");
+    this.getUsers();
   },
 };
 </script>

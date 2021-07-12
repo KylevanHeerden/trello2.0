@@ -275,6 +275,7 @@ import { db, storage } from "@/firebase";
 import LineItem from "@/components/LineItem.vue";
 import vue2Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
+import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "NewCard",
@@ -382,13 +383,16 @@ export default {
   },
 
   computed: {
-    suppliers() {
-      let suppliers = this.$store.getters.getSuppliers;
-      return suppliers.sort();
-    },
+    ...mapState({
+      suppliers: (state) => {
+        let suppliers = state.suppliers.suppliers;
+        return suppliers.sort();
+      },
+    }),
+    ...mapGetters(["getSuppliers", "getUserProfile"]),
 
     user() {
-      let user = this.$store.getters.getUserProfile;
+      let user = this.getUserProfile;
       return user;
     },
 

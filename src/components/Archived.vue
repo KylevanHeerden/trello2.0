@@ -120,9 +120,9 @@ import { mapState, mapGetters } from "vuex";
 export default {
   data() {
     return {
-      search: "",
       dialog: false,
       fetchedProgrammeId: this.$route.params.id,
+      search: "",
     };
   },
   computed: {
@@ -131,11 +131,7 @@ export default {
     }),
     ...mapGetters(["getProgrammeById"]),
 
-    programme() {
-      let programme = this.getProgrammeById(this.fetchedProgrammeId);
-      return programme;
-    },
-
+    // Filter products on programme id and archived
     filteredProducts() {
       let filteredProducts = this.products.filter(
         (product) =>
@@ -143,6 +139,11 @@ export default {
           product.archived === true
       );
       return filteredProducts;
+    },
+
+    programme() {
+      let programme = this.getProgrammeById(this.fetchedProgrammeId);
+      return programme;
     },
 
     searchedArchivedProducts() {
@@ -180,6 +181,7 @@ export default {
       return date;
     },
 
+    // Change archived status of product to false in fb
     Unarchive(productId) {
       const fbProduct = db.collection("products").doc(productId);
       fbProduct.update({ archived: false });

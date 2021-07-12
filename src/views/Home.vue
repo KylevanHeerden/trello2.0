@@ -230,27 +230,12 @@ export default {
   components: {},
   data() {
     return {
-      message: "",
-      show: false,
-      loginForm: {
-        email: "",
-        password: "",
-      },
-      signupForm: {
-        name: "",
-        surname: "",
-        email: "",
-        password: "",
-      },
-      showLoginForm: true,
-      resetEmail: "",
       inputRulesEmail: [
         (v) => !!v || "Required",
         (v) =>
           /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(v) ||
           "Invalid email",
       ],
-      showPasswordReset: false,
       inputRulesPassword: [
         (v) =>
           /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*)(+=._-]).{8,32}$/.test(
@@ -259,16 +244,26 @@ export default {
           "Minimum 8 Charaters with a lowercase letter, a uppercase letter, a number and a special charater",
       ],
       inputRulesRequired: [(v) => !!v || "Required"],
+      loginForm: {
+        email: "",
+        password: "",
+      },
+      message: "",
+      show: false,
+      showLoginForm: true,
+      showPasswordReset: false,
+      signupForm: {
+        name: "",
+        surname: "",
+        email: "",
+        password: "",
+      },
+      resetEmail: "",
     };
   },
   methods: {
-    toggleForm() {
-      this.showLoginForm = !this.showLoginForm;
-    },
-    togglePasswordReset() {
-      this.showPasswordReset = !this.showPasswordReset;
-    },
     login() {
+      // Triggers the login function defined in vuex
       let login = this.$store.dispatch("login", {
         email: this.loginForm.email,
         password: this.loginForm.password,
@@ -278,21 +273,33 @@ export default {
       });
     },
     logout() {
+      // Triggers the logout function defined in vuex
       this.$store.dispatch("logout");
     },
+    toggleForm() {
+      // Toggles between login and signup form
+      this.showLoginForm = !this.showLoginForm;
+    },
+    togglePasswordReset() {
+      // Shows password reset option
+      this.showPasswordReset = !this.showPasswordReset;
+    },
+
+    sendPasswordReset() {
+      // Triggers FB reset password function
+      auth.sendPasswordResetEmail(this.resetEmail);
+      this.resetEmail = "";
+      this.showPasswordReset = false;
+    },
+
     signup() {
+      // Triggers signup function defined in vuex
       this.$store.dispatch("signup", {
         email: this.signupForm.email,
         password: this.signupForm.password,
         name: this.signupForm.name,
         surname: this.signupForm.surname,
       });
-    },
-
-    sendPasswordReset() {
-      auth.sendPasswordResetEmail(this.resetEmail);
-      this.resetEmail = "";
-      this.showPasswordReset = false;
     },
   },
 };

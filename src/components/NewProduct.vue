@@ -75,7 +75,6 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
-import { db } from "@/firebase";
 
 export default {
   props: {
@@ -86,7 +85,7 @@ export default {
   },
   data() {
     return {
-      newProductDialog: false,
+      inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
       loading: false,
       newProduct: {
         name: "",
@@ -94,16 +93,29 @@ export default {
         programme_name: this.programme.name,
         status: "Quotes",
       },
-      inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
+      newProductDialog: false,
     };
   },
+
+  computed: {
+    ...mapState({
+      currentUser: (state) => state.profile.userProfile,
+    }),
+    ...mapGetters({}),
+
+    nameSurname() {
+      return this.currentUser.name + " " + this.currentUser.surname;
+    },
+  },
+
   methods: {
-    ...mapActions(["createNewProduct"]),
+    ...mapActions(["createNewProduct", "getUsers"]),
     async submit() {
       if (this.$refs.newProductForm.validate()) {
         //Validates form before allowed to submit
         this.loading = true;
 
+        // Setup product data
         let productData = {
           name: this.newProduct.name,
           programme: {
@@ -121,8 +133,10 @@ export default {
           leadTime: null,
         };
 
+        // Fire createnewProduct function defined in vuex
         this.createNewProduct(productData);
 
+        // Reset newProduct data
         this.loading = false;
         this.newProduct.name = "";
         this.newProduct.status = "";
@@ -132,19 +146,8 @@ export default {
     },
   },
 
-  computed: {
-    ...mapState({
-      currentUser: (state) => state.profile.userProfile,
-    }),
-    ...mapGetters({}),
-
-    nameSurname() {
-      return this.currentUser.name + " " + this.currentUser.surname;
-    },
-  },
-
   mounted() {
-    this.$store.dispatch("getUsers");
+    this.getUsers();
   },
 };
 </script>
