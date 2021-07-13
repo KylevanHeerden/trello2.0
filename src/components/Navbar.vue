@@ -179,9 +179,9 @@ export default {
 
   methods: {
     ...mapActions({
-      removeNotification: "removeNotification",
-
       logout: "logout",
+
+      removeNotification: "removeNotification",
     }),
     conditionalDrawer() {
       if (this.logInStatus) {
@@ -202,9 +202,8 @@ export default {
 
   computed: {
     ...mapState({
-      logInStatus: (state) => state.user.loggedIn,
-      user: (state) => state.profile.userProfile,
       links: (state) => state.links,
+      logInStatus: (state) => state.user.loggedIn,
       notifications(state) {
         let notifications = state.notifications.notifications;
 
@@ -216,6 +215,7 @@ export default {
           return b.createdOn - a.createdOn;
         });
       },
+      user: (state) => state.profile.userProfile,
     }),
     ...mapGetters({}),
   },

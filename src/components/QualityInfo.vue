@@ -79,17 +79,6 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
-                <!-- <v-select
-                  v-model="newCard.quality_approval"
-                  label="Quality Approval"
-                  :items="quality_approval_options"
-                  item-text="text"
-                  item-value="value"
-                  @change="handleClick2('quality_approval')"
-                  :disabled="Object.keys(newCard.quality_approver).length === 0"
-                >
-                </v-select> -->
-
                 <v-radio-group
                   v-model="newCard.quality_approval"
                   row
@@ -219,6 +208,7 @@ import Comments from "@/components/Comments";
 import FileUploadDialog from "@/components/FileUploadDialog";
 import vue2Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
+
 export default {
   components: {
     Comments,
@@ -226,10 +216,6 @@ export default {
     vueDropzone: vue2Dropzone,
   },
   props: {
-    team: {
-      type: Object,
-      required: true,
-    },
     card: {
       type: Object,
       required: true,
@@ -238,12 +224,16 @@ export default {
       type: Array,
       required: true,
     },
+    commentPosition: {
+      type: Number,
+      required: true,
+    },
     counter: {
       type: Number,
       required: true,
     },
-    commentPosition: {
-      type: Number,
+    team: {
+      type: Object,
       required: true,
     },
   },
@@ -287,8 +277,8 @@ export default {
     }),
     ...mapGetters(["getUsers"]),
 
+    // make an array where the keys for each user object is changed to text & value for the select
     mapUsersArray() {
-      // make an array where the keys for each user object is changed to text & value for the select
       let mapUsersArray = [];
       this.users.forEach((user) => {
         let map = {
@@ -302,6 +292,7 @@ export default {
     },
   },
   methods: {
+    // Changes boolean to Approved or Not approved
     approvedStatus(boolean) {
       if (boolean == true) {
         return "Approved";
@@ -310,6 +301,7 @@ export default {
       }
     },
 
+    // Changes boolean to Accepted or Rejected
     approvedStatus2(boolean) {
       if (boolean == true) {
         return "Approved";
@@ -320,8 +312,8 @@ export default {
       }
     },
 
+    //This function checks if current user part of the users assigned to the authority role
     checkIfUserInAuthorityArray(teamAuthority) {
-      //This function checks if current user part of the users assigned to the authority role
       let userId = this.currentUser.id;
 
       let teamAuthorityUsersArray = [];
@@ -349,11 +341,13 @@ export default {
       }
     },
 
+    // Add quality files to quality_photos array
     fileAddedQuality(file) {
       this.quality_photos.push(file);
       this.customStyles != this.customStyles;
     },
 
+    // Handles approval for quality and reciever approval
     handleClick2(statusType) {
       this.$confirm({
         message: `Are you sure?`,
@@ -389,6 +383,7 @@ export default {
       });
     },
 
+    // Handles the click for addition of file to hubdoc
     handleClick3() {
       this.$confirm({
         message: `Are you sure?`,
@@ -408,6 +403,7 @@ export default {
       });
     },
 
+    // Uploads quality photos to fb
     newQualityPhoto(files) {
       var filesArray = [];
 
@@ -428,6 +424,7 @@ export default {
       this.upload_quality_photos = false;
     },
 
+    // Template render for dropzone
     template: function() {
       return `<div class="dz-preview dz-file-preview" style=" position: relative; display: inline-block;  margin-left: 5px; width: 100px;height: 60px;padding: 8px;background-color: rgba(0, 0, 0, 0.05); text-align: center; border-radius: 10px;">
                   <span data-dz-remove>
@@ -448,6 +445,7 @@ export default {
         `;
     },
 
+    // Setup function for dropzone
     thumbnail: function(file, dataUrl) {
       var j, len, ref, thumbnailElement;
       if (file.previewElement) {

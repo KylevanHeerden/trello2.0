@@ -50,32 +50,40 @@ import "vue2-dropzone/dist/vue2Dropzone.min.css";
 export default {
   components: { vueDropzone: vue2Dropzone },
   props: {
-    programmeName: {
-      type: String,
-      required: true,
-    },
     cardId: {
       type: String,
       required: true,
     },
+
     productId: {
+      type: String,
+      required: true,
+    },
+
+    programmeName: {
       type: String,
       required: true,
     },
   },
   data() {
     return {
-      fileUploadDialog: false,
-      files: [],
       dropzoneOptions: {
         url: "https://httpbin.org/post",
         previewTemplate: this.template(),
         uploadMultiple: true,
       },
+      files: [],
+      fileUploadDialog: false,
     };
   },
 
   methods: {
+    // Add files to files array which is the added to fb card
+    fileAdded(file) {
+      this.files.push(file);
+    },
+
+    // Dropzone template rendered when file upload dialog shows
     template: function() {
       return `<div class="dz-preview dz-file-preview" style=" position: relative; display: inline-block;  margin-left: 5px; width: 100px;height: 60px;padding: 8px;background-color: rgba(0, 0, 0, 0.05); text-align: center; border-radius: 10px;">
                   <span data-dz-remove>
@@ -96,6 +104,7 @@ export default {
         `;
     },
 
+    // Setup function for file upload dropzone
     thumbnail: function(file, dataUrl) {
       var j, len, ref, thumbnailElement;
       if (file.previewElement) {
@@ -117,10 +126,21 @@ export default {
       }
     },
 
-    fileAdded(file) {
-      this.files.push(file);
+    // Uploads file to fb card
+    uploadFiles(files, cardId) {
+      files.forEach((file) => {
+        var fileName = file.name;
+        var fileref = storage
+          .ref()
+          .child(
+            `Quotes/${this.programmeName}/${this.productId}/${cardId}/${fileName}`
+          );
+
+        fileref.put(file);
+      });
     },
 
+    // All the small details that happen arround fileupload
     async uploadFilesFunc() {
       await this.uploadFiles(this.files, this.cardId);
 
@@ -133,19 +153,6 @@ export default {
       await cardRef.update({ files_count: old_count + 1 });
 
       this.fileUploadDialog = false;
-    },
-
-    uploadFiles(files, cardId) {
-      files.forEach((file) => {
-        var fileName = file.name;
-        var fileref = storage
-          .ref()
-          .child(
-            `Quotes/${this.programmeName}/${this.productId}/${cardId}/${fileName}`
-          );
-
-        fileref.put(file);
-      });
     },
   },
 };

@@ -238,14 +238,6 @@ import "vue2-dropzone/dist/vue2Dropzone.min.css";
 export default {
   components: { Comments, vueDropzone: vue2Dropzone, FileUploadDialog },
   props: {
-    stepName: {
-      type: String,
-      required: true,
-    },
-    team: {
-      type: Object,
-      required: true,
-    },
     card: {
       type: Object,
       required: true,
@@ -254,15 +246,23 @@ export default {
       type: Array,
       required: true,
     },
-    counter: {
-      type: Number,
-      required: true,
-    },
     commentPosition: {
       type: Number,
       required: true,
     },
+    counter: {
+      type: Number,
+      required: true,
+    },
     product: {
+      type: Object,
+      required: true,
+    },
+    stepName: {
+      type: String,
+      required: true,
+    },
+    team: {
       type: Object,
       required: true,
     },
@@ -294,8 +294,8 @@ export default {
     }),
   },
   methods: {
+    //This function checks if current user part of the users assigned to the authority role
     checkIfUserInAuthorityArray(teamAuthority) {
-      //This function checks if current user part of the users assigned to the authority role
       let userId = this.currentUser.id;
 
       let teamAuthorityUsersArray = [];
@@ -303,8 +303,7 @@ export default {
       teamAuthority.users.forEach((user) => {
         teamAuthorityUsersArray.push(user.value);
       });
-      //   console.log(teamAuthorityUsersArray[0]);
-      //   console.log(userId);
+
       if (this.counter > 0 && teamAuthorityUsersArray.includes(userId)) {
         return { boolean: Boolean(true), message: "" };
       } else if (
@@ -323,14 +322,17 @@ export default {
       }
     },
 
+    // Add file to POP array
     fileAddedPOP(file) {
       this.POP.push(file);
     },
 
+    // Add file to purchaseOrder array
     fileAddedPurchase(file) {
       this.purchase_order.push(file);
     },
 
+    // Makes sure the link with # doesnt ecscape
     fileLinkEncoded(string) {
       if (string == undefined) {
         return;
@@ -341,6 +343,7 @@ export default {
       }
     },
 
+    // Handles the approval click per stage of card
     handleClick(teamAuthority, statusType) {
       let authorize = this.checkIfUserInAuthorityArray(teamAuthority).boolean;
       if (authorize == true) {
@@ -412,28 +415,7 @@ export default {
       }
     },
 
-    async moveCardAutoForward(fbCard) {
-      let card = await fbCard.get();
-      let cardData = card.data();
-
-      // Move card forward is approved
-      fbCard.update({ list_id: 5 });
-
-      // Change the status of product with the moce of card
-      let fbProduct = db.collection("products").doc(cardData.product_id);
-      await fbProduct.update({
-        status: "FollowUp",
-      });
-
-      // Go up multiple parent components to trigger snackbar
-      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.snackbar = true;
-      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.newListName =
-        "Follow Up";
-
-      // Send notification
-      this.sendNotification(5, "Follow Up");
-    },
-
+    // Function moves card by to quotes by making list Id 0
     async moveCardAutoBackward(fbCard) {
       let card = await fbCard.get();
       let cardData = card.data();
@@ -456,6 +438,30 @@ export default {
       this.sendNotification(1, "Quotes");
     },
 
+    // Function moves card by changing the relevant list Id by adding 1
+    async moveCardAutoForward(fbCard) {
+      let card = await fbCard.get();
+      let cardData = card.data();
+
+      // Move card forward is approved
+      fbCard.update({ list_id: 5 });
+
+      // Change the status of product with the moce of card
+      let fbProduct = db.collection("products").doc(cardData.product_id);
+      await fbProduct.update({
+        status: "FollowUp",
+      });
+
+      // Go up multiple parent components to trigger snackbar
+      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.snackbar = true;
+      this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.snackbar.newListName =
+        "Follow Up";
+
+      // Send notification
+      this.sendNotification(5, "Follow Up");
+    },
+
+    // Uploads POP to fb
     newPOP(files) {
       const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
       const fbProduct = db.collection("products").doc(this.card.product_id);
@@ -480,6 +486,7 @@ export default {
       fbProduct.update({ leadTime: this.card.lead_time });
     },
 
+    // Uploads purchaseOrder to fb
     newPurchaseOrder(files) {
       const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
       fbCard.update({ PO_number: this.newCard.PO_number }); // updates the PO_number on the firebase card
@@ -505,6 +512,7 @@ export default {
       this.moveCardAutoForward(fbCard);
     },
 
+    // Changes boolean to Ordered or Not Ordered
     procurementStatus(boolean) {
       if (boolean == true) {
         return "Ordered";
@@ -513,6 +521,7 @@ export default {
       }
     },
 
+    // Creates new notification in fb which triggers slack/email cloud function
     sendNotification(newListId, status) {
       const person_array = [
         "technical_approver",
@@ -595,6 +604,7 @@ export default {
       this.getNotifications;
     },
 
+    // Template rendered for dropzone
     template: function() {
       return `<div class="dz-preview dz-file-preview" style=" position: relative; display: inline-block;  margin-left: 5px; width: 100px;height: 60px;padding: 8px;background-color: rgba(0, 0, 0, 0.05); text-align: center; border-radius: 10px;">
                   <span data-dz-remove>
@@ -615,6 +625,7 @@ export default {
         `;
     },
 
+    // Setup function for dropzone
     thumbnail: function(file, dataUrl) {
       var j, len, ref, thumbnailElement;
       if (file.previewElement) {
@@ -636,6 +647,7 @@ export default {
       }
     },
 
+    // Update the PO number of the card after it has been typed in
     updatePOnumber() {
       const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
       fbCard.update({ PO_number: this.newCard.PO_number }); // updates the PO_number on the firebase card

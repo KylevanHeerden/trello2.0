@@ -92,14 +92,6 @@ import Comments from "@/components/Comments";
 export default {
   components: { Comments },
   props: {
-    stepName: {
-      type: String,
-      required: true,
-    },
-    team: {
-      type: Object,
-      required: true,
-    },
     card: {
       type: Object,
       required: true,
@@ -108,15 +100,23 @@ export default {
       type: Array,
       required: true,
     },
-    counter: {
-      type: Number,
-      required: true,
-    },
     commentPosition: {
       type: Number,
       required: true,
     },
+    counter: {
+      type: Number,
+      required: true,
+    },
     product: {
+      type: Object,
+      required: true,
+    },
+    stepName: {
+      type: String,
+      required: true,
+    },
+    team: {
       type: Object,
       required: true,
     },
@@ -137,6 +137,7 @@ export default {
       currentUser: (state) => state.profile.userProfile,
     }),
 
+    // Chnages colour of message based on approval
     msgClass() {
       return this.newCard[this.stepNameFn(this.stepName, 1)]
         ? "acceptMsg"
@@ -144,20 +145,8 @@ export default {
     },
   },
   methods: {
-    stepNameFn(name, num) {
-      // Returns name according to either purchase of technical
-      if (num == 1) {
-        return `${name}_approval`;
-      } else if (num == 2) {
-        return `${name}_approver`;
-      } else if (num == 3) {
-        let str = name.charAt(0).toUpperCase() + name.slice(1);
-        return `${str} Approval`;
-      }
-    },
-
+    // Returns whether status apprpved or not from db
     approvedStatus(boolean) {
-      // Returns whether status apprpved or not from db
       if (boolean == true) {
         return "Approved";
       } else {
@@ -165,8 +154,8 @@ export default {
       }
     },
 
+    //This function checks if current user part of the users assigned to the authority role
     checkIfUserInAuthorityArray(teamAuthority) {
-      //This function checks if current user part of the users assigned to the authority role
       let userId = this.currentUser.id;
 
       let teamAuthorityUsersArray = [];
@@ -194,6 +183,7 @@ export default {
       }
     },
 
+    // Function handles approval based on which stage the card is in
     handleClick(teamAuthority, statusType) {
       let authorize = this.checkIfUserInAuthorityArray(teamAuthority).boolean;
       if (authorize == true) {
@@ -267,6 +257,7 @@ export default {
       }
     },
 
+    // Move the card by changing the list Id
     async moveCardAuto(fbCard, param) {
       let card = await fbCard.get();
       let cardData = card.data();
@@ -319,6 +310,7 @@ export default {
       this.sendNotification(newListId, status[newListId - 1]);
     },
 
+    // Creates new notification which triggers email/slack cloud function
     sendNotification(newListId, status) {
       const person_array = [
         "technical_approver",
@@ -362,6 +354,18 @@ export default {
             status: status,
           });
         });
+      }
+    },
+
+    // Returns name according to either purchase of technical
+    stepNameFn(name, num) {
+      if (num == 1) {
+        return `${name}_approval`;
+      } else if (num == 2) {
+        return `${name}_approver`;
+      } else if (num == 3) {
+        let str = name.charAt(0).toUpperCase() + name.slice(1);
+        return `${str} Approval`;
       }
     },
   },

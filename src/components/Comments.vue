@@ -72,12 +72,12 @@ import moment from "moment";
 
 export default {
   props: {
-    cardId: {
-      type: String,
-      required: true,
-    },
     cardComments: {
       type: Array,
+      required: true,
+    },
+    cardId: {
+      type: String,
       required: true,
     },
     position: {
@@ -105,10 +105,22 @@ export default {
     },
   },
 
-  mounted() {
-    this.$store.dispatch("getUsers");
-  },
   methods: {
+    // Filter comments based on where they are on stage of card
+    commentsPerPosition(position) {
+      let comments = this.cardComments.filter(
+        (comment) => comment.position == position
+      );
+      return comments;
+    },
+
+    // Format fb timestamp to Do MMM YYYY
+    dateFormat(param) {
+      let date = moment(param.toDate()).format("Do MMM YYYY");
+      return date;
+    },
+
+    // Submits new comment to fb
     SubmitComment(position) {
       db.collection("comments").add({
         card_id: this.cardId,
@@ -122,18 +134,10 @@ export default {
       this.newComment.text = "";
       this.newComment.position = "";
     },
+  },
 
-    commentsPerPosition(position) {
-      let comments = this.cardComments.filter(
-        (comment) => comment.position == position
-      );
-      return comments;
-    },
-
-    dateFormat(param) {
-      let date = moment(param.toDate()).format("Do MMM YYYY");
-      return date;
-    },
+  mounted() {
+    this.$store.dispatch("getUsers");
   },
 };
 </script>

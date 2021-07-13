@@ -151,16 +151,12 @@ import QualityInfo from "@/components/QualityInfo";
 export default {
   components: {
     Comments,
-    QuoteInfo,
-    TechPurApproval,
     PurchaseInfo,
     QualityInfo,
+    QuoteInfo,
+    TechPurApproval,
   },
   props: {
-    listId: {
-      type: Number,
-      required: true,
-    },
     card: {
       type: Object,
       required: true,
@@ -169,11 +165,15 @@ export default {
       type: Array,
       required: true,
     },
-    team: {
-      type: Object,
+    listId: {
+      type: Number,
       required: true,
     },
     product: {
+      type: Object,
+      required: true,
+    },
+    team: {
       type: Object,
       required: true,
     },

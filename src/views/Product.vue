@@ -72,20 +72,17 @@
 
 <script>
 // @ is an alias to /src
-import Draggable from "vuedraggable";
-import Card from "@/components/Card.vue";
-import NewCard from "@/components/NewCard.vue";
 import { db } from "@/firebase";
-import { mapState, mapGetters } from "vuex";
+import { mapActions, mapState, mapGetters } from "vuex";
+import Card from "@/components/Card.vue";
+import Draggable from "vuedraggable";
+import NewCard from "@/components/NewCard.vue";
 
 export default {
   name: "Products",
-  components: { Draggable, Card, NewCard },
+  components: { Card, Draggable, NewCard },
   data() {
     return {
-      productId: String(this.$route.params.id),
-      fetchedProductId: this.$route.params.id,
-      update: true,
       Array: [
         // Updates this data according to products page you on
         {
@@ -129,11 +126,14 @@ export default {
           cards: [],
         },
       ],
+      fetchedProductId: this.$route.params.id,
+      productId: String(this.$route.params.id),
       snackbar: {
         snackbar: false,
         timeout: 20000000,
         newListName: "", //This is provided by cardMoved function
       },
+      update: true,
     };
   },
 
@@ -165,37 +165,8 @@ export default {
       "getProgrammeById",
       "getTeams",
       "getCards",
-      "getNotifications",
     ]),
 
-    product() {
-      let product = this.getProductById(this.fetchedProductId);
-
-      return product;
-    },
-    programme() {
-      if (this.product == undefined) {
-        let programme = this.getProgrammeById(
-          this.product.programme.programme_id
-        );
-
-        return programme;
-      } else {
-        let programme = this.getProgrammeById(
-          this.product.programme.programme_id
-        );
-
-        return programme;
-      }
-    },
-
-    team() {
-      let teams = this.getTeams;
-      let team = teams.filter(
-        (team) => team.programme.programme_id === this.programme.id
-      );
-      return team[0];
-    },
     links() {
       if (this.product == undefined) {
         return [
@@ -228,9 +199,49 @@ export default {
         ];
       }
     },
+
+    product() {
+      let product = this.getProductById(this.fetchedProductId);
+
+      return product;
+    },
+
+    programme() {
+      if (this.product == undefined) {
+        let programme = this.getProgrammeById(
+          this.product.programme.programme_id
+        );
+
+        return programme;
+      } else {
+        let programme = this.getProgrammeById(
+          this.product.programme.programme_id
+        );
+
+        return programme;
+      }
+    },
+
+    team() {
+      let teams = this.getTeams;
+      let team = teams.filter(
+        (team) => team.programme.programme_id === this.programme.id
+      );
+      return team[0];
+    },
   },
 
   methods: {
+    ...mapActions([
+      "getProducts",
+      "getProgrammes",
+      "getSuppliers",
+      "getComments",
+      "getLineItems",
+      "getNotifications",
+    ]),
+
+    // Checks if card in specific list then addeds the draggable functionality to card
     checkMove(card, listID) {
       if (listID === 1 || listID === 5) {
         return "draggable";
@@ -239,6 +250,7 @@ export default {
       }
     },
 
+    // Function triggered when card is moved
     async cardMoved(listId, e) {
       const evt = e.added || e.moved; //the events triggered by draggable
       if (evt == undefined) {
@@ -258,6 +270,7 @@ export default {
       ).list_name;
       this.snackbar.snackbar = true;
 
+      // Updates the product status to new list card is in
       const fbProduct = db.collection("products").doc(card.product_id);
       await fbProduct.update({
         status: this.Array[listId - 1].list_status,
@@ -366,17 +379,17 @@ export default {
 
   created() {
     //Methods run before page load complete so that data available in store but also local3000ly in component
-    this.$store.dispatch("getProducts");
-    this.$store.dispatch("getProgrammes");
-    this.$store.dispatch("getSuppliers");
-    this.$store.dispatch("getComments");
-    this.$store.dispatch("getTeams");
-    this.$store.dispatch("getLineItems");
-    this.$store.dispatch("getNotifications");
+    this.getProducts();
+    this.getProgrammes();
+    this.getSuppliers();
+    this.getComments();
+    this.$store.dispatch("getTeams"); // Cannot mapAction because Getter has same name
+    this.getLineItems();
+    this.getNotifications();
   },
 
   mounted() {
-    this.$store.dispatch("getCards");
+    this.$store.dispatch("getCards"); // Cannot mapAction because Getter has same name
   },
 };
 </script>

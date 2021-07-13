@@ -321,8 +321,8 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
 import { db } from "@/firebase";
+import { mapState } from "vuex";
 import FileUploadDialog from "@/components/FileUploadDialog";
 
 export default {
@@ -339,9 +339,13 @@ export default {
   },
   data() {
     return {
-      editCardInfo: true,
       cardInfoEditingButtons: false,
       closeChip: false,
+      editCardInfo: true,
+      fileRules: [
+        (v) => !!v || "File is required",
+        (v) => (v && v.length > 0) || "File is required",
+      ],
       newCard: {
         name: this.card.name,
         supplier_name: this.card.supplier_name,
@@ -375,11 +379,6 @@ export default {
         PO_number: this.card.PO_number,
         POP: this.card.POP,
       },
-      inputRulesRequired: [(v) => !!v || "Required"],
-      fileRules: [
-        (v) => !!v || "File is required",
-        (v) => (v && v.length > 0) || "File is required",
-      ],
       inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
       inputRulesConNum: [
         (v) =>
@@ -391,19 +390,20 @@ export default {
           /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(v) ||
           "Invalid email",
       ],
-      inputRulesQuan: [
-        (v) => v % 1 == 0 || "Must be a whole number",
-        (v) => !!v || "Required",
-      ],
       inputRulesMoney: [
         (v) => v.match(/^\d+(?:\.\d{0,2})$/) || "Must be in the format R0.00",
         (v) => v.length >= 4 || "Minimum length is 4 characters",
       ],
+      inputRulesRequired: [(v) => !!v || "Required"],
+      inputRulesQuan: [
+        (v) => v % 1 == 0 || "Must be a whole number",
+        (v) => !!v || "Required",
+      ],
       inputRulesVAT: [
         (v) => v.match(/^\d+(?:\.\d{0,2})$/) || "Must be in the format R0.00",
       ],
-      snackbar: false,
       savedAlert: false,
+      snackbar: false,
     };
   },
   computed: {
@@ -415,12 +415,7 @@ export default {
       return this.cards.find((card) => card.id == this.card.id);
     },
 
-    lineItemsFiltered() {
-      let FBlineItems = this.$store.getters.getLineItemsByCardId(this.card.id);
-
-      return FBlineItems;
-    },
-
+    // This is used to show pending chip if file not uploaded yet
     files_count() {
       let count_array = this.$store.getters.getFilesCount(this.card.id);
 
@@ -429,6 +424,13 @@ export default {
       return count;
     },
 
+    lineItemsFiltered() {
+      let FBlineItems = this.$store.getters.getLineItemsByCardId(this.card.id);
+
+      return FBlineItems;
+    },
+
+    // Display when the currency not ZAR
     nonVAT() {
       if (this.newCard.currency != "R") {
         return "Customs Duty";
@@ -437,7 +439,47 @@ export default {
       }
     },
   },
+
   methods: {
+    // Revert edit after card edit
+    cancelCardInfoEdit() {
+      this.cardInfoEditingButtons = false;
+      this.editCardInfo = true;
+      this.snackbar = false;
+      this.closeChip = false;
+
+      this.newCard = {
+        name: this.card.name,
+        supplier_name: this.card.supplier_name,
+        contact_person: this.card.contact_person,
+        contact_number: this.card.contact_number,
+        supplier_email: this.card.supplier_email,
+        supplier_quote_num: this.card.supplier_quote_num,
+        nano_item_description: this.card.nano_item_description,
+        supplier_item_num: this.card.supp_item_num,
+        supplier_item_name: this.card.supp_item_name,
+        quantity: this.card.quantity,
+        unit_price: this.card.unit_price,
+        lead_time: this.card.lead_time,
+        VAT: this.card.VAT,
+        total_inc_vat: this.card.total_inc_vat,
+        total_exc_vat: this.card.total_exc_vat,
+        files: this.card.files,
+        technical_approval: this.card.technical_approval,
+        purchase_approval: this.card.purchase_approval,
+        procured: this.card.procured,
+        receiver_approval: this.card.receiver_approval,
+        quality_approval: this.card.quality_approval,
+        purchase_order: this.card.purchase_order,
+        quality_photos: this.card.quality_photos,
+        payment_terms: this.card.payment_terms,
+        currency: this.card.currency,
+        quality_approver: this.card.team.quality_approver.user,
+        receiver: this.card.team.receiver,
+      };
+    },
+
+    // Function that deletes the card as well as the relevant line items
     deleteCard() {
       this.$confirm({
         message: `Are you sure you want to delete this card permanantly?`,
@@ -461,13 +503,7 @@ export default {
       });
     },
 
-    editCard() {
-      this.cardInfoEditingButtons = true;
-      this.editCardInfo = false;
-      this.snackbar = true;
-      this.closeChip = true;
-    },
-
+    // Deletes only the files not the card function
     deleteFile(fileName) {
       this.$confirm({
         message: `Are you sure you want to delete this file permanantly?`,
@@ -481,18 +517,25 @@ export default {
 
             let doc = await fbCard.get();
 
+            // Change the file count
             let old_count = doc.data().files_count;
 
             // Set the 'files_count' field of the card document
             await fbCard.update({ files_count: old_count - 1 });
 
+            // Find file to delete
             let file = this.newCard.files.find(
               (file) => file.file_name == fileName
             );
+
+            // Find the index of file to delete
             let index = this.newCard.files.indexOf(file);
             let Files = this.newCard.files;
+
+            // Remove file from files array i.e delete file
             Files.splice(index, 1);
 
+            // Update files after file delete
             this.newCard.files = Files;
             fbCard.update({ files: Files });
           }
@@ -500,6 +543,15 @@ export default {
       });
     },
 
+    // Activates the card edit functionality
+    editCard() {
+      this.cardInfoEditingButtons = true;
+      this.editCardInfo = false;
+      this.snackbar = true;
+      this.closeChip = true;
+    },
+
+    // Edit the line items
     async lineItemEdit(id, changeKey, changeValue) {
       if (this.$refs.form.validate()) {
         const fbCard = db.collection("line_items").doc(id); // gets the firebase card
@@ -556,9 +608,6 @@ export default {
           }
         });
 
-        // console.log(`noVAT: ${noVAT}`);
-        // console.log(`yesVAT: ${yesVAT}`);
-
         // Calculate the desired values
         let finalVAT = (yesVAT * 0.15).toFixed(2);
         let totalExcVAT = Number(yesVAT) + Number(noVAT);
@@ -566,21 +615,14 @@ export default {
         let totalIncVAT = Number(yesVAT) + Number(noVAT) + Number(finalVAT);
         let finalTotalInc = totalIncVAT.toFixed(2);
 
-        // console.log(`finalVAT: ${finalVAT}`);
-        // console.log(`finalTotalExc: ${finalTotalExc}`);
-        // console.log(`finalTotalInc: ${finalTotalInc}`);
-
         // Set newCard value to update UI and fb thereafter
         this.newCard.VAT = finalVAT;
         this.newCard.total_exc_vat = finalTotalExc;
         this.newCard.total_inc_vat = finalTotalInc;
-
-        // console.log(this.newCard.VAT);
-        // console.log(this.newCard.total_exc_vat);
-        // console.log(this.newCard.total_inc_vat);
       }
     },
 
+    // Save the card after edit
     saveCardInfoEdit() {
       this.cardInfoEditingButtons = false;
       this.editCardInfo = true;
@@ -607,43 +649,6 @@ export default {
       }
 
       this.savedAlert = true;
-    },
-
-    cancelCardInfoEdit() {
-      this.cardInfoEditingButtons = false;
-      this.editCardInfo = true;
-      this.snackbar = false;
-      this.closeChip = false;
-
-      this.newCard = {
-        name: this.card.name,
-        supplier_name: this.card.supplier_name,
-        contact_person: this.card.contact_person,
-        contact_number: this.card.contact_number,
-        supplier_email: this.card.supplier_email,
-        supplier_quote_num: this.card.supplier_quote_num,
-        nano_item_description: this.card.nano_item_description,
-        supplier_item_num: this.card.supp_item_num,
-        supplier_item_name: this.card.supp_item_name,
-        quantity: this.card.quantity,
-        unit_price: this.card.unit_price,
-        lead_time: this.card.lead_time,
-        VAT: this.card.VAT,
-        total_inc_vat: this.card.total_inc_vat,
-        total_exc_vat: this.card.total_exc_vat,
-        files: this.card.files,
-        technical_approval: this.card.technical_approval,
-        purchase_approval: this.card.purchase_approval,
-        procured: this.card.procured,
-        receiver_approval: this.card.receiver_approval,
-        quality_approval: this.card.quality_approval,
-        purchase_order: this.card.purchase_order,
-        quality_photos: this.card.quality_photos,
-        payment_terms: this.card.payment_terms,
-        currency: this.card.currency,
-        quality_approver: this.card.team.quality_approver.user,
-        receiver: this.card.team.receiver,
-      };
     },
   },
 

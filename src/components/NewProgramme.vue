@@ -125,11 +125,10 @@ import { db } from "@/firebase";
 export default {
   data() {
     return {
-      newProgrammeDialog: false,
-      programmeTypeOptions: [
-        { text: "Capability Domain", value: "CD" },
-        { text: "X - Programmes", value: "X" },
-        { text: "Y - Programmes", value: "Y" },
+      inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
+      inputRulesMoney: [
+        (v) => v.match(/^\d+(?:\.\d{0,2})$/) || "Must be in the format R0.00",
+        (v) => v.length >= 5 || "Minimum length is 4 characters",
       ],
       loading: false,
       newProgramme: {
@@ -140,6 +139,7 @@ export default {
         budget: "",
         programme_type: "",
       },
+      newProgrammeDialog: false,
       newTeam: {
         name: "",
         programme_id: "",
@@ -162,20 +162,20 @@ export default {
         createdOn: new Date(),
         updatedOn: new Date(),
       },
-      selectRequired: [(v) => v.length > 0 || "Required"],
-      inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
-      inputRulesMoney: [
-        (v) => v.match(/^\d+(?:\.\d{0,2})$/) || "Must be in the format R0.00",
-        (v) => v.length >= 5 || "Minimum length is 4 characters",
+      programmeTypeOptions: [
+        { text: "Capability Domain", value: "CD" },
+        { text: "X - Programmes", value: "X" },
+        { text: "Y - Programmes", value: "Y" },
       ],
+      selectRequired: [(v) => v.length > 0 || "Required"],
     };
   },
 
   computed: {
     ...mapState({
+      currentUser: (state) => state.profile.userProfile,
       user: (state) => state.profile.userProfile,
       users: (state) => state.users.users,
-      currentUser: (state) => state.profile.userProfile,
     }),
 
     mapUsersArray() {
