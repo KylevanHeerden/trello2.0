@@ -178,8 +178,8 @@ export default {
       users: (state) => state.users.users,
     }),
 
+    // Make an array where the keys for each user object is changed to text & value for the select
     mapUsersArray() {
-      // make an array where the keys for each user object is changed to text & value for the select
       let mapUsersArray = [];
       this.users.forEach((user) => {
         let map = {

@@ -272,10 +272,10 @@
 
 <script>
 import { db, storage } from "@/firebase";
+import { mapGetters, mapState } from "vuex";
 import LineItem from "@/components/LineItem.vue";
 import vue2Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
-import { mapGetters, mapState } from "vuex";
 
 export default {
   name: "NewCard",
@@ -406,96 +406,7 @@ export default {
   },
 
   methods: {
-    fileAdded(file) {
-      this.newCard.files.push(file);
-    },
-    async submit() {
-      if (this.$refs.form.validate()) {
-        this.loading = true;
-        this.newCard.product_id = this.productId;
-
-        var FBcard = await db.collection("cards").add({});
-
-        this.cardId = FBcard.id;
-
-        let FBproduct = await db
-          .collection("products")
-          .doc(this.newCard.product_id)
-          .get();
-
-        let FBproductData = FBproduct.data();
-
-        FBproductData.cards.push({
-          card_id: FBcard.id,
-          card_name: this.newCard.name,
-        });
-
-        await db
-          .collection("products")
-          .doc(this.newCard.product_id)
-          .set(FBproductData);
-
-        const cardData = {
-          files: [],
-          name: this.newCard.name,
-          VAT: this.newCard.VAT,
-          contact_person: this.newCard.contact_person,
-          contact_number: this.newCard.contact_number,
-          createdOn: this.newCard.createdOn,
-          lead_time: this.newCard.lead_time,
-          list_id: this.newCard.list_id,
-          nano_item_description: this.newCard.nano_item_description,
-          product_id: this.newCard.product_id,
-          supplier_name: this.newCard.supplier_name,
-          supplier_email: this.newCard.supplier_email,
-          supplier_quote_num: this.newCard.supplier_quote_num,
-          total_exc_vat: this.newCard.total_exc_vat,
-          total_inc_vat: this.newCard.total_inc_vat,
-          updatedOn: this.newCard.updatedOn,
-          technical_approval: this.newCard.technical_approval,
-          purchase_approval: this.newCard.purchase_approval,
-          procured: this.newCard.procured,
-          receiver_approval: this.newCard.receiver_approval,
-          quality_approval: this.newCard.quality_approval,
-          purchase_order: [],
-          team: this.team,
-          lineItems: this.lineItemsArray,
-          creator: this.user.id,
-          quality_photos: [],
-          payment_terms: this.newCard.payment_terms,
-          currency: this.newCard.currency,
-          files_count: this.newCard.files.length,
-          hubdoc: this.newCard.hubdoc,
-          PO_number: this.newCard.PO_number,
-          POP: this.newCard.POP,
-        };
-
-        await db
-          .collection("cards")
-          .doc(FBcard.id)
-          .set(cardData);
-
-        this.uploadfiles(this.newCard.files, FBcard.id);
-
-        await FBcard.update({ lineItems: this.lineItemsArray });
-
-        this.$emit("addNewCardToArray", cardData);
-
-        this.addNewSupplier(
-          this.newCard.supplier_name,
-          this.newCard.supplier_email,
-          this.newCard.contact_number,
-          this.newCard.contact_person
-        );
-
-        this.submitValue = true;
-
-        this.newCard.product_id = 0;
-        this.loading = false;
-        this.newCardDialog = false;
-      }
-    },
-
+    // Add new suppliers to fb if they do not already exist
     async addNewSupplier(supplierName, email, number, person) {
       let suppliers_names = [];
 
@@ -523,6 +434,160 @@ export default {
       }
     },
 
+    // Add files to the newCard files Array
+    fileAdded(file) {
+      this.newCard.files.push(file);
+    },
+
+    // Add card lineItems to lineIte,ms array for fb
+    recieveLineItemsData(lineItem) {
+      this.lineItemsArray.push(lineItem);
+    },
+
+    // Submit function to add newCard to fb
+    async submit() {
+      if (this.$refs.form.validate()) {
+        this.loading = true;
+        this.newCard.product_id = this.productId;
+
+        // Create empty fb card document
+        var FBcard = await db.collection("cards").add({});
+
+        this.cardId = FBcard.id;
+
+        // Get product document relevant to card
+        let FBproduct = await db
+          .collection("products")
+          .doc(this.newCard.product_id)
+          .get();
+
+        let FBproductData = FBproduct.data();
+
+        FBproductData.cards.push({
+          card_id: FBcard.id,
+          card_name: this.newCard.name,
+        });
+
+        // Update product document
+        await db
+          .collection("products")
+          .doc(this.newCard.product_id)
+          .set(FBproductData);
+
+        // Setup card data
+        const cardData = {
+          contact_number: this.newCard.contact_number,
+          contact_person: this.newCard.contact_person,
+          createdOn: this.newCard.createdOn,
+          creator: this.user.id,
+          currency: this.newCard.currency,
+          files: [],
+          files_count: this.newCard.files.length,
+          hubdoc: this.newCard.hubdoc,
+          lead_time: this.newCard.lead_time,
+          lineItems: this.lineItemsArray,
+          list_id: this.newCard.list_id,
+          name: this.newCard.name,
+          nano_item_description: this.newCard.nano_item_description,
+          payment_terms: this.newCard.payment_terms,
+          PO_number: this.newCard.PO_number,
+          POP: this.newCard.POP,
+          procured: this.newCard.procured,
+          product_id: this.newCard.product_id,
+          purchase_approval: this.newCard.purchase_approval,
+          purchase_order: [],
+          quality_approval: this.newCard.quality_approval,
+          quality_photos: [],
+          receiver_approval: this.newCard.receiver_approval,
+          supplier_name: this.newCard.supplier_name,
+          supplier_email: this.newCard.supplier_email,
+          supplier_quote_num: this.newCard.supplier_quote_num,
+          team: this.team,
+          technical_approval: this.newCard.technical_approval,
+          total_exc_vat: this.newCard.total_exc_vat,
+          total_inc_vat: this.newCard.total_inc_vat,
+          updatedOn: this.newCard.updatedOn,
+          VAT: this.newCard.VAT,
+        };
+
+        // update newly created card
+        await db
+          .collection("cards")
+          .doc(FBcard.id)
+          .set(cardData);
+
+        // Trigger upload files function
+        this.uploadfiles(this.newCard.files, FBcard.id);
+
+        // Update card lineitems
+        await FBcard.update({ lineItems: this.lineItemsArray });
+
+        // Trigger new card to state to have realtime update
+        this.$emit("addNewCardToArray", cardData);
+
+        // Add new supplier is the supplier does not already exist
+        this.addNewSupplier(
+          this.newCard.supplier_name,
+          this.newCard.supplier_email,
+          this.newCard.contact_number,
+          this.newCard.contact_person
+        );
+
+        // Set subtmit value to trigger subtmit function of lineItem component
+        this.submitValue = true;
+
+        // Reset field values
+        this.newCard.product_id = 0;
+        this.loading = false;
+        this.newCardDialog = false;
+      }
+    },
+
+    // Template rendered for dropzone
+    template: function() {
+      return `<div class="dz-preview dz-file-preview" style="position: relative; display: inline-block; width: 100px;height: 120px;margin-left: 10px !important;padding: 8px;padding-bottom: 10px;background-color: rgba(0, 0, 0, 0.05); text-align: center; border-radius: 10px;">
+                <span data-dz-remove>
+                  <i style="transform: translate(45px, -15px);" class="material-icons">cancel</i>
+                  </span>
+                <div style="margin-top: 2px">
+                  <div class="dz-image">
+                      <div data-dz-thumbnail></div>
+                  </div>
+                  <div class="dz-details">
+                      <div class="dz-filename"><span data-dz-name></span></div>
+                  </div>
+                  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                  <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                  <div class="dz-success-mark"><i class="fa fa-check"></i></div>
+                  <div class="dz-error-mark"><i class="fa fa-close"></i></div>
+                </div>
+            </div>
+        `;
+    },
+
+    // Dropzone setup function
+    thumbnail: function(file, dataUrl) {
+      var j, len, ref, thumbnailElement;
+      if (file.previewElement) {
+        file.previewElement.classList.remove("dz-file-preview");
+        ref = file.previewElement.querySelectorAll("[data-dz-thumbnail-bg]");
+        for (j = 0, len = ref.length; j < len; j++) {
+          thumbnailElement = ref[j];
+          thumbnailElement.alt = file.name;
+          thumbnailElement.style.backgroundImage = 'url("' + dataUrl + '")';
+        }
+        return setTimeout(
+          (function() {
+            return function() {
+              return file.previewElement.classList.add("dz-image-preview");
+            };
+          })(this),
+          1
+        );
+      }
+    },
+
+    // Upload files to fb
     uploadfiles(files, cardId) {
       files.forEach((file) => {
         var fileName = file.name;
@@ -536,6 +601,7 @@ export default {
       });
     },
 
+    // Update total price base of the user VAT selection
     updatePrice(answer) {
       if (this.componentIdArray.includes(answer.componentId)) {
         let oldPrice = this.priceArray.find(
@@ -593,20 +659,18 @@ export default {
       this.updateTotal();
     },
 
-    updateVat(incVAT) {
-      if (this.newCard.currency != "R") {
-        if (this.VATexclude) {
-          this.newCard.VAT = 0.0;
-        }
-      } else {
-        if (this.VATexclude) {
-          this.newCard.VAT = 0.0;
-        } else {
-          this.newCard.VAT = (incVAT * 0.15).toFixed(2);
-        }
+    // After supplier been selected update accordingly in form
+    updateSupplierInfo(event) {
+      if (typeof event == "object") {
+        this.newCard.supplier_name = event.supplier_name;
+
+        this.newCard.contact_person = event.contact_person;
+        this.newCard.contact_number = event.contact_number;
+        this.newCard.supplier_email = event.contact_email;
       }
     },
 
+    // Update both total with and without VAT
     updateTotal() {
       this.updateVat(this.newCard.price);
       if (this.VATexclude) {
@@ -628,57 +692,18 @@ export default {
       }
     },
 
-    updateSupplierInfo(event) {
-      if (typeof event == "object") {
-        this.newCard.supplier_name = event.supplier_name;
-
-        this.newCard.contact_person = event.contact_person;
-        this.newCard.contact_number = event.contact_number;
-        this.newCard.supplier_email = event.contact_email;
-      }
-    },
-
-    recieveLineItemsData(lineItem) {
-      this.lineItemsArray.push(lineItem);
-    },
-    template: function() {
-      return `<div class="dz-preview dz-file-preview" style="position: relative; display: inline-block; width: 100px;height: 120px;margin-left: 10px !important;padding: 8px;padding-bottom: 10px;background-color: rgba(0, 0, 0, 0.05); text-align: center; border-radius: 10px;">
-                <span data-dz-remove>
-                  <i style="transform: translate(45px, -15px);" class="material-icons">cancel</i>
-                  </span>
-                <div style="margin-top: 2px">
-                  <div class="dz-image">
-                      <div data-dz-thumbnail></div>
-                  </div>
-                  <div class="dz-details">
-                      <div class="dz-filename"><span data-dz-name></span></div>
-                  </div>
-                  <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
-                  <div class="dz-error-message"><span data-dz-errormessage></span></div>
-                  <div class="dz-success-mark"><i class="fa fa-check"></i></div>
-                  <div class="dz-error-mark"><i class="fa fa-close"></i></div>
-                </div>
-            </div>
-        `;
-    },
-    thumbnail: function(file, dataUrl) {
-      var j, len, ref, thumbnailElement;
-      if (file.previewElement) {
-        file.previewElement.classList.remove("dz-file-preview");
-        ref = file.previewElement.querySelectorAll("[data-dz-thumbnail-bg]");
-        for (j = 0, len = ref.length; j < len; j++) {
-          thumbnailElement = ref[j];
-          thumbnailElement.alt = file.name;
-          thumbnailElement.style.backgroundImage = 'url("' + dataUrl + '")';
+    // Update the VAT value for each lineItem and total
+    updateVat(incVAT) {
+      if (this.newCard.currency != "R") {
+        if (this.VATexclude) {
+          this.newCard.VAT = 0.0;
         }
-        return setTimeout(
-          (function() {
-            return function() {
-              return file.previewElement.classList.add("dz-image-preview");
-            };
-          })(this),
-          1
-        );
+      } else {
+        if (this.VATexclude) {
+          this.newCard.VAT = 0.0;
+        } else {
+          this.newCard.VAT = (incVAT * 0.15).toFixed(2);
+        }
       }
     },
   },

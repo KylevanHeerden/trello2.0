@@ -92,8 +92,8 @@ export default {
   components: {},
   data() {
     return {
-      programme: "",
       clicked: false,
+      programme: "",
       search: "",
       searchOption: null,
     };

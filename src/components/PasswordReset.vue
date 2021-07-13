@@ -26,8 +26,8 @@ export default {
   data() {
     return {
       email: "",
-      showSuccess: false,
       errorMsg: "",
+      showSuccess: false,
     };
   },
   methods: {
