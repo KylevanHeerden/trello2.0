@@ -24,7 +24,7 @@ describe("Test product page", () => {
       "Technical",
       "Purchase",
       "Purchase",
-      "Waiting",
+      "FollowUp",
       "Quality",
     ];
 
