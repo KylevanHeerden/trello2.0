@@ -103,10 +103,6 @@ export default {
       cards: (state) => state.cards,
     }),
 
-    url() {
-      return `https://${process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/${this.programme}`;
-    },
-
     getProgrammes() {
       let select_options = [];
       this.$store.getters.getProgrammes.map((programme) => {
@@ -137,6 +133,10 @@ export default {
           }
         });
       }
+    },
+
+    url() {
+      return `https://${process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/${this.programme}`;
     },
   },
 

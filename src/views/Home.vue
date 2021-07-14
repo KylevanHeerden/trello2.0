@@ -223,7 +223,6 @@
 </template>
 
 <script>
-// import PasswordReset from "@/components/PasswordReset";
 import { auth } from "@/firebase";
 
 export default {
@@ -249,21 +248,21 @@ export default {
         password: "",
       },
       message: "",
+      signupForm: {
+        email: "",
+        name: "",
+        password: "",
+        surname: "",
+      },
       show: false,
       showLoginForm: true,
       showPasswordReset: false,
-      signupForm: {
-        name: "",
-        surname: "",
-        email: "",
-        password: "",
-      },
       resetEmail: "",
     };
   },
   methods: {
+    // Triggers the login function defined in vuex
     login() {
-      // Triggers the login function defined in vuex
       let login = this.$store.dispatch("login", {
         email: this.loginForm.email,
         password: this.loginForm.password,
@@ -272,28 +271,31 @@ export default {
         this.message = val;
       });
     },
+
+    // Triggers the logout function defined in vuex
     logout() {
-      // Triggers the logout function defined in vuex
       this.$store.dispatch("logout");
     },
+
+    // Toggles between login and signup form
     toggleForm() {
-      // Toggles between login and signup form
       this.showLoginForm = !this.showLoginForm;
     },
+
+    // Shows password reset option
     togglePasswordReset() {
-      // Shows password reset option
       this.showPasswordReset = !this.showPasswordReset;
     },
 
+    // Triggers FB reset password function
     sendPasswordReset() {
-      // Triggers FB reset password function
       auth.sendPasswordResetEmail(this.resetEmail);
       this.resetEmail = "";
       this.showPasswordReset = false;
     },
 
+    // Triggers signup function defined in vuex
     signup() {
-      // Triggers signup function defined in vuex
       this.$store.dispatch("signup", {
         email: this.signupForm.email,
         password: this.signupForm.password,

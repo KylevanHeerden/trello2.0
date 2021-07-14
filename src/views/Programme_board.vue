@@ -35,6 +35,7 @@
               :listId="list.id"
               :cardComments="commentsByCard(card.id)"
               :team="team"
+              :product="product(card.product_id)"
             ></Card>
           </Draggable>
         </v-col>
@@ -63,19 +64,17 @@
 
 <script>
 // @ is an alias to /src
-import Draggable from "vuedraggable";
+import { db } from "@/firebase";
+import { mapState, mapGetters, mapActions } from "vuex";
 import Card from "@/components/Card.vue";
 import Archived from "@/components/Archived.vue";
-import { db } from "@/firebase";
+import Draggable from "vuedraggable";
 
 export default {
   name: "Products",
   components: { Draggable, Card, Archived },
   data() {
     return {
-      programmeId: String(this.$route.params.id),
-      fetchedProgrammeId: this.$route.params.id,
-      update: true,
       Array: [
         // Updates this data according to products page you on
         {
@@ -119,11 +118,14 @@ export default {
           cards: [],
         },
       ],
+      fetchedProgrammeId: this.$route.params.id,
+      programmeId: String(this.$route.params.id),
       snackbar: {
+        newListName: "", //This is provided by cardMoved function
         snackbar: false,
         timeout: 20000000,
-        newListName: "", //This is provided by cardMoved function
       },
+      update: true,
     };
   },
 
@@ -133,7 +135,94 @@ export default {
     },
   },
 
+  computed: {
+    ...mapState({
+      products: (state) => state.products.products,
+      currentUser: (state) => state.profile.userProfile,
+      comments: (state) => state.comments.comments,
+    }),
+    ...mapGetters([
+      "getProgrammeById",
+      "getCardsByProgrammeId",
+      "getSuppliers",
+      "getTeamsByProgrammeId",
+      "getUsers",
+      "getLists",
+      "getProductById",
+    ]),
+
+    cards() {
+      let cards = this.getCardsByProgrammeId(this.programme.id);
+      let notArchived = [];
+
+      cards.forEach((card) => {
+        let product = this.products.find((product) => {
+          return product.id === card.product_id;
+        });
+
+        if (product.archived == false) {
+          notArchived.push(card);
+        } else {
+        }
+      });
+      let sortedCards = notArchived.sort((a, b) => a.createdOn - b.createdOn);
+      // //This method is to populate lists.cards of Array
+      sortedCards.map((card) => this.Array[card.list_id - 1].cards.push(card));
+      return notArchived;
+    },
+
+    links() {
+      if (this.programme == undefined) {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+        ];
+      } else {
+        return [
+          {
+            text: "Programmes",
+            to: "/",
+          },
+          {
+            text: `${this.programme.name}`,
+            to: "/programme/" + `${this.fetchedProgrammeId}`,
+          },
+        ];
+      }
+    },
+
+    lists() {
+      let lists = this.getLists();
+      return lists;
+    },
+
+    programme() {
+      let programme = this.getProgrammeById(this.fetchedProgrammeId);
+      return programme;
+    },
+
+    suppliers() {
+      let suppliers = this.getSuppliers();
+      return suppliers;
+    },
+
+    team() {
+      let team = this.getTeamsByProgrammeId(this.programme.id);
+      return team;
+    },
+
+    users() {
+      let users = this.getUsers();
+      return users;
+    },
+  },
+
   methods: {
+    ...mapActions(["getProducts", "getProgrammes", "getCards"]),
+
+    // Function that triggers when card is moved
     async cardMoved(listId, e) {
       const evt = e.added || e.moved; //the events triggered by draggable
       if (evt == undefined) {
@@ -207,6 +296,12 @@ export default {
       this.$store.dispatch("getNotifications");
     },
 
+    cards1(id) {
+      let listCards = this.cards.filter((card) => card.list_id === id);
+      return listCards;
+    },
+
+    // Filter comments by card Id
     commentsByCard(cardId) {
       let card_comments = this.comments.filter(
         (comment) => comment.card_id === cardId
@@ -214,94 +309,18 @@ export default {
       return card_comments;
     },
 
-    cards1(id) {
-      let listCards = this.cards.filter((card) => card.list_id === id);
-      return listCards;
+    // Gets the product for the specific card
+    product(id) {
+      let product = this.getProductById(id);
+
+      return product;
     },
   },
 
-  computed: {
-    products() {
-      let products = this.$store.getters.getProducts;
-      return products;
-    },
-
-    programme() {
-      let programme = this.$store.getters.getProgrammeById(
-        this.fetchedProgrammeId
-      );
-      return programme;
-    },
-    lists() {
-      let lists = this.$store.getters.getLists;
-      return lists;
-    },
-    cards() {
-      let cards = this.$store.getters.getCardsByProgrammeId(this.programme.id);
-      let notArchived = [];
-
-      cards.forEach((card) => {
-        let product = this.products.find((product) => {
-          return product.id === card.product_id;
-        });
-
-        if (product.archived == false) {
-          notArchived.push(card);
-        } else {
-        }
-      });
-      let sortedCards = notArchived.sort((a, b) => a.createdOn - b.createdOn);
-      // //This method is to populate lists.cards of Array
-      sortedCards.map((card) => this.Array[card.list_id - 1].cards.push(card));
-      return notArchived;
-    },
-
-    suppliers() {
-      let suppliers = this.$store.getters.getSuppliers;
-      return suppliers;
-    },
-    comments() {
-      let comments = this.$store.getters.getComments;
-      return comments;
-    },
-    team() {
-      let team = this.$store.getters.getTeamsByProgrammeId(this.programme.id);
-      return team;
-    },
-    user() {
-      let user = this.$store.getters.getUserProfile;
-      return user;
-    },
-    users() {
-      let users = this.$store.getters.getUserProfile;
-      return users;
-    },
-    links() {
-      if (this.programme == undefined) {
-        return [
-          {
-            text: "Programmes",
-            to: "/",
-          },
-        ];
-      } else {
-        return [
-          {
-            text: "Programmes",
-            to: "/",
-          },
-          {
-            text: `${this.programme.name}`,
-            to: "/programme/" + `${this.fetchedProgrammeId}`,
-          },
-        ];
-      }
-    },
-  },
   created() {
     //Methods run before page load complete so that data available in store but also local3000ly in component
-    this.$store.dispatch("getProducts");
-    this.$store.dispatch("getProgrammes");
+    this.getProducts();
+    this.getProgrammes();
     this.$store.dispatch("getLists");
     this.$store.dispatch("getSuppliers");
     this.$store.dispatch("getComments");
@@ -310,7 +329,7 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch("getCards");
+    this.getCards();
   },
 };
 </script>

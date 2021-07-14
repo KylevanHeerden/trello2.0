@@ -10,7 +10,7 @@ export default {
     },
 
     getCardsByProgrammeId: (state) => (id) => {
-      return state.cards.find(
+      return state.cards.filter(
         (card) => card.team.programme.programme_id === id
       );
     },
