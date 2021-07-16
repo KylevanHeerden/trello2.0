@@ -395,6 +395,8 @@ export default {
                         .catch((error) => console.log(error));
                     })
                     .catch((error) => console.log(error));
+
+                  this.moveCardAutoForward(fbCard);
                 } else {
                   this.moveCardAutoBackward(fbCard);
                 }
@@ -484,6 +486,8 @@ export default {
       fbCard.update({ POP_date: new Date() });
       fbProduct.update({ POP_date: new Date() });
       fbProduct.update({ leadTime: this.card.lead_time });
+
+      this.sendNotification(5, "Follow Up");
     },
 
     // Uploads purchaseOrder to fb
@@ -508,8 +512,6 @@ export default {
       });
 
       this.newCard.purchase_order = filesArray;
-
-      this.moveCardAutoForward(fbCard);
     },
 
     // Changes boolean to Ordered or Not Ordered
