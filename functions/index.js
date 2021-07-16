@@ -6,6 +6,7 @@ const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 const cors = require("cors")({ origin: true });
 const hbs = require("nodemailer-express-handlebars");
+const moment = require("moment");
 
 admin.initializeApp();
 
@@ -55,7 +56,9 @@ exports.csvJsonReport = functions.https.onRequest((request, response) => {
               total_cost: lineItem.unit_price * lineItem.quantity,
               VAT: card.currency == "R" ? "Excluded" : "N/A",
               currency: card.currency,
-              date_ordered: card.updatedOn,
+              date_ordered: moment(card.updatedOn.toDate()).format(
+                "Do MMM YYYY"
+              ),
               lead_time_days: card.lead_time,
               payment_terms: card.payment_terms,
             };
