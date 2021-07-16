@@ -17,7 +17,7 @@
         >
           <v-virtual-scroll height="400" item-height="75" :items="searchCards">
             <template v-slot:default="{ item }">
-              <v-list width="60%" rounded>
+              <v-list width="60%" rounded class="searchCardList">
                 <v-list-item-group>
                   <v-list-item
                     :key="item.PO_number"
@@ -50,7 +50,12 @@
       <v-card elevation="2" width="50%">
         <v-card-text class="v-card-text">
           Select the programme to export as CSV:
-          <v-select v-model="programme" :items="getProgrammes"></v-select>
+          <v-select
+            v-model="programme"
+            :items="getProgrammes"
+            item-text="text"
+            item-value="value"
+          ></v-select>
         </v-card-text>
 
         <v-card-actions class="justify-end v-card-actions">
@@ -100,7 +105,7 @@ export default {
   },
   computed: {
     ...mapState({
-      cards: (state) => state.cards,
+      cards: (state) => state.cards.cards,
     }),
 
     getProgrammes() {
@@ -206,7 +211,7 @@ export default {
   padding-right: 2rem;
 }
 
-.v-list {
+.searchCardList {
   position: absolute;
   left: 20%;
 }
