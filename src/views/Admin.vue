@@ -111,7 +111,11 @@ export default {
     getProgrammes() {
       let select_options = [];
       this.$store.getters.getProgrammes.map((programme) => {
-        select_options.push({ text: programme.name, value: programme.id });
+        select_options.push({
+          text: programme.name,
+          value: programme.id,
+          disabled: false,
+        });
       });
       return select_options;
     },
