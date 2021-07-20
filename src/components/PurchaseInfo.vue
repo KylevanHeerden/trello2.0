@@ -395,8 +395,6 @@ export default {
                         .catch((error) => console.log(error));
                     })
                     .catch((error) => console.log(error));
-
-                  this.moveCardAutoForward(fbCard);
                 } else {
                   this.moveCardAutoBackward(fbCard);
                 }
@@ -512,6 +510,10 @@ export default {
       });
 
       this.newCard.purchase_order = filesArray;
+
+      setTimeout(console.log("Done"), 5000);
+
+      this.moveCardAutoForward(fbCard); // move card automatically
     },
 
     // Changes boolean to Ordered or Not Ordered
