@@ -1,5 +1,6 @@
 import * as fb from "@/firebase";
 
+// module for the suppliers
 export default {
   state: {
     suppliers: [],
