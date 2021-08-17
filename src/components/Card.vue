@@ -45,7 +45,8 @@
             <v-stepper-step step="1" editable>Purchase Request</v-stepper-step>
             <v-stepper-content step="1">
               Purchase request from
-              {{ card.supplier_name }}.
+              {{ card.supplier_name }}. Created on
+              {{ dateFormat(card.createdOn) }} by {{ cardUser }}
             </v-stepper-content>
 
             <v-stepper-step
@@ -147,6 +148,8 @@ import QuoteInfo from "@/components/QuoteInfo";
 import TechPurApproval from "@/components/TechPurApproval";
 import PurchaseInfo from "@/components/PurchaseInfo";
 import QualityInfo from "@/components/QualityInfo";
+import moment from "moment";
+import { mapActions, mapGetters, mapState } from "vuex";
 
 export default {
   components: {
@@ -185,7 +188,20 @@ export default {
     };
   },
 
-  computed: {},
+  computed: {
+    users() {
+      let users = this.$store.getters.getUsers;
+      return users;
+    },
+
+    cardUser() {
+      let cardUser = this.users.filter((user) => {
+        return user.id == this.card.creator;
+      });
+
+      return this.nameSurname(cardUser[0].name, cardUser[0].surname);
+    },
+  },
 
   methods: {
     progressbarColor: function(listid) {
@@ -200,9 +216,21 @@ export default {
 
       return colors[listid];
     },
+
+    // Format fb timestamp to Do MMM YYYY
+    dateFormat(param) {
+      let date = moment(param.toDate()).format("Do MMM YYYY");
+      return date;
+    },
+
+    nameSurname(name, surname) {
+      return name + " " + surname;
+    },
   },
 
-  created() {},
+  created() {
+    this.$store.dispatch("getUsers");
+  },
 
   mounted() {},
 };
