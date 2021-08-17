@@ -92,6 +92,7 @@
 // @ is an alias to /src
 import { mapActions, mapGetters, mapState } from "vuex";
 import { db } from "@/firebase";
+import moment from "moment";
 
 export default {
   name: "Admin",
@@ -132,7 +133,7 @@ export default {
           }
         });
 
-        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
       } else if (this.searchOption == "Supplier") {
         let searchCards = this.cards.filter((card) => {
           let cardSupplierName = card.supplier_name;
@@ -145,7 +146,7 @@ export default {
           }
         });
 
-        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
       } else if (this.searchOption == "Value") {
         let searchCards = this.cards.filter((card) => {
           let cardTotalExcVAT = card.total_exc_vat;
@@ -156,7 +157,7 @@ export default {
           }
         });
 
-        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
       }
     },
 
@@ -178,6 +179,12 @@ export default {
           });
         });
       return "Done!";
+    },
+
+    // Format fb timestamp to Do MMM YYYY
+    dateFormat(param) {
+      let date = moment(param.toDate()).format("Do MMM YYYY");
+      return date;
     },
   },
 
