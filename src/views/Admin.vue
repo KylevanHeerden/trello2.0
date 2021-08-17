@@ -7,6 +7,7 @@
           <v-radio-group v-model="searchOption" row mandatory>
             <v-radio label="PO Number" value="PO#"></v-radio>
             <v-radio label="Supplier" value="Supplier"></v-radio>
+            <v-radio label="Total Exc VAT" value="Value"></v-radio>
           </v-radio-group>
           <v-text-field v-model="search" data-cypress="searchbar">
           </v-text-field>
@@ -130,7 +131,7 @@ export default {
             return card;
           }
         });
-      } else {
+      } else if (this.searchOption == "Supplier") {
         return this.cards.filter((card) => {
           let cardSupplierName = card.supplier_name;
           if (cardSupplierName == null) {
@@ -138,6 +139,15 @@ export default {
           } else if (
             cardSupplierName.toLowerCase().match(this.search.toLowerCase())
           ) {
+            return card;
+          }
+        });
+      } else if (this.searchOption == "Value") {
+        return this.cards.filter((card) => {
+          let cardTotalExcVAT = card.total_exc_vat;
+          if (cardTotalExcVAT == null) {
+            return;
+          } else if (cardTotalExcVAT.match(this.search)) {
             return card;
           }
         });
