@@ -123,7 +123,7 @@ export default {
 
     searchCards() {
       if (this.searchOption == "PO#") {
-        return this.cards.filter((card) => {
+        let searchCards = this.cards.filter((card) => {
           let cardPO = card.PO_number;
           if (cardPO == null) {
             return;
@@ -131,8 +131,10 @@ export default {
             return card;
           }
         });
+
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
       } else if (this.searchOption == "Supplier") {
-        return this.cards.filter((card) => {
+        let searchCards = this.cards.filter((card) => {
           let cardSupplierName = card.supplier_name;
           if (cardSupplierName == null) {
             return;
@@ -142,8 +144,10 @@ export default {
             return card;
           }
         });
+
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
       } else if (this.searchOption == "Value") {
-        return this.cards.filter((card) => {
+        let searchCards = this.cards.filter((card) => {
           let cardTotalExcVAT = card.total_exc_vat;
           if (cardTotalExcVAT == null) {
             return;
@@ -151,6 +155,8 @@ export default {
             return card;
           }
         });
+
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? 1 : -1));
       }
     },
 
