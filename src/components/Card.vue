@@ -43,10 +43,13 @@
         <v-card-text>
           <v-stepper flat vertical>
             <v-stepper-step step="1" editable>Purchase Request</v-stepper-step>
-            <v-stepper-content step="1">
+            <v-stepper-content step="1" class="greyText">
               Purchase request from
-              {{ card.supplier_name }}. Created on
-              {{ dateFormat(card.createdOn) }} by {{ cardUser }}
+              <span class="text">{{ card.supplier_name }}</span
+              >. Created on
+              <span class="text">{{ dateFormat(card.createdOn) }}</span> by
+              <span class="text">{{ cardUser }}</span
+              >.
             </v-stepper-content>
 
             <v-stepper-step
@@ -253,5 +256,13 @@ export default {
 .backgroundColorPrimary {
   background-color: #37474f;
   color: white;
+}
+
+.greyText {
+  color: dimgrey;
+}
+
+.text {
+  font-style: italic;
 }
 </style>
