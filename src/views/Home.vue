@@ -288,8 +288,17 @@ export default {
     },
 
     // Triggers FB reset password function
-    sendPasswordReset() {
-      auth.sendPasswordResetEmail(this.resetEmail);
+    async sendPasswordReset() {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: this.resetEmail }),
+      };
+      const response = await fetch(
+        "https://us-central1-nanodyn-cim.cloudfunctions.net/resetPassword",
+        requestOptions
+      );
+
       this.resetEmail = "";
       this.showPasswordReset = false;
     },
