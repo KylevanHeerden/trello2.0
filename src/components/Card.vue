@@ -74,7 +74,7 @@
             </v-stepper-step>
 
             <v-stepper-content step="3">
-              <TechPurApproval
+              <TechApproval
                 :stepName="'technical'"
                 :team="team"
                 :card="card"
@@ -82,7 +82,7 @@
                 :counter="counter"
                 :commentPosition="1"
                 :product="product"
-              ></TechPurApproval>
+              ></TechApproval>
             </v-stepper-content>
 
             <v-stepper-step
@@ -93,7 +93,7 @@
             </v-stepper-step>
 
             <v-stepper-content step="4">
-              <TechPurApproval
+              <PurApproval
                 :stepName="'purchase'"
                 :team="team"
                 :card="card"
@@ -101,7 +101,7 @@
                 :counter="counter"
                 :commentPosition="2"
                 :product="product"
-              ></TechPurApproval>
+              ></PurApproval>
             </v-stepper-content>
 
             <v-stepper-step
@@ -124,18 +124,36 @@
 
             <v-stepper-step
               step="6"
-              :editable="listId >= 5"
-              data-cypress="qualityInfo"
+              :editable="listId >= 5 || card.procured != null"
             >
-              Quality Approval Information
+              Purchase Closure
             </v-stepper-step>
             <v-stepper-content step="6">
-              <QualityInfo
+              <PurchaseClosure
+                :stepName="'procurement_closure'"
                 :team="team"
                 :card="card"
                 :cardComments="cardComments"
                 :counter="counter"
                 :commentPosition="4"
+                :product="product"
+              ></PurchaseClosure>
+            </v-stepper-content>
+
+            <v-stepper-step
+              step="7"
+              :editable="listId >= 5"
+              data-cypress="qualityInfo"
+            >
+              Quality Approval Information
+            </v-stepper-step>
+            <v-stepper-content step="7">
+              <QualityInfo
+                :team="team"
+                :card="card"
+                :cardComments="cardComments"
+                :counter="counter"
+                :commentPosition="5"
               ></QualityInfo>
             </v-stepper-content>
           </v-stepper>
@@ -148,11 +166,13 @@
 <script>
 import Comments from "@/components/Comments";
 import QuoteInfo from "@/components/QuoteInfo";
-import TechPurApproval from "@/components/TechPurApproval";
+import TechApproval from "@/components/TechApproval";
+import PurApproval from "@/components/PurApproval";
 import PurchaseInfo from "@/components/PurchaseInfo";
 import QualityInfo from "@/components/QualityInfo";
 import moment from "moment";
 import { mapActions, mapGetters, mapState } from "vuex";
+import PurchaseClosure from "./PurchaseClosure.vue";
 
 export default {
   components: {
@@ -160,7 +180,9 @@ export default {
     PurchaseInfo,
     QualityInfo,
     QuoteInfo,
-    TechPurApproval,
+    TechApproval,
+    PurApproval,
+    PurchaseClosure,
   },
   props: {
     card: {

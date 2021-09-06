@@ -193,7 +193,7 @@
       </v-row>
       <Comments
         :cardComments="cardComments"
-        :position="4"
+        :position="commentPosition"
         :cardId="card.id"
         class="commentsRow"
       ></Comments>
