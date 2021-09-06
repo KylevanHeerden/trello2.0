@@ -373,6 +373,7 @@ export default {
         { text: "EUR(€)", value: "€" },
         { text: "GBP (£)", value: "£" },
         { text: "USD ($)", value: "$" },
+        { text: "BRL (R$)", value: "R$" },
       ],
       dropzoneOptions: {
         url: "https://httpbin.org/post",

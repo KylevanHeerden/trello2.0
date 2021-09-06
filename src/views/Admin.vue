@@ -169,12 +169,18 @@ export default {
   methods: {
     // The addField function adds a field to all the docs in a firebase collection.
     async addField() {
-      db.collection("products")
+      db.collection("cards")
         .get()
         .then(function(querySnapshot) {
           querySnapshot.forEach(function(doc) {
             doc.ref.update({
-              POP_date: new Date(),
+              payments: [
+                {
+                  payment: "Final Payment",
+                  value: doc.data().total_inc_vat,
+                  date: "",
+                },
+              ],
             });
           });
         });

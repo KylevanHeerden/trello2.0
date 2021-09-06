@@ -1,6 +1,7 @@
 <template>
   <v-form>
     <v-container>
+      <Payments :cardInfo="card"></Payments>
       <v-row>
         <v-col cols="12" sm="6" md="6">
           <v-text-field
@@ -24,7 +25,7 @@
                   :label="`${stepNameFn(stepName, 3)}:`"
                   :disabled="
                     !checkIfUserInAuthorityArray(team[stepNameFn(stepName, 2)])
-                      .boolean
+                      .boolean || card.payments[0].date == ''
                   "
                 >
                   <v-radio
@@ -88,9 +89,10 @@
 import { db } from "@/firebase";
 import { mapState } from "vuex";
 import Comments from "@/components/Comments";
+import Payments from "@/components/Payments";
 
 export default {
-  components: { Comments },
+  components: { Comments, Payments },
   props: {
     card: {
       type: Object,

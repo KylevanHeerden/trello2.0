@@ -71,6 +71,7 @@ export default {
               hubdoc: doc.data().hubdoc,
               PO_number: doc.data().PO_number,
               POP: doc.data().POP,
+              payments: doc.data().payments,
             };
             cards_array.push(object);
           });
