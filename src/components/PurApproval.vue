@@ -155,6 +155,7 @@ export default {
         : "rejectMsg";
     },
 
+    // checks if the current user is the purchase approver and then determines authorisation boolean
     paymentsAllowed() {
       return this.checkIfUserInAuthorityArray(this.team.purchase_approver);
     },

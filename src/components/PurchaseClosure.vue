@@ -186,12 +186,12 @@ export default {
   data() {
     return {
       confirmationDialog: false,
-      savedAlert: false,
-      inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
-      deliveryDate: "",
-      menu2: false,
-      edit: false,
       date: "",
+      deliveryDate: "",
+      edit: false,
+      inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
+      menu2: false,
+      savedAlert: false,
     };
   },
   computed: {
@@ -199,6 +199,7 @@ export default {
       currentUser: (state) => state.profile.userProfile,
     }),
 
+    // Returns boolean determining authorisation based on user role
     allowed() {
       let answer = true;
 
@@ -211,11 +212,33 @@ export default {
       return answer;
     },
 
+    // returns edit status based on edit boolean
     editingStatus() {
       return this.edit ? "ON" : "OFF";
     },
   },
   methods: {
+    // save the date for the payment in the payments array
+    addDate(date) {
+      this.date = date;
+
+      this.saveChanges();
+    },
+    // saves delivery date to fb card
+    async addDeliveryDate() {
+      this.savedAlert = true;
+
+      this.menu2 = false;
+
+      const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+
+      // Update fb card
+      await fbCard.update({
+        delivery_date: this.deliveryDate,
+      });
+    },
+
+    // save the date for the payment in the payments array
     allowedDates(val) {
       if (new Date(val).getDay() == 2) {
         return true;
@@ -226,7 +249,22 @@ export default {
       }
     },
 
-    //This function checks if current user part of the users assigned to the authority role
+    // changes final payment amount based on the number of payment values and the total inc vat
+    changeFinalPaymentValue() {
+      let finalPayment = parseFloat(this.card.total_inc_vat);
+
+      this.card.payments.forEach((payment) => {
+        if (payment.payment !== "Final Payment") {
+          finalPayment = finalPayment - parseFloat(payment.value);
+        }
+      });
+
+      this.card.payments[0].value = parseFloat(finalPayment).toFixed(2);
+
+      this.saveChanges();
+    },
+
+    //This function checks if current user part of the users assigned to the authority role !! This one different than the rest cause it also checks if card in list 5
     checkIfUserInAuthorityArray(teamAuthority) {
       let userId = this.currentUser.id;
 
@@ -330,89 +368,6 @@ export default {
       }
     },
 
-    // Creates new notification in fb which triggers slack/email cloud function
-    sendNotification(newListId, status) {
-      const person_array = [
-        "technical_approver",
-        "purchase_approver",
-        "procurer",
-        "purchase_approver",
-      ];
-
-      const toCall = person_array[newListId - 2];
-
-      if (this.team[toCall] == undefined) {
-        // card creator notified when card is in quality
-        db.collection("notifications").add({
-          card_id: this.card.id,
-          product: {
-            product_name: this.product.name,
-            product_id: this.product.id,
-          },
-          programme: {
-            programme_name: this.product.programme.programme_name,
-            programme_id: this.product.programme.programme_id,
-          },
-          user_id: this.card.creator,
-          createdOn: new Date(),
-          status: status,
-        });
-      } else if (newListId - 2 === 3) {
-        // Now purchase approver and card creator is notified when card is in awaiting
-        db.collection("notifications").add({
-          card_id: this.card.id,
-          product: {
-            product_name: this.product.name,
-            product_id: this.product.id,
-          },
-          programme: {
-            programme_name: this.product.programme.programme_name,
-            programme_id: this.product.programme.programme_id,
-          },
-          user_id: this.card.creator,
-          createdOn: new Date(),
-          status: status,
-        });
-
-        this.team[toCall].users.forEach((notify) => {
-          db.collection("notifications").add({
-            card_id: this.card.id,
-            product: {
-              product_name: this.product.name,
-              product_id: this.product.id,
-            },
-            programme: {
-              programme_name: this.product.programme.programme_name,
-              programme_id: this.product.programme.programme_id,
-            },
-            user_id: notify.value,
-            createdOn: new Date(),
-            status: status,
-          });
-        });
-      } else {
-        // nofity relevant party when card moves to column
-        this.team[toCall].users.forEach((notify) => {
-          db.collection("notifications").add({
-            card_id: this.card.id,
-            product: {
-              product_name: this.product.name,
-              product_id: this.product.id,
-            },
-            programme: {
-              programme_name: this.product.programme.programme_name,
-              programme_id: this.product.programme.programme_id,
-            },
-            user_id: notify.value,
-            createdOn: new Date(),
-            status: status,
-          });
-        });
-      }
-
-      this.getNotifications;
-    },
-
     // Returns name according to either purchase of technical
     stepNameFn(name, num) {
       if (num == 1) {
@@ -425,33 +380,7 @@ export default {
       }
     },
 
-    async addDeliveryDate() {
-      this.savedAlert = true;
-
-      this.menu2 = false;
-
-      const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
-
-      // Update fb card
-      await fbCard.update({
-        delivery_date: this.deliveryDate,
-      });
-    },
-
-    changeFinalPaymentValue() {
-      let finalPayment = parseFloat(this.card.total_inc_vat);
-
-      this.card.payments.forEach((payment) => {
-        if (payment.payment !== "Final Payment") {
-          finalPayment = finalPayment - parseFloat(payment.value);
-        }
-      });
-
-      this.card.payments[0].value = parseFloat(finalPayment).toFixed(2);
-
-      this.saveChanges();
-    },
-
+    // saves changes made to the fb card
     async saveChanges() {
       this.savedAlert = true;
 
@@ -461,12 +390,6 @@ export default {
       await fbCard.update({
         payments: this.card.payments,
       });
-    },
-
-    addDate(date) {
-      this.date = date;
-
-      this.saveChanges();
     },
   },
   mounted() {},

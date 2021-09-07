@@ -153,18 +153,19 @@ export default {
   data: () => {
     return {
       date: "",
+      inputRules: [(v) => v.length >= 4 || "Must be in format 0.00"], //Validation rule for form
       menu1: false,
       menu2: false,
       menu3: false,
       menu4: false,
       menu5: false,
       menu6: false,
-      inputRules: [(v) => v.length >= 4 || "Must be in format 0.00"], //Validation rule for form
       savedAlert: false,
     };
   },
 
   computed: {
+    // Returns boolean determining authorisation based on user role and wether card is in list 3 or 4
     allowed() {
       let answer = true;
       if (this.paymentsAllowed.boolean) {
@@ -178,16 +179,14 @@ export default {
   },
 
   methods: {
-    allowedDates(val) {
-      if (new Date(val).getDay() == 2) {
-        return true;
-      } else if (new Date(val).getDay() == 4) {
-        return true;
-      } else {
-        return false;
-      }
+    // save the date for the payment in the payments array
+    addDate(date) {
+      this.date = date;
+
+      this.saveChanges();
     },
 
+    // add new row to card.payments, first deposit and then there after interim
     addPayment() {
       if (this.cardInfo.payments.length < 2) {
         this.cardInfo.payments.push({
@@ -206,14 +205,18 @@ export default {
       }
     },
 
-    removePayment() {
-      if (this.cardInfo.payments.length > 1) {
-        this.cardInfo.payments.pop();
-
-        this.changeFinalPaymentValue();
+    // returns dates that are allowed for date picker, only tuesdays and thursdays
+    allowedDates(val) {
+      if (new Date(val).getDay() == 2) {
+        return true;
+      } else if (new Date(val).getDay() == 4) {
+        return true;
+      } else {
+        return false;
       }
     },
 
+    // changes final payment amount based on the number of payment values and the total inc vat
     changeFinalPaymentValue() {
       let finalPayment = parseFloat(this.cardInfo.total_inc_vat);
 
@@ -228,18 +231,23 @@ export default {
       this.saveChanges();
     },
 
-    addDate(date) {
-      this.date = date;
-
-      this.saveChanges();
-    },
-
+    // removes date from payment in payment array
     clearDate() {
       this.date = "";
 
       this.saveChanges();
     },
 
+    // removes payment from card.pamets array
+    removePayment() {
+      if (this.cardInfo.payments.length > 1) {
+        this.cardInfo.payments.pop();
+
+        this.changeFinalPaymentValue();
+      }
+    },
+
+    // saves the changes made to the payment array to the fb card
     async saveChanges() {
       this.savedAlert = true;
 
