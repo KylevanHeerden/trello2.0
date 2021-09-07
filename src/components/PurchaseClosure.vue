@@ -30,7 +30,16 @@
         </v-col>
       </v-row>
       <v-row justify="end" align-content="end" class="ma-0 pa-0">
-        <v-btn v-model="edit" icon small @click="edit = !edit" class="mr-10">
+        <v-btn
+          v-model="edit"
+          icon
+          small
+          @click="edit = !edit"
+          class="mr-10"
+          :disabled="
+            !checkIfUserInAuthorityArray(team.purchase_approver).boolean
+          "
+        >
           <v-icon class="pr-7">
             edit
           </v-icon>
