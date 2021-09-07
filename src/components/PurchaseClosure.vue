@@ -29,6 +29,14 @@
           </v-menu>
         </v-col>
       </v-row>
+      <v-row justify="end" align-content="end" class="ma-0 pa-0">
+        <v-btn v-model="edit" icon small @click="edit = !edit" class="mr-10">
+          <v-icon class="pr-7">
+            edit
+          </v-icon>
+          <div :class="{ editON: edit }">Editing: {{ editingStatus }}</div>
+        </v-btn>
+      </v-row>
       <v-row
         justify="center"
         align-content="center"
@@ -55,7 +63,7 @@
             label="Value"
             @change="changeFinalPaymentValue()"
             :rules="inputRules"
-            readonly
+            :readonly="!edit"
           ></v-text-field>
         </v-col>
         <v-col cols="12" sm="2" md="2">
@@ -68,11 +76,17 @@
               <v-text-field
                 :value="i.date"
                 label="Payment Date"
-                readonly
+                :readonly="!edit"
                 v-bind="attrs"
                 v-on="on"
               ></v-text-field>
             </template>
+            <v-date-picker
+              v-model="i.date"
+              @change="addDate(i.date)"
+              :allowed-dates="allowedDates"
+              :disabled="!edit"
+            ></v-date-picker>
           </v-menu>
         </v-col>
 
@@ -85,28 +99,15 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
-                <v-radio-group
-                  row
-                  dense
-                  class="mt-0"
+                <v-checkbox
                   v-model="i.committed"
-                  mandatory
+                  label="Confirm Payment"
+                  :disabled="allowed"
+                  color="success"
                   @change="saveChanges()"
-                >
-                  <v-radio
-                    label="Confirm"
-                    value="true"
-                    color="success"
-                    :disabled="allowed"
-                    class=""
-                  ></v-radio>
-                  <v-radio
-                    label="Reject"
-                    value="false"
-                    color="rgb(225,99,71)"
-                    :disabled="allowed"
-                  ></v-radio>
-                </v-radio-group>
+                  dense
+                  class="ma-0 pa-0"
+                ></v-checkbox>
               </div>
             </template>
             <span>
@@ -180,6 +181,8 @@ export default {
       inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
       deliveryDate: "",
       menu2: false,
+      edit: false,
+      date: "",
     };
   },
   computed: {
@@ -198,8 +201,22 @@ export default {
 
       return answer;
     },
+
+    editingStatus() {
+      return this.edit ? "ON" : "OFF";
+    },
   },
   methods: {
+    allowedDates(val) {
+      if (new Date(val).getDay() == 2) {
+        return true;
+      } else if (new Date(val).getDay() == 4) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+
     //This function checks if current user part of the users assigned to the authority role
     checkIfUserInAuthorityArray(teamAuthority) {
       let userId = this.currentUser.id;
@@ -436,6 +453,12 @@ export default {
         payments: this.card.payments,
       });
     },
+
+    addDate(date) {
+      this.date = date;
+
+      this.saveChanges();
+    },
   },
   mounted() {},
 };
@@ -461,5 +484,9 @@ export default {
 
 .rejectMsg {
   color: rgb(255, 99, 71);
+}
+
+.editON {
+  color: tomato;
 }
 </style>
