@@ -1,9 +1,130 @@
 <template>
   <v-form>
     <v-container>
-      <v-row>
-        <div>Purchase closure component</div>
+      <v-row justify="start">
+        <v-col cols="12" sm="4" md="4">
+          <v-menu
+            v-model="menu2"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="deliveryDate"
+                label="Devilvery Date"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="deliveryDate"
+              @input="addDeliveryDate()"
+              landscape
+            ></v-date-picker>
+          </v-menu>
+        </v-col>
       </v-row>
+      <v-row
+        justify="center"
+        align-content="center"
+        v-for="i in card.payments"
+        :key="i.Payment"
+      >
+        <v-col cols="12" sm="3" md="3">
+          <v-text-field
+            v-model="i.payment"
+            label="Payment"
+            readonly
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" sm="1" md="1">
+          <v-text-field
+            v-model="card.currency"
+            label="Currency"
+            readonly
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" sm="2" md="2">
+          <v-text-field
+            v-model="i.value"
+            label="Value"
+            @change="changeFinalPaymentValue()"
+            :rules="inputRules"
+            readonly
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" sm="2" md="2">
+          <v-menu
+            :v-model="`menu${card.payments.length}`"
+            :close-on-content-click="true"
+            max-width="290"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                :value="i.date"
+                label="Payment Date"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+          </v-menu>
+        </v-col>
+
+        <v-col cols="12" sm="4" md="4" align-self="center">
+          <v-tooltip
+            top
+            :disabled="
+              checkIfUserInAuthorityArray(team.purchase_approver).boolean
+            "
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <div v-bind="attrs" v-on="on">
+                <v-radio-group
+                  row
+                  dense
+                  class="mt-0"
+                  v-model="i.committed"
+                  mandatory
+                  @change="saveChanges()"
+                >
+                  <v-radio
+                    label="Confirm"
+                    value="true"
+                    color="success"
+                    :disabled="allowed"
+                    class=""
+                  ></v-radio>
+                  <v-radio
+                    label="Reject"
+                    value="false"
+                    color="rgb(225,99,71)"
+                    :disabled="allowed"
+                  ></v-radio>
+                </v-radio-group>
+              </div>
+            </template>
+            <span>
+              {{ checkIfUserInAuthorityArray(team.purchase_approver).message }}
+            </span>
+          </v-tooltip>
+        </v-col>
+      </v-row>
+      <v-snackbar
+        v-model="savedAlert"
+        color="green"
+        timeout="2000"
+        class="text-center"
+        data-cypress="updatedCardSnackbar"
+      >
+        <v-icon>check_circle</v-icon>
+        Payment Updated
+      </v-snackbar>
 
       <Comments
         :cardComments="cardComments"
@@ -55,14 +176,28 @@ export default {
   data() {
     return {
       confirmationDialog: false,
-
+      savedAlert: false,
       inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
+      deliveryDate: "",
+      menu2: false,
     };
   },
   computed: {
     ...mapState({
       currentUser: (state) => state.profile.userProfile,
     }),
+
+    allowed() {
+      let answer = true;
+
+      if (
+        this.checkIfUserInAuthorityArray(this.team.purchase_approver).boolean
+      ) {
+        answer = false;
+      }
+
+      return answer;
+    },
   },
   methods: {
     //This function checks if current user part of the users assigned to the authority role
@@ -75,7 +210,11 @@ export default {
         teamAuthorityUsersArray.push(user.value);
       });
 
-      if (this.counter > 0 && teamAuthorityUsersArray.includes(userId)) {
+      if (
+        this.counter > 0 &&
+        teamAuthorityUsersArray.includes(userId) &&
+        this.card.list_id == 5
+      ) {
         return { boolean: Boolean(true), message: "" };
       } else if (
         this.counter == 0 &&
@@ -247,6 +386,56 @@ export default {
 
       this.getNotifications;
     },
+
+    // Returns name according to either purchase of technical
+    stepNameFn(name, num) {
+      if (num == 1) {
+        return `${name}_approval`;
+      } else if (num == 2) {
+        return `${name}_approver`;
+      } else if (num == 3) {
+        let str = name.charAt(0).toUpperCase() + name.slice(1);
+        return `${str} Approval`;
+      }
+    },
+
+    async addDeliveryDate() {
+      this.savedAlert = true;
+
+      this.menu2 = false;
+
+      const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+
+      // Update fb card
+      await fbCard.update({
+        delivery_date: this.deliveryDate,
+      });
+    },
+
+    changeFinalPaymentValue() {
+      let finalPayment = parseFloat(this.card.total_inc_vat);
+
+      this.card.payments.forEach((payment) => {
+        if (payment.payment !== "Final Payment") {
+          finalPayment = finalPayment - parseFloat(payment.value);
+        }
+      });
+
+      this.card.payments[0].value = parseFloat(finalPayment).toFixed(2);
+
+      this.saveChanges();
+    },
+
+    async saveChanges() {
+      this.savedAlert = true;
+
+      const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+
+      // Update fb card
+      await fbCard.update({
+        payments: this.card.payments,
+      });
+    },
   },
   mounted() {},
 };
@@ -271,6 +460,6 @@ export default {
 }
 
 .rejectMsg {
-  color: tomato;
+  color: rgb(255, 99, 71);
 }
 </style>

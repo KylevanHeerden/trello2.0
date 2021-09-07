@@ -1,8 +1,13 @@
 <template>
   <v-form>
     <v-container>
-      <Payments :cardInfo="card"></Payments>
-      <v-row>
+      <Payments
+        :cardInfo="card"
+        :stepNum="commentPosition"
+        :paymentsAllowed="paymentsAllowed"
+        class="pb-12"
+      ></Payments>
+      <v-row justify="center" align-content="center">
         <v-col cols="12" sm="6" md="6">
           <v-text-field
             :label="`${stepNameFn(stepName, 3)} Personal:`"
@@ -49,6 +54,10 @@
                     :value="Boolean(false)"
                   ></v-radio>
                 </v-radio-group>
+                <p class="caption">
+                  *Purchase approval will only be available after payment date
+                  is selected
+                </p>
               </div>
             </template>
             <span>
@@ -144,6 +153,10 @@ export default {
       return this.newCard[this.stepNameFn(this.stepName, 1)]
         ? "acceptMsg"
         : "rejectMsg";
+    },
+
+    paymentsAllowed() {
+      return this.checkIfUserInAuthorityArray(this.team.purchase_approver);
     },
   },
   methods: {
@@ -383,5 +396,10 @@ export default {
 
 .rejectMsg {
   color: tomato;
+}
+
+.caption {
+  color: #9e9e9e;
+  display: inline-block;
 }
 </style>

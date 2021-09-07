@@ -42,12 +42,20 @@
         </v-col>
 
         <v-col cols="12" sm="3" md="3">
-          <v-switch
-            v-model="newCard.hubdoc"
-            :label="'Attached to Hubdoc'"
-            @click="handleClick3()"
-            data-cypress="hubdocCheck"
-          ></v-switch>
+          <v-tooltip top :disabled="Object.keys(newCard.receiver).length !== 0">
+            <template v-slot:activator="{ on, attrs }">
+              <div v-bind="attrs" v-on="on">
+                <v-switch
+                  v-model="newCard.hubdoc"
+                  :label="'Attached to Hubdoc'"
+                  @click="handleClick3()"
+                  data-cypress="hubdocCheck"
+                  :disabled="Object.keys(newCard.receiver).length === 0"
+                ></v-switch>
+              </div>
+            </template>
+            <span>Select a Receiver first</span>
+          </v-tooltip>
         </v-col>
       </v-row>
       <v-row>

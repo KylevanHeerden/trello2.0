@@ -179,6 +179,7 @@ export default {
                   payment: "Final Payment",
                   value: doc.data().total_inc_vat,
                   date: "",
+                  committed: false,
                 },
               ],
             });

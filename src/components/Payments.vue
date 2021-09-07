@@ -1,5 +1,62 @@
 <template>
   <v-container>
+    <v-tooltip top :disabled="paymentsAllowed.boolean">
+      <template v-slot:activator="{ on, attrs }">
+        <v-row
+          justify="end"
+          align-content="end"
+          class="pa-0"
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-col
+            cols="12"
+            sm="1"
+            md="1"
+            align-self="center"
+            class="d-flex flex-row ma-0 pa-0"
+          >
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  class=""
+                  @click="addPayment()"
+                  v-bind="attrs"
+                  v-on="on"
+                  :disabled="allowed"
+                  color="primary"
+                >
+                  <v-icon>add</v-icon>
+                </v-btn>
+              </template>
+              <span>Add Payment</span>
+            </v-tooltip>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  class=""
+                  @click="removePayment()"
+                  v-bind="attrs"
+                  v-on="on"
+                  :disabled="allowed"
+                  color="primary"
+                >
+                  <v-icon>remove</v-icon>
+                </v-btn>
+              </template>
+              <span>Remove Payment</span>
+            </v-tooltip>
+          </v-col>
+        </v-row>
+      </template>
+      <span>{{ paymentsAllowed.message }}</span>
+    </v-tooltip>
+
     <v-row
       justify="center"
       align-content="center"
@@ -7,13 +64,20 @@
       :key="i.Payment"
     >
       <v-col cols="12" sm="3" md="3">
-        <v-text-field v-model="i.payment" label="Payment"> </v-text-field>
+        <v-text-field
+          v-model="i.payment"
+          label="Payment"
+          :readonly="allowed"
+          :disabled="allowed"
+        >
+        </v-text-field>
       </v-col>
       <v-col cols="12" sm="2" md="2">
         <v-text-field
           v-model="cardInfo.currency"
           label="Currency"
-          readonly
+          :readonly="allowed"
+          :disabled="allowed"
         ></v-text-field>
       </v-col>
       <v-col cols="12" sm="2" md="2">
@@ -22,46 +86,47 @@
           label="Value"
           @change="changeFinalPaymentValue()"
           :rules="inputRules"
+          :readonly="allowed"
+          :disabled="allowed"
         ></v-text-field>
       </v-col>
       <v-col cols="12" sm="3" md="3">
-        <v-menu v-model="menu1" :close-on-content-click="true" max-width="290">
+        <v-menu
+          :v-model="`menu${cardInfo.payments.length}`"
+          :close-on-content-click="true"
+          max-width="290"
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
               :value="i.date"
-              clearable
+              :clearable="!allowed"
               label="Payment Date"
-              readonly
+              :disabled="allowed"
               v-bind="attrs"
               v-on="on"
-              @click:clear="date = ''"
+              @click:clear="clearDate()"
             ></v-text-field>
           </template>
           <v-date-picker
             v-model="i.date"
             @change="addDate(i.date)"
+            :allowed-dates="allowedDates"
+            :disabled="allowed"
           ></v-date-picker>
         </v-menu>
       </v-col>
-      <v-col cols="12" sm="1" md="1" align-self="center">
-        <v-btn
-          icon
-          small
-          class=""
-          @click="addPayment()"
-          v-if="i == cardInfo.payments[cardInfo.payments.length - 1]"
-          ><v-icon>add</v-icon></v-btn
-        >
-        <v-btn
-          icon
-          small
-          class=""
-          @click="removePayment()"
-          v-if="i == cardInfo.payments[cardInfo.payments.length - 1]"
-          ><v-icon>remove</v-icon></v-btn
-        >
-      </v-col>
     </v-row>
+
+    <v-snackbar
+      v-model="savedAlert"
+      color="green"
+      timeout="2000"
+      class="text-center"
+      data-cypress="updatedCardSnackbar"
+    >
+      <v-icon>check_circle</v-icon>
+      Payment Updated
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -71,6 +136,16 @@ import { db } from "@/firebase";
 export default {
   props: {
     cardInfo: {
+      type: Object,
+      required: true,
+    },
+
+    stepNum: {
+      type: Number,
+      required: true,
+    },
+
+    paymentsAllowed: {
       type: Object,
       required: true,
     },
@@ -85,14 +160,32 @@ export default {
       menu5: false,
       menu6: false,
       inputRules: [(v) => v.length >= 4 || "Must be in format 0.00"], //Validation rule for form
+      savedAlert: false,
     };
   },
 
-  computed: {},
+  computed: {
+    allowed() {
+      let answer = true;
+      if (this.paymentsAllowed.boolean) {
+        if (this.cardInfo.list_id == 3 || this.cardInfo.list_id == 4) {
+          answer = false;
+        }
+      }
+
+      return answer;
+    },
+  },
 
   methods: {
-    allowedDates() {
-      return;
+    allowedDates(val) {
+      if (new Date(val).getDay() == 2) {
+        return true;
+      } else if (new Date(val).getDay() == 4) {
+        return true;
+      } else {
+        return false;
+      }
     },
 
     addPayment() {
@@ -101,12 +194,14 @@ export default {
           payment: "Deposit/Down Payment",
           date: "",
           value: "0.00",
+          committed: null,
         });
       } else {
         this.cardInfo.payments.push({
           payment: "Interim Payment",
           date: "",
           value: "0.00",
+          committed: null,
         });
       }
     },
@@ -114,6 +209,7 @@ export default {
     removePayment() {
       if (this.cardInfo.payments.length > 1) {
         this.cardInfo.payments.pop();
+
         this.changeFinalPaymentValue();
       }
     },
@@ -138,7 +234,15 @@ export default {
       this.saveChanges();
     },
 
+    clearDate() {
+      this.date = "";
+
+      this.saveChanges();
+    },
+
     async saveChanges() {
+      this.savedAlert = true;
+
       const fbCard = db.collection("cards").doc(this.cardInfo.id); // gets the firebase card
 
       // Update fb card
