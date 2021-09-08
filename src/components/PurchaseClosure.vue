@@ -113,7 +113,7 @@
                   label="Confirm Payment"
                   :disabled="allowed"
                   color="success"
-                  @change="saveChanges()"
+                  @change="addPaymentsToProduct()"
                   dense
                   class="ma-0 pa-0"
                 ></v-checkbox>
@@ -254,6 +254,18 @@ export default {
       } else {
         return false;
       }
+    },
+
+    // After payments been confirmed it is addded to product in fb
+    async addPaymentsToProduct() {
+      this.saveChanges();
+
+      const fbCard2 = db.collection("products").doc(this.card.product_id); // gets the firebase card
+
+      // Update fb card
+      await fbCard2.update({
+        payments: this.card.payments,
+      });
     },
 
     // changes final payment amount based on the number of payment values and the total inc vat

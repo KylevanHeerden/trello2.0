@@ -42,6 +42,7 @@ const store = new Vuex.Store({
       { icon: "people", text: "Teams", route: "/teams" },
       { icon: "account_circle", text: "Profile", route: "/profile" },
       { icon: "folder", text: "Admin", route: "/admin" },
+      { icon: "folder", text: "Finance", route: "/finance" },
     ],
     user: {
       loggedIn: null,

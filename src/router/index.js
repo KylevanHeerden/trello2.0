@@ -77,6 +77,15 @@ const routes = [
       requiresAuth: true,
     },
   },
+  {
+    path: "/finance",
+    name: "Finance",
+    component: () =>
+      import(/* webpackChankName: "profile" */ "@/views/Finance.vue"),
+    meta: {
+      requiresAuth: true,
+    },
+  },
 ];
 
 const router = new VueRouter({

@@ -294,6 +294,16 @@ export default {
     }),
   },
   methods: {
+    // After POP  card payments addded to product in fb
+    async addPaymentsToProduct() {
+      const fbCard2 = db.collection("products").doc(this.card.product_id); // gets the firebase card
+
+      // Update fb card
+      await fbCard2.update({
+        payments: this.card.payments,
+      });
+    },
+
     //This function checks if current user part of the users assigned to the authority role
     checkIfUserInAuthorityArray(teamAuthority) {
       let userId = this.currentUser.id;
@@ -459,6 +469,9 @@ export default {
 
       // Send notification
       this.sendNotification(5, "Follow Up");
+
+      // Add payments to product in fb
+      this.addPaymentsToProduct();
     },
 
     // Uploads POP to fb

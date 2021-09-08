@@ -100,7 +100,6 @@
 import { db } from "@/firebase";
 import { mapState, mapGetters } from "vuex";
 import moment from "moment";
-import products from "../store/modules/products";
 
 export default {
   data() {
@@ -175,7 +174,6 @@ export default {
       });
 
       this.events = events;
-      console.log(this.events);
     },
 
     programme() {
