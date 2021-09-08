@@ -72,6 +72,7 @@ export default {
               PO_number: doc.data().PO_number,
               POP: doc.data().POP,
               payments: doc.data().payments,
+              delivery_date: doc.data().delivery_date,
             };
             cards_array.push(object);
           });

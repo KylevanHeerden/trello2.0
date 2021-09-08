@@ -168,20 +168,33 @@ export default {
 
   methods: {
     // The addField function adds a field to all the docs in a firebase collection.
+    // async addField() {
+    //   db.collection("cards")
+    //     .get()
+    //     .then(function(querySnapshot) {
+    //       querySnapshot.forEach(function(doc) {
+    //         doc.ref.update({
+    //           payments: [
+    //             {
+    //               payment: "Final Payment",
+    //               value: doc.data().total_inc_vat,
+    //               date: "",
+    //               committed: false,
+    //             },
+    //           ],
+    //         });
+    //       });
+    //     });
+    //   return "Done!";
+    // },
+
     async addField() {
-      db.collection("cards")
+      db.collection("products")
         .get()
         .then(function(querySnapshot) {
           querySnapshot.forEach(function(doc) {
             doc.ref.update({
-              payments: [
-                {
-                  payment: "Final Payment",
-                  value: doc.data().total_inc_vat,
-                  date: "",
-                  committed: false,
-                },
-              ],
+              delivery_date: "",
             });
           });
         });

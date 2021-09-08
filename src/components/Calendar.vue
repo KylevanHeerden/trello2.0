@@ -100,6 +100,7 @@
 import { db } from "@/firebase";
 import { mapState, mapGetters } from "vuex";
 import moment from "moment";
+import products from "../store/modules/products";
 
 export default {
   data() {
@@ -140,40 +141,41 @@ export default {
 
       // Change data from fb to YYYY-MM-DD
       this.filteredProducts.forEach((product) => {
-        let expectDate = moment(product.POP_date.toDate())
-          .add(parseInt(product.leadTime), "days")
-          .format("YYYY-MM-DD");
+        let expectDate = product.delivery_date;
 
-        // Take todays date
-        let today = moment().format("YYYY-MM-DD");
+        if (expectDate !== "") {
+          // Take todays date
+          let today = moment().format("YYYY-MM-DD");
 
-        // Add value if arrives today
-        if (expectDate == today) {
-          this.todayArrivals += 1;
+          // Add value if arrives today
+          if (expectDate == today) {
+            this.todayArrivals += 1;
+          }
+
+          let card = this.getCard(product.cards[0].card_id);
+
+          // Make an event of each card
+          card.then((r) => {
+            let event = {
+              name: product.name,
+              start: expectDate,
+              color: this.getEventColor(expectDate),
+              url: product.id,
+              supplier_name: r.supplier_name,
+              supplier_email: r.supplier_email,
+              contact_number: r.contact_number,
+              contact_person: r.contact_person,
+              person: product.person,
+            };
+
+            // Add events to events array
+            events.push(event);
+          });
         }
-
-        let card = this.getCard(product.cards[0].card_id);
-
-        // Make an event of each card
-        card.then((r) => {
-          let event = {
-            name: product.name,
-            start: expectDate,
-            color: this.getEventColor(expectDate),
-            url: product.id,
-            supplier_name: r.supplier_name,
-            supplier_email: r.supplier_email,
-            contact_number: r.contact_number,
-            contact_person: r.contact_person,
-            person: product.person,
-          };
-
-          // Add events to events array
-          events.push(event);
-        });
       });
 
       this.events = events;
+      console.log(this.events);
     },
 
     programme() {

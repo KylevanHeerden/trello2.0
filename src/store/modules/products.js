@@ -41,6 +41,7 @@ export default {
               POP_date: doc.data().POP_date,
               leadTime: doc.data().leadTime,
               cards: doc.data().cards,
+              delivery_date: doc.data().delivery_date,
             };
             products_array.push(object);
           });

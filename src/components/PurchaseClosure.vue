@@ -13,7 +13,7 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
-                v-model="deliveryDate"
+                :value="card.delivery_date"
                 label="Devilvery Date"
                 prepend-icon="mdi-calendar"
                 readonly
@@ -22,7 +22,7 @@
               ></v-text-field>
             </template>
             <v-date-picker
-              v-model="deliveryDate"
+              v-model="card.delivery_date"
               @input="addDeliveryDate()"
               landscape
             ></v-date-picker>
@@ -85,7 +85,7 @@
               <v-text-field
                 :value="i.date"
                 label="Payment Date"
-                :readonly="!edit"
+                readonly
                 v-bind="attrs"
                 v-on="on"
               ></v-text-field>
@@ -224,7 +224,7 @@ export default {
 
       this.saveChanges();
     },
-    // saves delivery date to fb card
+    // saves delivery date to fb card and product
     async addDeliveryDate() {
       this.savedAlert = true;
 
@@ -234,7 +234,14 @@ export default {
 
       // Update fb card
       await fbCard.update({
-        delivery_date: this.deliveryDate,
+        delivery_date: this.card.delivery_date,
+      });
+
+      const fbCard2 = db.collection("products").doc(this.card.product_id); // gets the firebase card
+
+      // Update fb card
+      await fbCard2.update({
+        delivery_date: this.card.delivery_date,
       });
     },
 
