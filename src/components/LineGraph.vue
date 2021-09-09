@@ -1,20 +1,63 @@
 <script>
-import { Line } from "vue-chartjs";
+import { Line, mixins } from "vue-chartjs";
 
 export default {
   extends: Line,
   props: {
-    chartdata: {
-      type: Object,
-      default: null,
-    },
-    options: {
-      type: Object,
-      default: null,
+    chartData: { type: Object, default: null },
+  },
+  mixins: [mixins.reactiveProp],
+
+  data: () => {
+    return {
+      chartOptions: {
+        responsive: true,
+        title: {
+          text: "Hello world",
+          display: true,
+        },
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              unit: "day",
+            },
+          },
+          xAxes: [
+            {
+              scaleLabel: {
+                display: true,
+                labelString: "Date",
+              },
+              bounds: "ticks",
+            },
+          ],
+          yAxes: [
+            {
+              scaleLabel: {
+                display: true,
+                labelString: "Value",
+              },
+            },
+          ],
+        },
+      },
+    };
+  },
+
+  watch: {
+    chartData: function() {
+      this.renderChart(this.chartData, this.chartOptions);
+      console.log("update");
+      console.log(this.chartData);
+      console.log(this.chartOptions);
     },
   },
+
   mounted() {
-    this.renderChart(this.chartdata, this.options);
+    // this.chartData is created in the mixin.
+    // If you want to pass options please create a local options object
+    this.renderChart(this.chartData, this.chartOptions);
   },
 };
 </script>

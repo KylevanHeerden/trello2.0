@@ -31,7 +31,6 @@
     "moment": "^2.29.1",
     "vue": "^2.6.11",
     "vue-axios": "^3.2.4",
-    "vue-chartjs": "^3.5.1",
     "vue-cli": "^2.9.6",
     "vue-confirm-dialog": "^1.0.2",
     "vue-router": "^3.4.9",

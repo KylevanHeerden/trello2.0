@@ -42,6 +42,7 @@ export default {
               leadTime: doc.data().leadTime,
               cards: doc.data().cards,
               delivery_date: doc.data().delivery_date,
+              payments: doc.data().payments,
             };
             products_array.push(object);
           });
