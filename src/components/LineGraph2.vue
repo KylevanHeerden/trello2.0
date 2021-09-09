@@ -57,6 +57,12 @@ export default {
             ],
             xAxes: [
               {
+                type: "time",
+                distribution: "series",
+                time: {
+                  unit: "month",
+                  round: true,
+                },
                 scaleLabel: {
                   display: true,
                   labelString: "Date",
@@ -73,6 +79,9 @@ export default {
     data: function() {
       this.lineChartSetup.data.datasets[0].data = this.data;
       this.lineChartSetup.data.labels = this.labels;
+
+      //   this.lineChartSetup.options.xAxes.min = this.data[0];
+      //   this.lineChartSetup.options.xAxes.max = this.data[-1];
 
       const ctx = document.getElementById("line-chart");
       new Chart(ctx, this.lineChartSetup);

@@ -140,6 +140,10 @@ export default {
       // sort payments by date
       map1.sort((a, b) => (a.x > b.x ? 1 : -1));
 
+      map1.push({ x: "2022-01-15", y: 15.5 });
+
+      console.log(map1);
+
       // if begin date is chosen find index of begin date in payments array
       if (this.beginDate !== null) {
         let begin = map1.find((point) => {
@@ -155,13 +159,22 @@ export default {
           return point.x.includes(this.endDate);
         });
 
+        map1.reverse();
+
+        console.log(map1, end);
+
         this.endIndex = map1.indexOf(end);
+
+        console.log(this.endIndex);
       }
+
+      let cutMap = [];
 
       // if begin date and end date is chosen splice array accordingling
       if (this.beginIndex !== null && this.endIndex !== null) {
         map1.splice(this.beginIndex, this.endIndex);
-        this.data = map1;
+
+        cutMap = map1;
 
         // make x labels accprding to data spliced
         const map2 = map1.map((payment) => {
@@ -172,7 +185,8 @@ export default {
         // if begin date but not end date is chosen splice array accordingling
       } else if (this.beginIndex !== null) {
         let newMap = map1.splice(this.beginIndex);
-        this.data = newMap;
+
+        cutMap = newMap;
 
         // make x labels accprding to data spliced
         const map2 = newMap.map((payment) => {
@@ -182,8 +196,9 @@ export default {
         this.labels = map2.sort();
         // if end date but not begin date is chosen splice array accordingling
       } else if (this.endIndex !== null) {
-        map1.reverse().splice(this.endIndex);
-        this.data = map1;
+        map1.splice(this.endIndex);
+
+        cutMap = map1;
 
         // make x labels accprding to data spliced
         const map2 = map1.map((payment) => {
@@ -193,7 +208,7 @@ export default {
         this.labels = map2.sort();
         // if no dates were chosen keep data as is
       } else {
-        this.data = map1;
+        cutMap = map1;
 
         const map2 = map1.map((payment) => {
           return payment.x;
@@ -202,21 +217,46 @@ export default {
         this.labels = map2.sort();
       }
 
-      console.log(map1);
+      //   console.log(map1);
 
-      const mapDayToMonth = map1.map((x) => ({
+      const mapMonthToSum = cutMap.map((x) => ({
         ...x,
-        day: new Date(x.x).getMonth(),
+        month: new Date(x.x).getMonth(),
+        year: new Date(x.x).getFullYear(),
       }));
 
-      //   console.log(mapDayToMonth);
+      //   console.log(mapMonthToSum);
 
-      const sumPerMonth = mapDayToMonth.reduce((acc, cur) => {
-        acc[cur.day] = acc[cur.day] + cur.y || cur.y;
+      let dataArray = [];
+
+      const sumPerMonth = mapMonthToSum.reduce((acc, cur) => {
+        if (acc.length == 0) {
+          acc.push({ month: cur.month, year: cur.year, y: cur.y });
+        } else {
+          if (acc.at(-1).year == cur.year) {
+            if (acc.at(-1).month == cur.month) {
+              acc.at(-1).y = acc.at(-1).y + cur.y;
+            } else {
+              acc.push({ month: cur.month, year: cur.year, y: cur.y });
+            }
+          } else {
+            acc.push({ month: cur.month, year: cur.year, y: cur.y });
+          }
+        }
+
         return acc;
-      }, {});
+      }, []);
 
-      //   console.log(sumPerMonth);
+      let finalData = sumPerMonth.map((point) => {
+        return {
+          x: `${point.year}-${("0" + (point.month + 1).toString()).slice(-2)}`,
+          y: point.y,
+        };
+      });
+
+      //   console.log(finalData);
+
+      this.data = finalData;
     },
 
     datePicked() {
