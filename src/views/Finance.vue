@@ -5,7 +5,7 @@
         v-model="chosenProgrammeId"
         label="Programme"
         :items="programmesOptions"
-        @change="selectedProgramme()"
+        @change="getData()"
       ></v-autocomplete>
 
       <v-menu
@@ -32,7 +32,7 @@
           type="month"
           no-title
           scrollable
-          @change="datePicked()"
+          @change="getData()"
         >
         </v-date-picker>
       </v-menu>
@@ -61,7 +61,7 @@
           type="month"
           no-title
           scrollable
-          @change="datePicked()"
+          @change="getData()"
         >
         </v-date-picker>
       </v-menu>
@@ -82,8 +82,10 @@ export default {
   components: { LineGraph },
   data: () => {
     return {
-      beginDate: "",
-      endDate: "",
+      beginDate: null,
+      endDate: null,
+      beginIndex: null,
+      endIndex: null,
       chosenProgrammeId: "",
       data: [],
       labels: [],
@@ -117,17 +119,11 @@ export default {
   },
 
   methods: {
-    selectedProgramme() {
-      //   console.log(this.filteredProducts);
-
-      this.getData();
-
-      //   console.log(this.data);
-    },
-
+    // function that generates data based on user selection
     getData() {
       const programmePaymentsArray = [];
 
+      // filter products of chosen programme to only prooducts with payments loaded
       this.filteredProducts.forEach((product) => {
         if (product.payments !== undefined) {
           product.payments.forEach((payment) => {
@@ -136,21 +132,77 @@ export default {
         }
       });
 
+      // map payments to array for data
       const map1 = programmePaymentsArray.map((payment) => {
         return { x: payment.date, y: parseFloat(payment.value) };
       });
 
+      // sort payments by date
       map1.sort((a, b) => (a.x > b.x ? 1 : -1));
 
+      // if begin date is chosen find index of begin date in payments array
+      if (this.beginDate !== null) {
+        let begin = map1.find((point) => {
+          return point.x.includes(this.beginDate);
+        });
+
+        this.beginIndex = map1.indexOf(begin);
+      }
+
+      // if end date is chosen find index of end date in payments array
+      if (this.endDate !== null) {
+        let end = map1.reverse().find((point) => {
+          return point.x.includes(this.endDate);
+        });
+
+        this.endIndex = map1.indexOf(end);
+      }
+
+      // if begin date and end date is chosen splice array accordingling
+      if (this.beginIndex !== null && this.endIndex !== null) {
+        map1.splice(this.beginIndex, this.endIndex);
+        this.data = map1;
+
+        // make x labels accprding to data spliced
+        const map2 = map1.map((payment) => {
+          return payment.x;
+        });
+
+        this.labels = map2.sort();
+        // if begin date but not end date is chosen splice array accordingling
+      } else if (this.beginIndex !== null) {
+        let newMap = map1.splice(this.beginIndex);
+        this.data = newMap;
+
+        // make x labels accprding to data spliced
+        const map2 = newMap.map((payment) => {
+          return payment.x;
+        });
+
+        this.labels = map2.sort();
+        // if end date but not begin date is chosen splice array accordingling
+      } else if (this.endIndex !== null) {
+        map1.reverse().splice(this.endIndex);
+        this.data = map1;
+
+        // make x labels accprding to data spliced
+        const map2 = map1.map((payment) => {
+          return payment.x;
+        });
+
+        this.labels = map2.sort();
+        // if no dates were chosen keep data as is
+      } else {
+        this.data = map1;
+
+        const map2 = map1.map((payment) => {
+          return payment.x;
+        });
+
+        this.labels = map2.sort();
+      }
+
       console.log(map1);
-
-      this.data = map1;
-
-      const map2 = programmePaymentsArray.map((payment) => {
-        return payment.date;
-      });
-
-      this.labels = map2.sort();
 
       const mapDayToMonth = map1.map((x) => ({
         ...x,
