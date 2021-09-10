@@ -68,7 +68,7 @@
     </v-row>
 
     <div class="chart-container" style="position: relative">
-      <LineGraph :data="data" :labels="labels"></LineGraph>
+      <LineGraph :data1="data1" :data2="data2" :labels="labels"></LineGraph>
     </div>
   </v-container>
 </template>
@@ -76,7 +76,7 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 
-import LineGraph from "@/components/LineGraph2";
+import LineGraph from "@/components/LineGraph3";
 
 export default {
   components: { LineGraph },
@@ -87,7 +87,8 @@ export default {
       beginIndex: null,
       endIndex: null,
       chosenProgrammeId: "",
-      data: [],
+      data1: [],
+      data2: [],
       labels: [],
       menu1: false,
       menu2: false,
@@ -142,66 +143,45 @@ export default {
 
       map1.push({ x: "2022-01-15", y: 15.5 });
 
-      console.log(map1);
-
-      // if begin date is chosen find index of begin date in payments array
-      if (this.beginDate !== null) {
-        let begin = map1.find((point) => {
-          return point.x.includes(this.beginDate);
-        });
-
-        this.beginIndex = map1.indexOf(begin);
-      }
-
-      // if end date is chosen find index of end date in payments array
-      if (this.endDate !== null) {
-        let end = map1.reverse().find((point) => {
-          return point.x.includes(this.endDate);
-        });
-
-        map1.reverse();
-
-        console.log(map1, end);
-
-        this.endIndex = map1.indexOf(end);
-
-        console.log(this.endIndex);
-      }
+      //   console.log(map1);
 
       let cutMap = [];
 
-      // if begin date and end date is chosen splice array accordingling
-      if (this.beginIndex !== null && this.endIndex !== null) {
-        map1.splice(this.beginIndex, this.endIndex);
-
-        cutMap = map1;
+      // if begin date and end date is chosen filter array accordingling
+      if (this.beginDate !== null && this.endDate !== null) {
+        cutMap = map1.filter((point) => {
+          return (
+            point.x.substring(0, 7) >= this.beginDate &&
+            point.x.substring(0, 7) <= this.endDate
+          );
+        });
 
         // make x labels accprding to data spliced
-        const map2 = map1.map((payment) => {
+        const map2 = cutMap.map((payment) => {
           return payment.x;
         });
 
         this.labels = map2.sort();
-        // if begin date but not end date is chosen splice array accordingling
-      } else if (this.beginIndex !== null) {
-        let newMap = map1.splice(this.beginIndex);
-
-        cutMap = newMap;
+        // if begin date but not end date is chosen filter array accordingling
+      } else if (this.beginDate !== null) {
+        cutMap = map1.filter((point) => {
+          return point.x.substring(0, 7) >= this.beginDate;
+        });
 
         // make x labels accprding to data spliced
-        const map2 = newMap.map((payment) => {
+        const map2 = cutMap.map((payment) => {
           return payment.x;
         });
 
         this.labels = map2.sort();
-        // if end date but not begin date is chosen splice array accordingling
-      } else if (this.endIndex !== null) {
-        map1.splice(this.endIndex);
-
-        cutMap = map1;
+        // if end date but not begin date is chosen filter array accordingling
+      } else if (this.endDate !== null) {
+        cutMap = map1.filter((point) => {
+          return point.x.substring(0, 7) <= this.endDate;
+        });
 
         // make x labels accprding to data spliced
-        const map2 = map1.map((payment) => {
+        const map2 = cutMap.map((payment) => {
           return payment.x;
         });
 
@@ -217,8 +197,7 @@ export default {
         this.labels = map2.sort();
       }
 
-      //   console.log(map1);
-
+      // get the month and year of the point to sum by month
       const mapMonthToSum = cutMap.map((x) => ({
         ...x,
         month: new Date(x.x).getMonth(),
@@ -227,8 +206,7 @@ export default {
 
       //   console.log(mapMonthToSum);
 
-      let dataArray = [];
-
+      // run through array and sum if curr has sam year and month as accumulated (acc)
       const sumPerMonth = mapMonthToSum.reduce((acc, cur) => {
         if (acc.length == 0) {
           acc.push({ month: cur.month, year: cur.year, y: cur.y });
@@ -247,21 +225,43 @@ export default {
         return acc;
       }, []);
 
+      let months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+
+      // map data to look good for graph
       let finalData = sumPerMonth.map((point) => {
         return {
-          x: `${point.year}-${("0" + (point.month + 1).toString()).slice(-2)}`,
+          x: `${months[point.month]} ${point.year}`,
           y: point.y,
         };
       });
 
-      //   console.log(finalData);
+      let finalData2 = finalData.reduce((acc, cur) => {
+        if (acc.length == 0) {
+          acc.push({ x: cur.x, y: cur.y });
+        } else {
+          acc.push({ x: cur.x, y: acc.at(-1).y + cur.y });
+        }
 
-      this.data = finalData;
-    },
+        return acc;
+      }, []);
 
-    datePicked() {
-      //   console.log(this.beginDate);
-      //   console.log(this.endDate);
+      //   console.log(finalData2);
+
+      this.data1 = finalData;
+      this.data2 = finalData2;
     },
   },
 

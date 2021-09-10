@@ -512,7 +512,7 @@ export default {
 }
 
 .qualityRejectedTitle {
-  color: tomato;
+  color: #ff6347;
 }
 
 .commentsRow {

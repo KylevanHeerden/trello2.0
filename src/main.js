@@ -9,6 +9,10 @@ import { auth } from "./firebase";
 import { firestorePlugin } from "vuefire";
 import axios from "axios";
 import VueAxios from "vue-axios";
+import VueApexCharts from "vue-apexcharts";
+
+Vue.use(VueApexCharts);
+Vue.component("apexchart", VueApexCharts);
 
 Vue.use(firestorePlugin);
 Vue.use(VueConfirmDialog);
