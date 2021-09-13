@@ -10,49 +10,73 @@ export default {
     data1: {
       type: Array,
       default: null,
+      require: true,
     },
     data2: {
       type: Array,
       default: null,
+      require: true,
     },
     labels: {
       type: Array,
       default: null,
+      require: true,
+    },
+    budget: {
+      type: Number,
+      require: true,
+    },
+    currentMonth: {
+      type: String,
+      required: true,
+    },
+    max: {
+      type: Number,
+      require: true,
+    },
+    programmeName: {
+      type: String,
+      required: true,
+    },
+    committedCount: {
+      type: Number,
+      required: true,
     },
   },
   data() {
     return {
       options: {
         chart: {
-          id: "vuechart-example",
+          height: 500,
         },
-        annotations: {
-          yaxis: [
-            {
-              y: 55,
-              borderColor: "#ff6347",
-              label: {
-                borderColor: "#ff6347",
-                style: {
-                  color: "#fff",
-                  background: "#ff6347",
-                },
-                text: "Budget",
-              },
-            },
-          ],
+        title: {
+          text: "Programme Expenditure Tracking",
+          align: "center",
         },
-        forecastDataPoints: {
-          count: 1,
+        legend: {
+          position: "top",
+        },
+        yaxis: {
+          show: true,
+          showAlways: true,
+          min: 0,
+          title: {
+            text: "Expenditure (R)",
+          },
+        },
+        xaxis: {
+          title: {
+            text: "Time (Months)",
+          },
         },
       },
       series: [
         {
-          name: "Month Expenditure",
+          name: "Monthly Expenditure",
           data: [],
         },
         {
-          name: "Accumalative Month Expenditure",
+          name: "Accumalative Monthly Expenditure",
           data: [],
         },
       ],
@@ -69,7 +93,124 @@ export default {
           data: this.data2,
         },
       ];
+
+      this.options = {
+        chart: {
+          height: 500,
+        },
+        title: {
+          text: `${this.programmeName} Expenditure Tracking`,
+          align: "center",
+        },
+
+        annotations: {
+          yaxis: [
+            {
+              y: this.budget,
+              borderColor: "#ff6347",
+              label: {
+                borderColor: "#ff6347",
+                style: {
+                  color: "#fff",
+                  background: "#ff6347",
+                },
+                text: "Budget",
+              },
+            },
+          ],
+
+          xaxis: [
+            {
+              x: this.currentMonth,
+              borderColor: "#e1ad01",
+              label: {
+                borderColor: "#e1ad01",
+                style: {
+                  color: "#fff",
+                  background: "#e1ad01",
+                },
+                text: "Current Month",
+              },
+            },
+          ],
+        },
+
+        forecastDataPoints: {
+          count: 1,
+        },
+
+        yaxis: {
+          show: true,
+          showAlways: true,
+          min: 0,
+          max: this.max,
+          title: {
+            text: "Expenditure (R)",
+          },
+        },
+      };
+    },
+
+    max: function() {
+      this.options = {
+        chart: {
+          height: 500,
+        },
+        title: {
+          text: `${this.programmeName} Expenditure Tracking`,
+          align: "center",
+        },
+        yaxis: {
+          show: true,
+          showAlways: true,
+          min: 0,
+          max: this.max,
+          title: {
+            text: "Expenditure (R)",
+          },
+        },
+
+        annotations: {
+          yaxis: [
+            {
+              y: this.budget,
+              borderColor: "#ff6347",
+              label: {
+                borderColor: "#ff6347",
+                style: {
+                  color: "#fff",
+                  background: "#ff6347",
+                },
+                text: "Budget",
+              },
+            },
+          ],
+
+          xaxis: [
+            {
+              x: this.currentMonth,
+              borderColor: "#e1ad01",
+              label: {
+                borderColor: "#e1ad01",
+                style: {
+                  color: "#fff",
+                  background: "#e1ad01",
+                },
+                text: "Current Month",
+              },
+            },
+          ],
+        },
+
+        forecastDataPoints: {
+          count: this.committedCount,
+        },
+      };
     },
   },
+
+  computed: {},
+
+  mounted() {},
 };
 </script>

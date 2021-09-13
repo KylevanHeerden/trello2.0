@@ -60,8 +60,8 @@
     <v-row
       justify="center"
       align-content="center"
-      v-for="i in cardInfo.payments"
-      :key="i.Payment"
+      v-for="(i, index) in cardInfo.payments"
+      :key="index"
     >
       <v-col cols="12" sm="3" md="3">
         <v-text-field
@@ -86,7 +86,7 @@
           label="Value"
           @change="changeFinalPaymentValue()"
           :rules="inputRules"
-          :readonly="allowed"
+          :readonly="index == 0"
           :disabled="allowed"
         ></v-text-field>
       </v-col>

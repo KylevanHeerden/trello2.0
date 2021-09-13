@@ -294,7 +294,7 @@ export default {
     }),
   },
   methods: {
-    // After POP  card payments addded to product in fb
+    // After POP card payments addded to product in fb
     async addPaymentsToProduct() {
       const fbCard2 = db.collection("products").doc(this.card.product_id); // gets the firebase card
 

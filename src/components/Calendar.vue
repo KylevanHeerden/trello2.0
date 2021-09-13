@@ -78,14 +78,16 @@
                   </v-row>
                 </v-card-text>
                 <v-card-actions>
-                  <router-link
-                    :to="{
-                      name: 'Product',
-                      params: { id: selectedEvent.url },
-                    }"
-                  >
-                    Product Link
-                  </router-link>
+                  <v-row justify="center" class="pa-0 ma-0">
+                    <router-link
+                      :to="{
+                        name: 'Product',
+                        params: { id: selectedEvent.url },
+                      }"
+                    >
+                      Product Link
+                    </router-link>
+                  </v-row>
                 </v-card-actions>
               </v-card>
             </v-menu>
@@ -290,5 +292,10 @@ export default {
   padding: 0;
   color: white;
   font-weight: 1000;
+}
+
+a {
+  font-size: small;
+  color: gray;
 }
 </style>

@@ -145,6 +145,23 @@ export default {
     },
   },
   methods: {
+    // After approval new payments array addded to card in fb
+    async addPaymentsToCard() {
+      const fbCard2 = db.collection("cards").doc(this.card.id); // gets the firebase card
+
+      // Update fb card
+      await fbCard2.update({
+        payments: [
+          {
+            committed: false,
+            date: "",
+            payment: "Final Payment",
+            value: this.card.total_inc_vat,
+          },
+        ],
+      });
+    },
+
     // Returns whether status apprpved or not from db
     approvedStatus(boolean) {
       if (boolean == true) {
@@ -308,6 +325,9 @@ export default {
 
       // Send notifications
       this.sendNotification(newListId, status[newListId - 1]);
+
+      // Add payments array to card
+      this.addPaymentsToCard();
     },
 
     // Creates new notification which triggers email/slack cloud function
