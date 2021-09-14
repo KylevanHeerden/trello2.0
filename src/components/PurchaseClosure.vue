@@ -28,6 +28,41 @@
             ></v-date-picker>
           </v-menu>
         </v-col>
+        <v-col cols="12" sm="8" md="8" class=" d-flex justify-center pt-7">
+          <v-row justify="center" class="text-center pt-0">
+            <v-tooltip top>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  x-small
+                  dark
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="sendSupplierEmail()"
+                >
+                  Send Supplier Email
+                </v-btn>
+              </template>
+              <span>Notify supplier of POP</span>
+            </v-tooltip>
+
+            <v-dialog v-model="confirmationDialog" persistent max-width="290">
+            </v-dialog>
+
+            <v-card-text class="numEmails pt-0">
+              Number of emails sent: {{ card.supplier_email_count }}
+            </v-card-text>
+          </v-row>
+          <v-snackbar
+            v-model="snackbar"
+            :timeout="timeout"
+            color="green"
+            class="text-center"
+          >
+            <v-icon>email</v-icon>
+            Email Sent to Supplier
+          </v-snackbar>
+        </v-col>
       </v-row>
       <v-row justify="end" align-content="end" class="ma-0 pa-0">
         <v-btn
@@ -192,6 +227,8 @@ export default {
       inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
       menu2: false,
       savedAlert: false,
+      snackbar: false,
+      timeout: 2000,
     };
   },
   computed: {
@@ -387,6 +424,41 @@ export default {
       }
     },
 
+    // Send email to supplier email
+    async sendSupplierEmail() {
+      this.$confirm({
+        message: `Are you want to send the email?`,
+        button: {
+          no: "No",
+          yes: "Yes",
+        },
+        callback: (confirm) => {
+          if (confirm) {
+            this.snackbar = true;
+            const fbCard = db.collection("cards").doc(this.card.id); // gets the firebase card
+
+            // Update fb card
+            fbCard.update({
+              supplier_email_count: this.card.supplier_email_count + 1,
+            });
+
+            // trigger cloud function
+
+            // Simple POST request with a JSON body using fetch
+            const requestOptions = {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ card: this.card }),
+            };
+            const response = fetch(
+              "https://us-central1-purchase-app-staging.cloudfunctions.net/sendEmailToSuppliers",
+              requestOptions
+            );
+          }
+        },
+      });
+    },
+
     // Returns name according to either purchase of technical
     stepNameFn(name, num) {
       if (num == 1) {
@@ -439,5 +511,10 @@ export default {
 
 .editON {
   color: tomato;
+}
+
+.numEmails {
+  color: grey;
+  font-size: small;
 }
 </style>

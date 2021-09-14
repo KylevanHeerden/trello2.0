@@ -73,6 +73,7 @@ export default {
               POP: doc.data().POP,
               payments: doc.data().payments,
               delivery_date: doc.data().delivery_date,
+              supplier_email_count: doc.data().supplier_email_count,
             };
             cards_array.push(object);
           });

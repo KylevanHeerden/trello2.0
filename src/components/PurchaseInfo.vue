@@ -472,6 +472,11 @@ export default {
 
       // Send notification
       this.sendNotification(5, "Follow Up");
+
+      //Add supplier_email_count property to card
+      await fbCard.update({
+        supplier_email_count: 0,
+      });
     },
 
     // Uploads POP to fb

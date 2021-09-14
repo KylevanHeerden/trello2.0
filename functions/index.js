@@ -678,3 +678,65 @@ exports.sendEmailNotification = functions.firestore
       });
     }
   });
+
+// Send email notification when new notification is added to firestore
+exports.sendEmailToSuppliers = functions.https.onRequest(
+  (request, response) => {
+    return cors(request, response, () => {
+      functions.logger.info(request.body.card);
+
+      const card = request.body.card;
+
+      // Create the transporter with the required configuration for Outlook
+      // change the user and pass !
+      var transporter = nodemailer.createTransport({
+        host: "smtp-mail.outlook.com", // hostname
+        secureConnection: false, // TLS requires secureConnection to be false
+        port: 587, // port for secure SMTP
+        tls: {
+          ciphers: "SSLv3",
+        },
+        auth: {
+          user: functions.config().outlook.email,
+          pass: functions.config().outlook.password,
+        },
+      });
+
+      const handlebarOptions = {
+        viewEngine: {
+          extName: ".html",
+          partialsDir: path.resolve("./views/"),
+          defaultLayout: false,
+        },
+        viewPath: path.resolve("./views/"),
+        extName: ".html",
+      };
+
+      // tell transporter to use template compiler
+      transporter.use("compile", hbs(handlebarOptions));
+
+      // setup e-mail data, even with unicode symbols
+      var mailOptions = {
+        from: '"RaptorApp" <dc@nanodyn.co.za>', // sender address (who sends)
+        to: "kylevh@nanodyn.co.za", // list of receivers (who receives)
+        subject: "RaptorApp Notification", // Subject line
+        template: "emailNotification",
+        context: {
+          programmeName: "Programme",
+          cardName: `${card.name}`,
+          action: `${card.supplier_name}`,
+          cardLink: `https://purchase-app-f14b0.web.app/product/${card.product_id}`,
+        },
+      };
+
+      // send mail with defined transport object
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          return console.log(error);
+        }
+
+        console.log("Message sent: " + info.response);
+      });
+    });
+  }
+);
