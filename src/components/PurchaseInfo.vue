@@ -153,7 +153,7 @@
             sm="12"
             md="12"
             class="text-center"
-            v-if="newCard.POP.length == 0"
+            v-if="newCard.POP.length == 0 && newCard.procured == true"
           >
             <v-btn
               color="primary"
@@ -217,6 +217,19 @@
           </v-row>
         </v-row>
       </v-row>
+      <v-row
+        justify="end"
+        class="pt-10"
+        v-if="newCard.POP.length != 0 && newCard.procured == true"
+      >
+        <POPUploadDialog
+          :programmeName="team.programme.programme_name"
+          :productId="card.product_id"
+          :cardId="card.id"
+          :card="card"
+          @POPLoaded="POPLoaded"
+        ></POPUploadDialog>
+      </v-row>
       <Comments
         :cardComments="cardComments"
         :position="commentPosition"
@@ -231,12 +244,12 @@
 import { db, storage } from "@/firebase";
 import { mapState } from "vuex";
 import Comments from "@/components/Comments";
-import FileUploadDialog from "@/components/FileUploadDialog";
+import POPUploadDialog from "@/components/POPUploadDialog";
 import vue2Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 
 export default {
-  components: { Comments, vueDropzone: vue2Dropzone, FileUploadDialog },
+  components: { Comments, vueDropzone: vue2Dropzone, POPUploadDialog },
   props: {
     card: {
       type: Object,
@@ -294,16 +307,6 @@ export default {
     }),
   },
   methods: {
-    // After POP card payments addded to product in fb
-    async addPaymentsToProduct() {
-      const fbCard2 = db.collection("products").doc(this.card.product_id); // gets the firebase card
-
-      // Update fb card
-      await fbCard2.update({
-        payments: this.card.payments,
-      });
-    },
-
     //This function checks if current user part of the users assigned to the authority role
     checkIfUserInAuthorityArray(teamAuthority) {
       let userId = this.currentUser.id;
@@ -469,9 +472,6 @@ export default {
 
       // Send notification
       this.sendNotification(5, "Follow Up");
-
-      // Add payments to product in fb
-      this.addPaymentsToProduct();
     },
 
     // Uploads POP to fb
@@ -527,6 +527,17 @@ export default {
       setTimeout(console.log("Done"), 5000);
 
       this.moveCardAutoForward(fbCard); // move card automatically
+    },
+
+    // Function triggered when additional POP is loaded
+    POPLoaded(filesArray) {
+      const mappedArray = filesArray.map((file) => {
+        return { file_name: "Pending...", link: file.name };
+      });
+
+      mappedArray.forEach((file) => {
+        this.newCard.POP.push(file);
+      });
     },
 
     // Changes boolean to Ordered or Not Ordered

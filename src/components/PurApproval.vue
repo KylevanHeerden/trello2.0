@@ -161,6 +161,16 @@ export default {
     },
   },
   methods: {
+    // After POP card payments addded to product in fb
+    async addPaymentsToProduct() {
+      const fbCard2 = db.collection("products").doc(this.card.product_id); // gets the firebase card
+
+      // Update fb card
+      await fbCard2.update({
+        payments: this.card.payments,
+      });
+    },
+
     // Returns whether status apprpved or not from db
     approvedStatus(boolean) {
       if (boolean == true) {
@@ -324,6 +334,9 @@ export default {
 
       // Send notifications
       this.sendNotification(newListId, status[newListId - 1]);
+
+      // add payments to product in fb
+      this.addPaymentsToProduct();
     },
 
     // Creates new notification which triggers email/slack cloud function
