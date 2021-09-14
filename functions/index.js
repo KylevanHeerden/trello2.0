@@ -24,10 +24,6 @@ admin.initializeApp();
 //   response.send("Hello from Firebase!");
 // });
 
-const { Storage } = require("@google-cloud/storage");
-const storage = new Storage();
-const myBucket = storage.bucket("purchase-app-staging");
-
 const db = admin.firestore();
 
 // Backups the firestore database
@@ -721,42 +717,35 @@ exports.sendEmailToSuppliers = functions.https.onRequest(
 
       // create date for email
       const date = new Date();
+      const formatDate = moment(date).format("Do MMM YYYY");
 
       // download file for attachment
 
-      let file = myBucket.file(
-        "POP/WMEoLmOUrIoUfFSf90rw/GqmhY0sdXFAZ6aoNI2js/sample.pdf"
-      );
-
-      functions.logger.info(file);
-
-      file.download(function(err, contents) {
-        // var downloaded = contents;
-        functions.logger.info(contents);
-
-        // setup e-mail data, even with unicode symbols
-        var mailOptions = {
-          from: '"RaptorApp" <dc@nanodyn.co.za>', // sender address (who sends)
-          to: "kylevh@nanodyn.co.za", // list of receivers (who receives)
-          subject: `Order ${card.supplier_quote_num} - Nanodyn Systems Payment Confirmation `, // Subject line
-          template: "emailSupplier",
-          context: {
-            date: `${date}`,
-            quote_num: `${card.supplier_quote_num}`,
+      // setup e-mail data, even with unicode symbols
+      var mailOptions = {
+        from: '"RaptorApp" <dc@nanodyn.co.za>', // sender address (who sends)
+        to: "kylevh@nanodyn.co.za", // list of receivers (who receives)
+        subject: `Order ${card.supplier_quote_num} - Nanodyn Systems Payment Confirmation `, // Subject line
+        template: "emailSupplier",
+        context: {
+          date: `${formatDate}`,
+          quote_num: `${card.supplier_quote_num}`,
+        },
+        attachments: [
+          {
+            filename: `${card.POP[0].file_name}`,
+            path: `${card.POP[0].link}`,
           },
-          // attachments: [
-          //   { filename: `${card.POP[0].filename}`, content: downloaded },
-          // ],
-        };
+        ],
+      };
 
-        // send mail with defined transport object
-        transporter.sendMail(mailOptions, function(error, info) {
-          if (error) {
-            return console.log(error);
-          }
+      // send mail with defined transport object
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          return console.log(error);
+        }
 
-          console.log("Message sent: " + info.response);
-        });
+        console.log("Message sent: " + info.response);
       });
     });
   }
