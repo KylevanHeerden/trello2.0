@@ -126,7 +126,7 @@
 <script>
 import { mapState, mapGetters } from "vuex";
 
-import LineGraph from "@/components/LineGraph3";
+import LineGraph from "@/components/LineGraph";
 
 export default {
   components: { LineGraph },
@@ -322,22 +322,16 @@ export default {
             month: cur.month,
             year: cur.year,
             y: cur.y,
-            committed: true,
           });
         } else {
           if (acc.at(-1).year == cur.year) {
             if (acc.at(-1).month == cur.month) {
               acc.at(-1).y = acc.at(-1).y + cur.y;
-
-              if (cur.committed === false) {
-                acc.at(-1).committed = false;
-              }
             } else {
               acc.push({
                 month: cur.month,
                 year: cur.year,
                 y: cur.y,
-                committed: cur.committed,
               });
             }
           } else {
@@ -345,7 +339,6 @@ export default {
               month: cur.month,
               year: cur.year,
               y: cur.y,
-              committed: cur.committed,
             });
           }
         }
@@ -376,10 +369,12 @@ export default {
         };
       });
 
+      // find the point in finalData that is for todays month
       const point = finalData.find((point) => {
         return point.x == this.currentMonth;
       });
 
+      // use the index to count number of months ahead and then set them as forcastCount
       this.committedCount = finalData.length - finalData.indexOf(point) - 1;
 
       let finalData2 = finalData.reduce((acc, cur) => {
@@ -391,8 +386,6 @@ export default {
 
         return acc;
       }, []);
-
-      //   console.log(finalData2);
 
       this.data1 = finalData;
       this.data2 = finalData2;
@@ -413,12 +406,12 @@ export default {
         }
       });
 
-      this.committedLength = committedFalse.length;
-
+      // Add all the values of the actual payments up for total
       const actualTotal = committedTrue.reduce((accu, curr) => {
         return accu + parseFloat(curr.value);
       }, 0);
 
+      // Add all the values of the committed payments up for total
       const committedTotal = committedFalse.reduce((accu, curr) => {
         return accu + parseFloat(curr.value);
       }, 0);
