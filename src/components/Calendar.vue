@@ -108,7 +108,7 @@ export default {
     return {
       calendarDialog: false,
       events: [],
-      fetchedProgrammeId: this.$route.params.id,
+      fetchedProgrammeId: localStorage.getItem("LS_ROUTE_KEY"),
       focus: "",
       selectedElement: null,
       selectedEvent: {},
@@ -179,10 +179,8 @@ export default {
     },
 
     programme() {
-      let programme = { name: "Pending..." };
-      if (this.fetchedProgrammeId) {
-        programme = this.getProgrammeById(this.fetchedProgrammeId);
-      }
+      let programme = this.getProgrammeById(this.fetchedProgrammeId);
+
       return programme;
     },
   },

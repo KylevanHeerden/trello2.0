@@ -87,13 +87,13 @@ export default {
     return {
       inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
       loading: false,
+      newProductDialog: false,
       newProduct: {
         name: "",
-        programme_id: this.programme.id,
-        programme_name: this.programme.name,
+        programme_id: "",
+        programme_name: "",
         status: "Quotes",
       },
-      newProductDialog: false,
     };
   },
 
@@ -108,8 +108,20 @@ export default {
     },
   },
 
+  watch: {
+    programme: function() {
+      this.setNewProductValues();
+    },
+  },
+
   methods: {
     ...mapActions(["createNewProduct", "getUsers"]),
+
+    setNewProductValues() {
+      this.newProduct.programme_id = this.programme.id;
+      this.newProduct.programme_name = this.programme.name;
+    },
+
     async submit() {
       if (this.$refs.newProductForm.validate()) {
         //Validates form before allowed to submit
@@ -148,6 +160,7 @@ export default {
 
   mounted() {
     this.getUsers();
+    this.setNewProductValues();
   },
 };
 </script>

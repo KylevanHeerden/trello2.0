@@ -152,7 +152,7 @@ export default {
     ]),
 
     cards() {
-      let cards = this.getCardsByProgrammeId(this.programme.id);
+      let cards = this.getCardsByProgrammeId(this.fetchedProgrammeId);
       let notArchived = [];
 
       cards.forEach((card) => {
