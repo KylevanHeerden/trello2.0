@@ -104,6 +104,7 @@ const store = new Vuex.Store({
         updatedOn: new Date(),
         teams: [],
         admin: false,
+        slack_id: form.slack_id,
       });
 
       // sign user in
