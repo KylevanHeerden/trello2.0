@@ -174,7 +174,7 @@ export default {
   components: { NewProduct, Archived, Calendar },
   data() {
     return {
-      fetchedProgrammeId: this.$route.params.id,
+      fetchedProgrammeId: localStorage.getItem("LS_ROUTE_KEY"),
       myProductsClicked: false,
       search: "",
     };
@@ -199,9 +199,13 @@ export default {
 
     // Genrates budget percentage
     budgetPercentage() {
-      let percentage =
-        (parseFloat(this.programme.total) / parseFloat(this.programme.budget)) *
-        100;
+      let percentage = 0;
+      if (this.programme) {
+        percentage =
+          (parseFloat(this.programme.total) /
+            parseFloat(this.programme.budget)) *
+          100;
+      }
       return percentage.toFixed(2);
     },
 
@@ -267,7 +271,8 @@ export default {
     },
 
     programme() {
-      let programme = this.getProgrammeById(this.fetchedProgrammeId);
+      const programme = this.getProgrammeById(this.fetchedProgrammeId);
+
       return programme;
     },
 

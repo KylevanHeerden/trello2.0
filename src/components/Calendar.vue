@@ -179,7 +179,10 @@ export default {
     },
 
     programme() {
-      let programme = this.getProgrammeById(this.fetchedProgrammeId);
+      let programme = { name: "Pending..." };
+      if (this.fetchedProgrammeId) {
+        programme = this.getProgrammeById(this.fetchedProgrammeId);
+      }
       return programme;
     },
   },

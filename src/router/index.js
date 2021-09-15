@@ -104,4 +104,10 @@ router.beforeEach((to, from, next) => {
   }
 });
 
+router.afterEach((to) => {
+  const splitPath = to.path.split("/");
+
+  localStorage.setItem("LS_ROUTE_KEY", splitPath.at(-1));
+});
+
 export default router;

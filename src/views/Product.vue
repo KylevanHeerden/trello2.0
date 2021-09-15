@@ -126,8 +126,8 @@ export default {
           cards: [],
         },
       ],
-      fetchedProductId: this.$route.params.id,
-      productId: String(this.$route.params.id),
+      fetchedProductId: localStorage.getItem("LS_ROUTE_KEY"),
+      productId: localStorage.getItem("LS_ROUTE_KEY"),
       snackbar: {
         snackbar: false,
         timeout: 20000000,
@@ -202,24 +202,14 @@ export default {
 
     product() {
       let product = this.getProductById(this.fetchedProductId);
-
       return product;
     },
 
     programme() {
-      if (this.product == undefined) {
-        let programme = this.getProgrammeById(
-          this.product.programme.programme_id
-        );
+      let product = this.getProductById(this.fetchedProductId);
+      let programme = this.getProgrammeById(product.programme.programme_id);
 
-        return programme;
-      } else {
-        let programme = this.getProgrammeById(
-          this.product.programme.programme_id
-        );
-
-        return programme;
-      }
+      return programme;
     },
 
     team() {

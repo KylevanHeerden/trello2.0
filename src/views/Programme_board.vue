@@ -118,8 +118,8 @@ export default {
           cards: [],
         },
       ],
-      fetchedProgrammeId: this.$route.params.id,
-      programmeId: String(this.$route.params.id),
+      fetchedProgrammeId: localStorage.getItem("LS_ROUTE_KEY"),
+      programmeId: localStorage.getItem("LS_ROUTE_KEY"),
       snackbar: {
         newListName: "", //This is provided by cardMoved function
         snackbar: false,

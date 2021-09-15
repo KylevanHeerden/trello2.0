@@ -11,7 +11,7 @@
         v-on="on"
         data-cypress="addProductBtn"
       >
-        <v-icon dark> mdi-plus </v-icon>
+        <v-icon dark small class="pr-1"> mdi-plus </v-icon>
         Add Product
       </v-btn>
     </template>
