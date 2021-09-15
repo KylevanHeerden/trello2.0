@@ -451,7 +451,7 @@ export default {
               body: JSON.stringify({ card: this.card }),
             };
             const response = fetch(
-              "https://us-central1-purchase-app-staging.cloudfunctions.net/sendEmailToSuppliers",
+              process.env.VUE_APP_SUPPLIER_EMAIL_CLOUDFUNCTION,
               requestOptions
             );
           }
