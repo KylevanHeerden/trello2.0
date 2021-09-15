@@ -56,11 +56,12 @@
             :items="getProgrammes"
             item-text="text"
             item-value="value"
+            :rule="inputRulesRequired"
           ></v-select>
         </v-card-text>
 
         <v-card-actions class="justify-end v-card-actions">
-          <v-btn small dark color="primary" :href="url">
+          <v-btn small dark color="primary" :href="url" :loading="loading" @click="downloadCSV()">
             Export
           </v-btn>
         </v-card-actions>
@@ -85,191 +86,256 @@
         </v-card-actions>
       </v-card>
     </v-row> -->
+
+    <!-- <v-row align-content="center" justify="center" class="adminRow">
+      <v-card elevation="2" width="50%">
+        <v-card-text>
+          Remove all duplicates from users Teams array:
+        </v-card-text>
+        <v-card-actions class="justify-end v-card-actions">
+          <v-btn
+            :disabled="true"
+            @click="clearTeamsDuplicates()"
+            small
+            dark
+            class="addFieldBtn"
+          >
+            Clear
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-row> -->
   </v-container>
 </template>
 
-<script>
-// @ is an alias to /src
-import { mapActions, mapGetters, mapState } from "vuex";
-import { db } from "@/firebase";
-import moment from "moment";
+    <script>
+      // @ is an alias to /src
+      import { mapActions, mapGetters, mapState } from "vuex";
+      import { db } from "@/firebase";
+      import moment from "moment";
 
-export default {
-  name: "Admin",
-  components: {},
-  data() {
-    return {
-      clicked: false,
-      programme: "",
-      search: "",
-      searchOption: null,
-    };
-  },
-  computed: {
-    ...mapState({
-      cards: (state) => state.cards.cards,
-    }),
+      export default {
+        name: "Admin",
+        components: {},
+        data() {
+          return {
+            clicked: false,
+            inputRulesRequired: [(v) => !!v || "Required"],
+            loading: false,
+            programme: "",
+            search: "",
+            searchOption: null,
+          };
+        },
+        computed: {
+          ...mapState({
+            cards: (state) => state.cards.cards,
+            users: (state) => state.users.users,
+          }),
 
-    getProgrammes() {
-      let select_options = [];
-      this.$store.getters.getProgrammes.map((programme) => {
-        select_options.push({
-          text: programme.name,
-          value: programme.id,
-          disabled: false,
-        });
-      });
-      return select_options;
-    },
-
-    searchCards() {
-      if (this.searchOption == "PO#") {
-        let searchCards = this.cards.filter((card) => {
-          let cardPO = card.PO_number;
-          if (cardPO == null) {
-            return;
-          } else if (cardPO.toLowerCase().match(this.search.toLowerCase())) {
-            return card;
-          }
-        });
-
-        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
-      } else if (this.searchOption == "Supplier") {
-        let searchCards = this.cards.filter((card) => {
-          let cardSupplierName = card.supplier_name;
-          if (cardSupplierName == null) {
-            return;
-          } else if (
-            cardSupplierName.toLowerCase().match(this.search.toLowerCase())
-          ) {
-            return card;
-          }
-        });
-
-        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
-      } else if (this.searchOption == "Value") {
-        let searchCards = this.cards.filter((card) => {
-          let cardTotalExcVAT = card.total_exc_vat;
-          if (cardTotalExcVAT == null) {
-            return;
-          } else if (cardTotalExcVAT.match(this.search)) {
-            return card;
-          }
-        });
-
-        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
-      }
-    },
-
-    url() {
-      return `https://${process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/${this.programme}`;
-    },
-  },
-
-  methods: {
-    // The addField function adds a field to all the docs in a firebase collection.
-    // async addField() {
-    //   db.collection("cards")
-    //     .get()
-    //     .then(function(querySnapshot) {
-    //       querySnapshot.forEach(function(doc) {
-    //         doc.ref.update({
-    //           payments: [
-    //             {
-    //               payment: "Final Payment",
-    //               value: doc.data().total_inc_vat,
-    //               date: "",
-    //               committed: false,
-    //             },
-    //           ],
-    //         });
-    //       });
-    //     });
-    //   return "Done!";
-    // },
-
-    async addField() {
-      db.collection("products")
-        .get()
-        .then(function(querySnapshot) {
-          querySnapshot.forEach(function(doc) {
-            doc.ref.update({
-              delivery_date: "",
+          getProgrammes() {
+            let select_options = [];
+            this.$store.getters.getProgrammes.map((programme) => {
+              select_options.push({
+                text: programme.name,
+                value: programme.id,
+                disabled: false,
+              });
             });
-          });
-        });
-      return "Done!";
-    },
+            return select_options;
+          },
 
-    // Format fb timestamp to Do MMM YYYY
-    dateFormat(param) {
-      let date = moment(param.toDate()).format("Do MMM YYYY");
-      return date;
-    },
-  },
+          searchCards() {
+            if (this.searchOption == "PO#") {
+              let searchCards = this.cards.filter((card) => {
+                let cardPO = card.PO_number;
+                if (cardPO == null) {
+                  return;
+                } else if (
+                  cardPO.toLowerCase().match(this.search.toLowerCase())
+                ) {
+                  return card;
+                }
+              });
 
-  mounted() {
-    this.$store.dispatch("getProgrammes");
-    this.$store.dispatch("getCards");
-  },
-};
-</script>
+              return searchCards.sort((a, b) =>
+                a.createdOn > b.createdOn ? -1 : 1
+              );
+            } else if (this.searchOption == "Supplier") {
+              let searchCards = this.cards.filter((card) => {
+                let cardSupplierName = card.supplier_name;
+                if (cardSupplierName == null) {
+                  return;
+                } else if (
+                  cardSupplierName
+                    .toLowerCase()
+                    .match(this.search.toLowerCase())
+                ) {
+                  return card;
+                }
+              });
 
-<style scoped>
-.adminContainer {
-  color: grey;
-}
+              return searchCards.sort((a, b) =>
+                a.createdOn > b.createdOn ? -1 : 1
+              );
+            } else if (this.searchOption == "Value") {
+              let searchCards = this.cards.filter((card) => {
+                let cardTotalExcVAT = card.total_exc_vat;
+                if (cardTotalExcVAT == null) {
+                  return;
+                } else if (cardTotalExcVAT.match(this.search)) {
+                  return card;
+                }
+              });
 
-.theme--light.v-data-table {
-  background-color: #f5f5f5;
-}
+              return searchCards.sort((a, b) =>
+                a.createdOn > b.createdOn ? -1 : 1
+              );
+            }
+          },
 
-.theme--light.v-data-table.v-data-table--fixed-header thead th {
-  background-color: #f5f5f5;
-}
+          url() {
+            return `https://${process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/${this.programme}`;
+          },
+        },
 
-.red {
-  background-color: red;
-}
+        methods: {
+          // The addField function adds a field to all the docs in a firebase collection.
+          // async addField() {
+          //   db.collection("cards")
+          //     .get()
+          //     .then(function(querySnapshot) {
+          //       querySnapshot.forEach(function(doc) {
+          //         doc.ref.update({
+          //           payments: [
+          //             {
+          //               payment: "Final Payment",
+          //               value: doc.data().total_inc_vat,
+          //               date: "",
+          //               committed: false,
+          //             },
+          //           ],
+          //         });
+          //       });
+          //     });
+          //   return "Done!";
+          // },
 
-.yellow {
-  background-color: yellow;
-}
+          async addField() {
+            db.collection("products")
+              .get()
+              .then(function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                  doc.ref.update({
+                    delivery_date: "",
+                  });
+                });
+              });
+            return "Done!";
+          },
 
-.blue {
-  background-color: blue;
-}
+          // Format fb timestamp to Do MMM YYYY
+          dateFormat(param) {
+            let date = moment(param.toDate()).format("Do MMM YYYY");
+            return date;
+          },
 
-.addFieldBtn {
-  background-color: #37474f !important;
-}
+          downloadCSV(){
+            this.loading = true
 
-.adminRow {
-  margin-top: 2rem;
-}
+            setTimeout(() => this.loading = false, 3000)
+          }
 
-.v-card-text {
-  padding: 2rem;
-  padding-bottom: 0rem;
-}
+          // clearTeamsDuplicates() {
+          //   this.users.forEach((user) => {
+          //     var result = user.teams.reduce((unique, o) => {
+          //       if (
+          //         !unique.some(
+          //           (obj) =>
+          //             obj.programme_name === o.programme_name &&
+          //             obj.team_id === o.team_id &&
+          //             obj.team_name === o.team_name
+          //         )
+          //       ) {
+          //         unique.push(o);
+          //       }
+          //       return unique;
+          //     }, []);
 
-.v-card-actions {
-  padding-bottom: 1rem;
-  padding-right: 2rem;
-}
+          //     const userRef = db.collection("users").doc(user.id);
 
-.searchCardList {
-  position: absolute;
-  left: 20%;
-}
+          //     userRef.update({
+          //       teams: result,
+          //     });
+          //   });
+          // },
+        },
 
-.list-item {
-  border: solid 1px #cfd8dc;
-  background-color: #cfd8dc;
-  color: white;
-}
+        mounted() {
+          this.$store.dispatch("getProgrammes");
+          this.$store.dispatch("getCards");
+          this.$store.dispatch("getUsers");
+        },
+      };
+    </script>
 
-.list-item:hover {
-  border: solid 2px #37474f;
-}
-</style>
+    <style scoped>
+      .adminContainer {
+        color: grey;
+      }
+
+      .theme--light.v-data-table {
+        background-color: #f5f5f5;
+      }
+
+      .theme--light.v-data-table.v-data-table--fixed-header thead th {
+        background-color: #f5f5f5;
+      }
+
+      .red {
+        background-color: red;
+      }
+
+      .yellow {
+        background-color: yellow;
+      }
+
+      .blue {
+        background-color: blue;
+      }
+
+      .addFieldBtn {
+        background-color: #37474f !important;
+      }
+
+      .adminRow {
+        margin-top: 2rem;
+      }
+
+      .v-card-text {
+        padding: 2rem;
+        padding-bottom: 0rem;
+      }
+
+      .v-card-actions {
+        padding-bottom: 1rem;
+        padding-right: 2rem;
+      }
+
+      .searchCardList {
+        position: absolute;
+        left: 20%;
+      }
+
+      .list-item {
+        border: solid 1px #cfd8dc;
+        background-color: #cfd8dc;
+        color: white;
+      }
+
+      .list-item:hover {
+        border: solid 2px #37474f;
+      }
+    </style>
+  </v-container></template
+>
