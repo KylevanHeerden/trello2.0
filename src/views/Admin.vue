@@ -242,8 +242,13 @@
 
           downloadCSV(){
             this.loading = true
+            
 
-            setTimeout(() => this.loading = false, 3000)
+            setTimeout(
+              () => {
+              this.loading = false
+            this.programme = ''
+            }, 3000)
           }
 
           // clearTeamsDuplicates() {
