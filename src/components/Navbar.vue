@@ -44,7 +44,7 @@
         </v-icon>
       </div>
       <div class="text-center">
-        <v-menu offset-y>
+        <v-menu offset-y left>
           <template v-slot:activator="{ on, attrs }">
             <v-btn text dark left v-bind="attrs" v-on="on">
               <v-icon style="color: white !important">expand_more</v-icon>
@@ -58,7 +58,14 @@
               router
               :to="link.route"
             >
-              <v-list-item-title>{{ link.text }}</v-list-item-title>
+              <v-list-item-action>
+                <v-icon>{{ link.icon }}</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title right>
+                  {{ link.text }}
+                </v-list-item-title>
+              </v-list-item-content>
             </v-list-item>
           </v-list>
         </v-menu>

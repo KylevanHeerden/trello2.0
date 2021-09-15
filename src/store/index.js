@@ -39,10 +39,10 @@ const store = new Vuex.Store({
   state: {
     links: [
       { icon: "dashboard", text: "Programmes", route: "/" },
+      { icon: "show_chart", text: "Finance", route: "/finance" },
+      { icon: "search", text: "Admin", route: "/admin" },
       { icon: "people", text: "Teams", route: "/teams" },
       { icon: "account_circle", text: "Profile", route: "/profile" },
-      { icon: "folder", text: "Admin", route: "/admin" },
-      { icon: "folder", text: "Finance", route: "/finance" },
     ],
     user: {
       loggedIn: null,
