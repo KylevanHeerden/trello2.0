@@ -37,9 +37,10 @@
       <v-card-title class="mb-2 headline backgroundColorPrimary">
         Archived Products
       </v-card-title>
-      <v-row class="noMargin" justify="center">
-        <v-col cols="12" col="4"></v-col>
-        <v-col cols="12" md="4">
+
+      <v-row class="mt-0 mb-0 pt-0 pb-0" justify="center">
+        <!--Search input-->
+        <v-col cols="12" md="4" class="mt-0 mb-0 pt-0 pb-0" align-self="center">
           <v-text-field
             v-model="search"
             label="Search Products"
@@ -47,63 +48,64 @@
           >
           </v-text-field>
         </v-col>
-        <!--Search input-->
-        <v-col cols="12" col="4"></v-col>
       </v-row>
-      <v-card-text v-if="searchedArchivedProducts != 0" class="maxHeight">
-        <v-card
-          id="productCard"
-          flat
-          class=" productCard"
-          v-for="product in searchedArchivedProducts"
-          :key="product.id"
-          data-cypress="productCard"
-        >
-          <!--filteredSearchProducts is function to filter products on search-->
-          <router-link :to="{ name: 'Product', params: { id: product.id } }">
-            <v-row :class="`product ${product.status}`">
-              <v-col cols="12" sm="3" md="3">
-                <div class="caption grey--text">Product Name</div>
-                <div class="card-text-black">{{ product.name }}</div>
-              </v-col>
-              <v-col cols="12" sm="3" md="3">
-                <div class="caption grey--text">Person</div>
-                <div class="card-text-black">{{ product.person }}</div>
-              </v-col>
-              <v-col cols="12" sm="3" md="2">
-                <div class="caption grey--text">Edit date</div>
-                <div class="card-text-black">
-                  {{ dateOnly(product.updatedOn) }}
-                </div>
-              </v-col>
-              <v-col cols="12" sm="3" md="3">
-                <v-chip
-                  small
-                  :color="`${chipColor(product.status)}`"
-                  :class="
-                    `${product.status} white--text caption my-2 fixedSize justify-center`
-                  "
-                >
-                  {{ product.status }}
-                </v-chip>
-                <!--Here we bind the class so that the color of chip changes by status-->
-              </v-col>
-              <v-col cols="12" sm="1" md="1">
-                <span>
-                  <v-btn
+
+      <v-card-text v-if="searchedArchivedProducts != 0">
+        <v-row class="pr-7">
+          <v-card
+            id="productCard"
+            flat
+            class="productCard"
+            v-for="product in searchedArchivedProducts"
+            :key="product.id"
+            data-cypress="productCard"
+          >
+            <!--filteredSearchProducts is function to filter products on search-->
+            <router-link :to="{ name: 'Product', params: { id: product.id } }">
+              <v-row :class="`product ${product.status}`">
+                <v-col cols="12" sm="3" md="3">
+                  <div class="caption grey--text">Product Name</div>
+                  <div class="card-text-black">{{ product.name }}</div>
+                </v-col>
+                <v-col cols="12" sm="3" md="3">
+                  <div class="caption grey--text">Person</div>
+                  <div class="card-text-black">{{ product.person }}</div>
+                </v-col>
+                <v-col cols="12" sm="3" md="2">
+                  <div class="caption grey--text">Edit date</div>
+                  <div class="card-text-black">
+                    {{ dateOnly(product.updatedOn) }}
+                  </div>
+                </v-col>
+                <v-col cols="12" sm="3" md="3">
+                  <v-chip
                     small
-                    text
-                    color="grey"
-                    @click.prevent="Unarchive(product.id)"
+                    :color="`${chipColor(product.status)}`"
+                    :class="
+                      `${product.status} white--text caption my-2 fixedSize justify-center`
+                    "
                   >
-                    <v-icon left small>unarchive</v-icon>
-                    <span class="caption text-lowercase">Unarchive</span>
-                  </v-btn>
-                </span>
-              </v-col>
-            </v-row>
-          </router-link>
-        </v-card>
+                    {{ product.status }}
+                  </v-chip>
+                  <!--Here we bind the class so that the color of chip changes by status-->
+                </v-col>
+                <v-col cols="12" sm="1" md="1">
+                  <span>
+                    <v-btn
+                      small
+                      text
+                      color="grey"
+                      @click.prevent="Unarchive(product.id)"
+                    >
+                      <v-icon left small>unarchive</v-icon>
+                      <span class="caption text-lowercase">Unarchive</span>
+                    </v-btn>
+                  </span>
+                </v-col>
+              </v-row>
+            </router-link>
+          </v-card>
+        </v-row>
       </v-card-text>
       <v-card-text v-else>
         <v-row justify="center" align-content="center" class="grey--text">
@@ -199,12 +201,13 @@ export default {
 }
 
 .dialogHeight {
-  max-height: 70vh;
-  min-height: 70vh;
+  max-height: 100vh;
+  min-height: 80vh;
 }
 
 .productCard {
   margin-bottom: 0px;
+  width: 100%;
 }
 
 .product.Quotes {

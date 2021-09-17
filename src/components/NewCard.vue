@@ -23,7 +23,7 @@
     </template>
     <v-card>
       <v-card-title class="headline backgroundColorPrimary">
-        New Quote
+        New Purchase Request
       </v-card-title>
       <v-card-text>
         <v-form class="px-3" ref="form">

@@ -96,7 +96,7 @@
             <v-avatar size="100">
               <img src="@/assets/avatar.jpg" />
             </v-avatar>
-            <p class="white--text subheading mt-1">User One</p>
+            <p class="white--text subheading mt-1">{{ nameSurname }}</p>
           </router-link>
         </v-flex>
       </v-layout>
@@ -225,6 +225,10 @@ export default {
       user: (state) => state.profile.userProfile,
     }),
     ...mapGetters({}),
+
+    nameSurname() {
+      return this.user.name + " " + this.user.surname;
+    },
   },
 
   created() {

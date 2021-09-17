@@ -120,7 +120,7 @@
               <div class="card-text-black">{{ product.name }}</div>
             </v-col>
             <v-col cols="12" sm="3" md="3">
-              <div class="caption grey--text">Person</div>
+              <div class="caption grey--text">Person Responsible</div>
               <div class="card-text-black">{{ product.person }}</div>
             </v-col>
             <v-col cols="12" sm="2" md="2">

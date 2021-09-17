@@ -176,6 +176,8 @@ export default {
       });
 
       this.events = events;
+
+      console.log(this.events);
     },
 
     programme() {
