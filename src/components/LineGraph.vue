@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import moment from "moment";
+
 export default {
   props: {
     data1: {
@@ -119,7 +121,7 @@ export default {
 
           xaxis: [
             {
-              x: this.currentMonth,
+              x: moment(new Date()).format("YYYY-MM-DD"),
               borderColor: "#e1ad01",
               label: {
                 borderColor: "#e1ad01",
@@ -145,6 +147,10 @@ export default {
           title: {
             text: "Expenditure (R)",
           },
+        },
+
+        xaxis: {
+          type: "datetime",
         },
       };
     },
@@ -178,6 +184,10 @@ export default {
           title: {
             text: "Expenditure (R)",
           },
+        },
+
+        xaxis: {
+          type: "datetime",
         },
 
         annotations: {
@@ -221,6 +231,8 @@ export default {
 
   computed: {},
 
-  mounted() {},
+  mounted() {
+    console.log(this.currentMonth);
+  },
 };
 </script>

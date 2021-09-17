@@ -61,8 +61,43 @@
         </v-card-text>
 
         <v-card-actions class="justify-end v-card-actions">
-          <v-btn small dark color="primary" :href="url" :loading="loading" @click="downloadCSV()">
+          <v-btn
+            small
+            dark
+            color="primary"
+            :href="url"
+            :loading="loading"
+            @click="downloadCSV()"
+          >
             Export
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-row>
+
+    <v-row align-content="center" justify="center" class="adminRow">
+      <v-card elevation="2" width="50%">
+        <v-card-text>
+          Add a field to each doc in firebase:
+        </v-card-text>
+        <v-card-actions class="justify-end v-card-actions">
+          <v-btn
+            :disabled="false"
+            @click="addField()"
+            small
+            dark
+            class="addFieldBtn"
+          >
+            Add Field To Cards
+          </v-btn>
+          <v-btn
+            :disabled="false"
+            @click="addField2()"
+            small
+            dark
+            class="addFieldBtn"
+          >
+            Add Field To Products
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -71,17 +106,17 @@
     <!-- <v-row align-content="center" justify="center" class="adminRow">
       <v-card elevation="2" width="50%">
         <v-card-text>
-          Add a field to each doc in firebase:
+          Remove all duplicates from users Teams array:
         </v-card-text>
         <v-card-actions class="justify-end v-card-actions">
           <v-btn
-            :disabled="true"
-            @click="addField()"
+            :disabled="false"
+            @click="clearTeamsDuplicates()"
             small
             dark
             class="addFieldBtn"
           >
-            Add Field
+            Clear
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -90,12 +125,12 @@
     <!-- <v-row align-content="center" justify="center" class="adminRow">
       <v-card elevation="2" width="50%">
         <v-card-text>
-          Remove all duplicates from users Teams array:
+          Change the comment in Quality Approval to 5:
         </v-card-text>
         <v-card-actions class="justify-end v-card-actions">
           <v-btn
             :disabled="true"
-            @click="clearTeamsDuplicates()"
+            @click="changeComment5()"
             small
             dark
             class="addFieldBtn"
@@ -108,239 +143,332 @@
   </v-container>
 </template>
 
-    <script>
-      // @ is an alias to /src
-      import { mapActions, mapGetters, mapState } from "vuex";
-      import { db } from "@/firebase";
-      import moment from "moment";
+<script>
+// @ is an alias to /src
+import { mapActions, mapGetters, mapState } from "vuex";
+import { db } from "@/firebase";
+import moment from "moment";
 
-      export default {
-        name: "Admin",
-        components: {},
-        data() {
-          return {
-            clicked: false,
-            inputRulesRequired: [(v) => !!v || "Required"],
-            loading: false,
-            programme: "",
-            search: "",
-            searchOption: null,
-          };
-        },
-        computed: {
-          ...mapState({
-            cards: (state) => state.cards.cards,
-            users: (state) => state.users.users,
-          }),
+export default {
+  name: "Admin",
+  components: {},
+  data() {
+    return {
+      clicked: false,
+      inputRulesRequired: [(v) => !!v || "Required"],
+      loading: false,
+      programme: "",
+      search: "",
+      searchOption: null,
+    };
+  },
+  computed: {
+    ...mapState({
+      cards: (state) => state.cards.cards,
+      users: (state) => state.users.users,
+    }),
 
-          getProgrammes() {
-            let select_options = [];
-            this.$store.getters.getProgrammes.map((programme) => {
-              select_options.push({
-                text: programme.name,
-                value: programme.id,
-                disabled: false,
-              });
-            });
-            return select_options;
-          },
+    getProgrammes() {
+      let select_options = [];
+      this.$store.getters.getProgrammes.map((programme) => {
+        select_options.push({
+          text: programme.name,
+          value: programme.id,
+          disabled: false,
+        });
+      });
+      return select_options;
+    },
 
-          searchCards() {
-            if (this.searchOption == "PO#") {
-              let searchCards = this.cards.filter((card) => {
-                let cardPO = card.PO_number;
-                if (cardPO == null) {
-                  return;
-                } else if (
-                  cardPO.toLowerCase().match(this.search.toLowerCase())
-                ) {
-                  return card;
-                }
-              });
-
-              return searchCards.sort((a, b) =>
-                a.createdOn > b.createdOn ? -1 : 1
-              );
-            } else if (this.searchOption == "Supplier") {
-              let searchCards = this.cards.filter((card) => {
-                let cardSupplierName = card.supplier_name;
-                if (cardSupplierName == null) {
-                  return;
-                } else if (
-                  cardSupplierName
-                    .toLowerCase()
-                    .match(this.search.toLowerCase())
-                ) {
-                  return card;
-                }
-              });
-
-              return searchCards.sort((a, b) =>
-                a.createdOn > b.createdOn ? -1 : 1
-              );
-            } else if (this.searchOption == "Value") {
-              let searchCards = this.cards.filter((card) => {
-                let cardTotalExcVAT = card.total_exc_vat;
-                if (cardTotalExcVAT == null) {
-                  return;
-                } else if (cardTotalExcVAT.match(this.search)) {
-                  return card;
-                }
-              });
-
-              return searchCards.sort((a, b) =>
-                a.createdOn > b.createdOn ? -1 : 1
-              );
-            }
-          },
-
-          url() {
-            return `https://${process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/${this.programme}`;
-          },
-        },
-
-        methods: {
-          // The addField function adds a field to all the docs in a firebase collection.
-          // async addField() {
-          //   db.collection("cards")
-          //     .get()
-          //     .then(function(querySnapshot) {
-          //       querySnapshot.forEach(function(doc) {
-          //         doc.ref.update({
-          //           payments: [
-          //             {
-          //               payment: "Final Payment",
-          //               value: doc.data().total_inc_vat,
-          //               date: "",
-          //               committed: false,
-          //             },
-          //           ],
-          //         });
-          //       });
-          //     });
-          //   return "Done!";
-          // },
-
-          async addField() {
-            db.collection("products")
-              .get()
-              .then(function(querySnapshot) {
-                querySnapshot.forEach(function(doc) {
-                  doc.ref.update({
-                    delivery_date: "",
-                  });
-                });
-              });
-            return "Done!";
-          },
-
-          // Format fb timestamp to Do MMM YYYY
-          dateFormat(param) {
-            let date = moment(param.toDate()).format("Do MMM YYYY");
-            return date;
-          },
-
-          downloadCSV(){
-            this.loading = true
-            
-
-            setTimeout(
-              () => {
-              this.loading = false
-            this.programme = ''
-            }, 3000)
+    searchCards() {
+      if (this.searchOption == "PO#") {
+        let searchCards = this.cards.filter((card) => {
+          let cardPO = card.PO_number;
+          if (cardPO == null) {
+            return;
+          } else if (cardPO.toLowerCase().match(this.search.toLowerCase())) {
+            return card;
           }
+        });
 
-          // clearTeamsDuplicates() {
-          //   this.users.forEach((user) => {
-          //     var result = user.teams.reduce((unique, o) => {
-          //       if (
-          //         !unique.some(
-          //           (obj) =>
-          //             obj.programme_name === o.programme_name &&
-          //             obj.team_id === o.team_id &&
-          //             obj.team_name === o.team_name
-          //         )
-          //       ) {
-          //         unique.push(o);
-          //       }
-          //       return unique;
-          //     }, []);
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
+      } else if (this.searchOption == "Supplier") {
+        let searchCards = this.cards.filter((card) => {
+          let cardSupplierName = card.supplier_name;
+          if (cardSupplierName == null) {
+            return;
+          } else if (
+            cardSupplierName.toLowerCase().match(this.search.toLowerCase())
+          ) {
+            return card;
+          }
+        });
 
-          //     const userRef = db.collection("users").doc(user.id);
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
+      } else if (this.searchOption == "Value") {
+        let searchCards = this.cards.filter((card) => {
+          let cardTotalExcVAT = card.total_exc_vat;
+          if (cardTotalExcVAT == null) {
+            return;
+          } else if (cardTotalExcVAT.match(this.search)) {
+            return card;
+          }
+        });
 
-          //     userRef.update({
-          //       teams: result,
-          //     });
-          //   });
-          // },
-        },
-
-        mounted() {
-          this.$store.dispatch("getProgrammes");
-          this.$store.dispatch("getCards");
-          this.$store.dispatch("getUsers");
-        },
-      };
-    </script>
-
-    <style scoped>
-      .adminContainer {
-        color: grey;
+        return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
       }
+    },
 
-      .theme--light.v-data-table {
-        background-color: #f5f5f5;
-      }
+    url() {
+      return `https://${process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/${this.programme}`;
+    },
+  },
 
-      .theme--light.v-data-table.v-data-table--fixed-header thead th {
-        background-color: #f5f5f5;
-      }
+  methods: {
+    // The addField function adds a field to all the docs in a firebase collection.
+    async addField() {
+      db.collection("cards")
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            if (doc.data().list_id == 3) {
+              doc.ref.update({
+                payments: [
+                  {
+                    payment: "Final Payment",
+                    value: doc.data().total_inc_vat,
+                    date: "",
+                    committed: false,
+                  },
+                ],
+              });
+            } else if (doc.data().list_id == 4 || doc.data().list_id == 5) {
+              doc.ref.update({
+                payments: [
+                  {
+                    payment: "Final Payment",
+                    value: doc.data().total_inc_vat,
+                    date: "2021-08-31",
+                    committed: false,
+                  },
+                ],
+              });
+            } else if (doc.data().list_id == 6) {
+              doc.ref.update({
+                payments: [
+                  {
+                    payment: "Final Payment",
+                    value: doc.data().total_inc_vat,
+                    date: "2021-08-31",
+                    committed: true,
+                  },
+                ],
+              });
+            }
+          });
 
-      .red {
-        background-color: red;
-      }
+          alert("I am done!");
+        });
+      return "Done!";
+    },
 
-      .yellow {
-        background-color: yellow;
-      }
+    async addField2() {
+      db.collection("products")
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            doc.ref.update({
+              delivery_date: "",
+            });
 
-      .blue {
-        background-color: blue;
-      }
+            if (doc.data().cards.length !== 0) {
+              let cardID = doc.data().cards.at(0).card_id;
 
-      .addFieldBtn {
-        background-color: #37474f !important;
-      }
+              db.collection("cards")
+                .doc(cardID)
+                .get()
+                .then(function(card) {
+                  if (card.data()) {
+                    if (doc.data().status == "Procurement") {
+                      doc.ref.update({
+                        payments: [
+                          {
+                            payment: "Final Payment",
+                            value: card.data().total_inc_vat,
+                            date: "2021-09-31",
+                            committed: false,
+                          },
+                        ],
+                      });
+                    } else if (doc.data().status == "FollowUp") {
+                      if (doc.data().POP_date !== null) {
+                        doc.ref.update({
+                          payments: [
+                            {
+                              payment: "Final Payment",
+                              value: card.data().total_inc_vat,
+                              date: moment(doc.data().POP_date.toDate()).format(
+                                "YYYY-MM-DD"
+                              ),
+                              committed: false,
+                            },
+                          ],
+                        });
+                      } else {
+                        doc.ref.update({
+                          payments: [
+                            {
+                              payment: "Final Payment",
+                              value: card.data().total_inc_vat,
+                              date: "2021-08-31",
+                              committed: false,
+                            },
+                          ],
+                        });
+                      }
+                    } else if (doc.data().status == "Quality") {
+                      doc.ref.update({
+                        payments: [
+                          {
+                            payment: "Final Payment",
+                            value: card.data().total_inc_vat,
+                            date: "2021-08-31",
+                            committed: true,
+                          },
+                        ],
+                      });
+                    }
+                  }
+                });
+            }
+          });
 
-      .adminRow {
-        margin-top: 2rem;
-      }
+          alert("I am done!");
+        });
+      return "Done!";
+    },
 
-      .v-card-text {
-        padding: 2rem;
-        padding-bottom: 0rem;
-      }
+    // async changeComment5() {
+    //   db.collection("comments")
+    //     .get()
+    //     .then(function(querySnapshot) {
+    //       querySnapshot.forEach(function(doc) {
+    //       if(doc.data().position == 4){
+    //           doc.ref.update({
+    //           position: 5,
+    //         });
+    //       }
 
-      .v-card-actions {
-        padding-bottom: 1rem;
-        padding-right: 2rem;
-      }
+    //       });
 
-      .searchCardList {
-        position: absolute;
-        left: 20%;
-      }
+    //       alert("I am done!")
+    //     });
+    //   return "Done!";
+    // },
 
-      .list-item {
-        border: solid 1px #cfd8dc;
-        background-color: #cfd8dc;
-        color: white;
-      }
+    // Format fb timestamp to Do MMM YYYY
+    dateFormat(param) {
+      let date = moment(param.toDate()).format("Do MMM YYYY");
+      return date;
+    },
 
-      .list-item:hover {
-        border: solid 2px #37474f;
-      }
-    </style>
-  </v-container></template
->
+    downloadCSV() {
+      this.loading = true;
+
+      setTimeout(() => {
+        this.loading = false;
+        this.programme = "";
+      }, 3000);
+    },
+
+    // clearTeamsDuplicates() {
+    //   this.users.forEach((user) => {
+    //     var result = user.teams.reduce((unique, o) => {
+    //       if (
+    //         !unique.some(
+    //           (obj) =>
+    //             obj.programme_name === o.programme_name &&
+    //             obj.team_id === o.team_id &&
+    //             obj.team_name === o.team_name
+    //         )
+    //       ) {
+    //         unique.push(o);
+    //       }
+    //       return unique;
+    //     }, []);
+
+    //     const userRef = db.collection("users").doc(user.id);
+
+    //     userRef.update({
+    //       teams: result,
+    //     });
+    //   });
+    // },
+  },
+
+  mounted() {
+    this.$store.dispatch("getProgrammes");
+    this.$store.dispatch("getCards");
+    this.$store.dispatch("getUsers");
+  },
+};
+</script>
+
+<style scoped>
+.adminContainer {
+  color: grey;
+}
+
+.theme--light.v-data-table {
+  background-color: #f5f5f5;
+}
+
+.theme--light.v-data-table.v-data-table--fixed-header thead th {
+  background-color: #f5f5f5;
+}
+
+.red {
+  background-color: red;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.blue {
+  background-color: blue;
+}
+
+.addFieldBtn {
+  background-color: #37474f !important;
+}
+
+.adminRow {
+  margin-top: 2rem;
+}
+
+.v-card-text {
+  padding: 2rem;
+  padding-bottom: 0rem;
+}
+
+.v-card-actions {
+  padding-bottom: 1rem;
+  padding-right: 2rem;
+}
+
+.searchCardList {
+  position: absolute;
+  left: 20%;
+}
+
+.list-item {
+  border: solid 1px #cfd8dc;
+  background-color: #cfd8dc;
+  color: white;
+}
+
+.list-item:hover {
+  border: solid 2px #37474f;
+}
+</style>

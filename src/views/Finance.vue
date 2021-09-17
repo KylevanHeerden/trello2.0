@@ -33,7 +33,6 @@
           </template>
           <v-date-picker
             v-model="beginDate"
-            type="month"
             no-title
             scrollable
             @change="getData()"
@@ -65,7 +64,6 @@
           </template>
           <v-date-picker
             v-model="endDate"
-            type="month"
             no-title
             scrollable
             @change="getData()"
@@ -81,7 +79,7 @@
         :data2="data2"
         :labels="labels"
         :budget="budgetNumber"
-        :currentMonth="currentMonth"
+        :currentMonth="today"
         :max="parseFloat(max)"
         :programmeName="programmeName"
         :committedCount="committedCount"
@@ -125,6 +123,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex";
+import moment from "moment";
 
 import LineGraph from "@/components/LineGraph";
 
@@ -148,6 +147,7 @@ export default {
       committedTotal: 0,
       actualTotal: 0,
       committedCount: 0,
+      today: moment(new Date()).format("YYYY-MM-DD"),
     };
   },
 
@@ -225,7 +225,7 @@ export default {
 
       this.budgetNumber = getBuget;
 
-      this.max = getBuget + 100;
+      this.max = getBuget;
 
       this.programmeName = this.getProgrammeById(this.chosenProgrammeId).name;
 
@@ -261,10 +261,7 @@ export default {
       // if begin date and end date is chosen filter array accordingling
       if (this.beginDate !== null && this.endDate !== null) {
         cutMap = map1.filter((point) => {
-          return (
-            point.x.substring(0, 7) >= this.beginDate &&
-            point.x.substring(0, 7) <= this.endDate
-          );
+          return point.x >= this.beginDate && point.x <= this.endDate;
         });
 
         // make x labels accprding to data spliced
@@ -276,7 +273,7 @@ export default {
         // if begin date but not end date is chosen filter array accordingling
       } else if (this.beginDate !== null) {
         cutMap = map1.filter((point) => {
-          return point.x.substring(0, 7) >= this.beginDate;
+          return point.x >= this.beginDate;
         });
 
         // make x labels accprding to data spliced
@@ -288,7 +285,7 @@ export default {
         // if end date but not begin date is chosen filter array accordingling
       } else if (this.endDate !== null) {
         cutMap = map1.filter((point) => {
-          return point.x.substring(0, 7) <= this.endDate;
+          return point.x <= this.endDate;
         });
 
         // make x labels accprding to data spliced
@@ -307,6 +304,8 @@ export default {
 
         this.labels = map2.sort();
       }
+
+      // ----------------------- PER MONTH OPTION -----------------------
 
       // get the month and year of the point to sum by month
       const mapMonthToSum = cutMap.map((x) => ({
@@ -387,19 +386,54 @@ export default {
         return acc;
       }, []);
 
-      this.data1 = finalData;
-      this.data2 = finalData2;
+      // this.data1 = finalData;
+      // this.data2 = finalData2;
+
+      // ----------------------- PER DAY OPTION -----------------------
+
+      const sumPerDay = cutMap.reduce((acc, cur) => {
+        if (acc.length == 0) {
+          acc.push({
+            x: cur.x,
+            y: cur.y,
+          });
+        } else if (acc.at(-1).x == cur.x) {
+          acc.at(-1).y = acc.at(-1).y + cur.y;
+        } else {
+          acc.push({
+            x: cur.x,
+            y: cur.y,
+          });
+        }
+
+        return acc;
+      }, []);
+
+      let finalData21 = sumPerDay.reduce((acc, cur) => {
+        if (acc.length == 0) {
+          acc.push({ x: cur.x, y: cur.y });
+        } else {
+          acc.push({ x: cur.x, y: acc.at(-1).y + cur.y });
+        }
+
+        return acc;
+      }, []);
+
+      this.data1 = sumPerDay;
+      this.data2 = finalData21;
     },
 
     splitCommitted() {
       const committedTrue = [];
       const committedFalse = [];
 
+      const current_month = moment(new Date()).format("MM");
+
       // filter products of chosen programme to only prooducts with payments loaded
       this.filteredProducts.forEach((product) => {
         if (product.payments !== undefined) {
           product.payments.forEach((payment) => {
-            if (payment.committed == true) {
+            if (payment.date.split("-")[1] < current_month) {
               committedTrue.push(payment);
             } else committedFalse.push(payment);
           });
