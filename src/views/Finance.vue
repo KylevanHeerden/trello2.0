@@ -412,6 +412,7 @@ export default {
 
       // ----------------------- PER DAY OPTION -----------------------
 
+      // create array with daily expenditure amounts by checking if accumalative date is equal to current date if so adde expenditure amount
       const sumPerDay = cutMap.reduce((acc, cur) => {
         if (acc.length == 0) {
           acc.push({
@@ -430,6 +431,7 @@ export default {
         return acc;
       }, []);
 
+      // create array where the sum of current value and the previous values to create accumalitave graph
       let finalData21 = sumPerDay.reduce((acc, cur) => {
         if (acc.length == 0) {
           acc.push({ x: cur.x, y: cur.y });
@@ -440,10 +442,12 @@ export default {
         return acc;
       }, []);
 
+      // find point with todays date
       let todayPoint = sumPerDay.find((point) => {
         point.x == this.today;
       });
 
+      // if no such point is found create point with point before todays data
       if (todayPoint == undefined) {
         sumPerDay.push({ x: this.today, y: 0.0 });
 
@@ -459,10 +463,12 @@ export default {
         todayPoint2.y = sumPerDay.at(index - 1).y;
       }
 
+      // find point with todays date
       let todayPoint3 = finalData21.find((point) => {
         point.x == this.today;
       });
 
+      // if no such point is found create point with point before todays data
       if (todayPoint3 == undefined) {
         finalData21.push({ x: this.today, y: 0.0 });
 
@@ -483,6 +489,7 @@ export default {
 
       let forcastNumber = 0;
 
+      // count number of point after current date and then make that the forecast number
       sumPerDay.forEach((point) => {
         if (point.x > this.today) {
           forcastNumber += 1;
