@@ -52,36 +52,17 @@ export default {
           text: "Select a Programme",
           align: "center",
         },
-        yaxis: {
-          show: false,
-        },
-        xaxis: {
-          type: "datetime",
-          labels: {
-            formatter: function(value, timestamp) {
-              return moment(new Date(timestamp)).format("DD MMM YY"); // The formatter function overrides format property
-            },
-          },
-        },
+
         grid: {
           show: false,
         },
 
-        annotations: {
-          xaxis: [
-            {
-              x: new Date(this.currentMonth).getTime(),
-              borderColor: "#e1ad01",
-              label: {
-                borderColor: "#e1ad01",
-                style: {
-                  color: "#fff",
-                  background: "#e1ad01",
-                },
-                text: "Current Month",
-              },
-            },
-          ],
+        yaxis: {
+          show: false,
+        },
+
+        xaxis: {
+          type: "datetime",
         },
       },
       series: [
@@ -128,6 +109,35 @@ export default {
           show: true,
         },
 
+        forecastDataPoints: {
+          count: this.committedCount,
+        },
+
+        yaxis: {
+          show: true,
+          showAlways: true,
+          min: 0,
+          max: this.max,
+
+          title: {
+            text: "Expenditure (R)",
+          },
+          labels: {
+            formatter: function(value) {
+              return value.toLocaleString("ru-RU");
+            },
+          },
+        },
+
+        xaxis: {
+          type: "datetime",
+          labels: {
+            formatter: function(value, timestamp) {
+              return moment(new Date(timestamp)).format("DD MMM YY"); // The formatter function overrides format property
+            },
+          },
+        },
+
         annotations: {
           yaxis: [
             {
@@ -160,30 +170,27 @@ export default {
           ],
         },
 
-        forecastDataPoints: {
-          count: this.committedCount,
-        },
+        tooltip: {
+          y: {
+            formatter: function(num) {
+              if (num % 1 === 0) {
+                return "R " + num.toLocaleString("ru-RU");
+              } else {
+                let result =
+                  Number(num.toFixed(2))
+                    .toLocaleString("ru-RU")
+                    .slice(0, -3) +
+                  Number(num.toFixed(2))
+                    .toString()
+                    .slice(
+                      Number(num.toFixed(2))
+                        .toString()
+                        .indexOf(".")
+                    );
 
-        yaxis: {
-          show: true,
-          showAlways: true,
-          min: 0,
-          max: this.max,
-
-          title: {
-            text: "Expenditure (R)",
-          },
-          labels: {
-            formatter: function(value) {
-              return value.toLocaleString("ru-RU");
+                return "R " + result;
+              }
             },
-          },
-        },
-
-        xaxis: {
-          type: "datetime",
-          datetimeFormatter: {
-            day: "dd MMM yy",
           },
         },
       };
@@ -210,6 +217,10 @@ export default {
           show: true,
         },
 
+        forecastDataPoints: {
+          count: this.committedCount,
+        },
+
         yaxis: {
           show: true,
           showAlways: true,
@@ -228,6 +239,11 @@ export default {
 
         xaxis: {
           type: "datetime",
+          labels: {
+            formatter: function(value, timestamp) {
+              return moment(new Date(timestamp)).format("DD MMM YY"); // The formatter function overrides format property
+            },
+          },
         },
 
         annotations: {
@@ -262,8 +278,28 @@ export default {
           ],
         },
 
-        forecastDataPoints: {
-          count: this.committedCount,
+        tooltip: {
+          y: {
+            formatter: function(num) {
+              if (num % 1 === 0) {
+                return "R " + num.toLocaleString("ru-RU");
+              } else {
+                let result =
+                  Number(num.toFixed(2))
+                    .toLocaleString("ru-RU")
+                    .slice(0, -3) +
+                  Number(num.toFixed(2))
+                    .toString()
+                    .slice(
+                      Number(num.toFixed(2))
+                        .toString()
+                        .indexOf(".")
+                    );
+
+                return "R " + result;
+              }
+            },
+          },
         },
       };
     },
