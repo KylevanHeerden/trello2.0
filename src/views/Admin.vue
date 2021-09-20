@@ -122,14 +122,14 @@
       </v-card>
     </v-row> -->
 
-    <!-- <v-row align-content="center" justify="center" class="adminRow">
+    <v-row align-content="center" justify="center" class="adminRow">
       <v-card elevation="2" width="50%">
         <v-card-text>
           Change the comment in Quality Approval to 5:
         </v-card-text>
         <v-card-actions class="justify-end v-card-actions">
           <v-btn
-            :disabled="true"
+            :disabled="false"
             @click="changeComment5()"
             small
             dark
@@ -139,7 +139,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-row> -->
+    </v-row>
   </v-container>
 </template>
 
@@ -348,23 +348,22 @@ export default {
       return "Done!";
     },
 
-    // async changeComment5() {
-    //   db.collection("comments")
-    //     .get()
-    //     .then(function(querySnapshot) {
-    //       querySnapshot.forEach(function(doc) {
-    //       if(doc.data().position == 4){
-    //           doc.ref.update({
-    //           position: 5,
-    //         });
-    //       }
+    async changeComment5() {
+      db.collection("comments")
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            if (doc.data().position == 4) {
+              doc.ref.update({
+                position: 5,
+              });
+            }
+          });
 
-    //       });
-
-    //       alert("I am done!")
-    //     });
-    //   return "Done!";
-    // },
+          alert("I am done!");
+        });
+      return "Done!";
+    },
 
     // Format fb timestamp to Do MMM YYYY
     dateFormat(param) {
