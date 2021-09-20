@@ -328,84 +328,84 @@ export default {
 
       // ----------------------- PER MONTH OPTION -----------------------
 
-      // get the month and year of the point to sum by month
-      const mapMonthToSum = cutMap.map((x) => ({
-        ...x,
-        month: new Date(x.x).getMonth(),
-        year: new Date(x.x).getFullYear(),
-      }));
+      // // get the month and year of the point to sum by month
+      // const mapMonthToSum = cutMap.map((x) => ({
+      //   ...x,
+      //   month: new Date(x.x).getMonth(),
+      //   year: new Date(x.x).getFullYear(),
+      // }));
 
-      // run through array and sum if curr has sam year and month as accumulated (acc)
-      const sumPerMonth = mapMonthToSum.reduce((acc, cur) => {
-        if (acc.length == 0) {
-          acc.push({
-            month: cur.month,
-            year: cur.year,
-            y: cur.y,
-          });
-        } else {
-          if (acc.at(-1).year == cur.year) {
-            if (acc.at(-1).month == cur.month) {
-              acc.at(-1).y = acc.at(-1).y + cur.y;
-            } else {
-              acc.push({
-                month: cur.month,
-                year: cur.year,
-                y: cur.y,
-              });
-            }
-          } else {
-            acc.push({
-              month: cur.month,
-              year: cur.year,
-              y: cur.y,
-            });
-          }
-        }
+      // // run through array and sum if curr has sam year and month as accumulated (acc)
+      // const sumPerMonth = mapMonthToSum.reduce((acc, cur) => {
+      //   if (acc.length == 0) {
+      //     acc.push({
+      //       month: cur.month,
+      //       year: cur.year,
+      //       y: cur.y,
+      //     });
+      //   } else {
+      //     if (acc.at(-1).year == cur.year) {
+      //       if (acc.at(-1).month == cur.month) {
+      //         acc.at(-1).y = acc.at(-1).y + cur.y;
+      //       } else {
+      //         acc.push({
+      //           month: cur.month,
+      //           year: cur.year,
+      //           y: cur.y,
+      //         });
+      //       }
+      //     } else {
+      //       acc.push({
+      //         month: cur.month,
+      //         year: cur.year,
+      //         y: cur.y,
+      //       });
+      //     }
+      //   }
 
-        return acc;
-      }, []);
+      //   return acc;
+      // }, []);
 
-      let months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
+      // let months = [
+      //   "Jan",
+      //   "Feb",
+      //   "Mar",
+      //   "Apr",
+      //   "May",
+      //   "Jun",
+      //   "Jul",
+      //   "Aug",
+      //   "Sep",
+      //   "Oct",
+      //   "Nov",
+      //   "Dec",
+      // ];
 
-      // map data to look good for graph
-      let finalData = sumPerMonth.map((point) => {
-        return {
-          x: `${months[point.month]} ${point.year}`,
-          y: point.y,
-        };
-      });
+      // // map data to look good for graph
+      // let finalData = sumPerMonth.map((point) => {
+      //   return {
+      //     x: `${months[point.month]} ${point.year}`,
+      //     y: point.y,
+      //   };
+      // });
 
-      // find the point in finalData that is for todays month
-      const point = finalData.find((point) => {
-        return point.x == this.currentMonth;
-      });
+      // // find the point in finalData that is for todays month
+      // const point = finalData.find((point) => {
+      //   return point.x == this.currentMonth;
+      // });
 
-      // use the index to count number of months ahead and then set them as forcastCount
-      this.committedCount = finalData.length - finalData.indexOf(point) - 1;
+      // // use the index to count number of months ahead and then set them as forcastCount
+      // this.committedCount = finalData.length - finalData.indexOf(point) - 1;
 
-      let finalData2 = finalData.reduce((acc, cur) => {
-        if (acc.length == 0) {
-          acc.push({ x: cur.x, y: cur.y });
-        } else {
-          acc.push({ x: cur.x, y: acc.at(-1).y + cur.y });
-        }
+      // let finalData2 = finalData.reduce((acc, cur) => {
+      //   if (acc.length == 0) {
+      //     acc.push({ x: cur.x, y: cur.y });
+      //   } else {
+      //     acc.push({ x: cur.x, y: acc.at(-1).y + cur.y });
+      //   }
 
-        return acc;
-      }, []);
+      //   return acc;
+      // }, []);
 
       // this.data1 = finalData;
       // this.data2 = finalData2;
@@ -440,8 +440,56 @@ export default {
         return acc;
       }, []);
 
+      let todayPoint = sumPerDay.find((point) => {
+        point.x == this.today;
+      });
+
+      if (todayPoint == undefined) {
+        sumPerDay.push({ x: this.today, y: 0.0 });
+
+        // sort payments by date
+        sumPerDay.sort((a, b) => (a.x > b.x ? 1 : -1));
+
+        let todayPoint2 = sumPerDay.find((point) => {
+          return point.x == this.today;
+        });
+
+        let index = sumPerDay.indexOf(todayPoint2);
+
+        todayPoint2.y = sumPerDay.at(index - 1).y;
+      }
+
+      let todayPoint3 = sumPerDay.find((point) => {
+        point.x == this.today;
+      });
+
+      if (todayPoint3 == undefined) {
+        finalData21.push({ x: this.today, y: 0.0 });
+
+        // sort payments by date
+        finalData21.sort((a, b) => (a.x > b.x ? 1 : -1));
+
+        let todayPoint4 = finalData21.find((point) => {
+          return point.x == this.today;
+        });
+
+        let index = finalData21.indexOf(todayPoint4);
+
+        todayPoint4.y = finalData21.at(index - 1).y;
+      }
+
       this.data1 = sumPerDay;
       this.data2 = finalData21;
+
+      let forcastNumber = 0;
+
+      sumPerDay.forEach((point) => {
+        if (point.x > this.today) {
+          forcastNumber += 1;
+        }
+      });
+
+      this.committedCount = forcastNumber;
     },
 
     splitCommitted() {
