@@ -459,7 +459,7 @@ export default {
         todayPoint2.y = sumPerDay.at(index - 1).y;
       }
 
-      let todayPoint3 = sumPerDay.find((point) => {
+      let todayPoint3 = finalData21.find((point) => {
         point.x == this.today;
       });
 
