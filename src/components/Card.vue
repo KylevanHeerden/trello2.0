@@ -101,6 +101,7 @@
                 :counter="counter"
                 :commentPosition="2"
                 :product="product"
+                :rates="rates"
               ></PurApproval>
             </v-stepper-content>
 
@@ -137,6 +138,7 @@
                 :counter="counter"
                 :commentPosition="4"
                 :product="product"
+                :rates="rates"
               ></PurchaseClosure>
             </v-stepper-content>
 
@@ -210,6 +212,7 @@ export default {
     return {
       cardDialog: false,
       counter: 0,
+      rates: {},
     };
   },
 
@@ -229,6 +232,31 @@ export default {
   },
 
   methods: {
+    // Format fb timestamp to Do MMM YYYY
+    dateFormat(param) {
+      let date = moment(param.toDate()).format("Do MMM YYYY");
+      return date;
+    },
+
+    // get the rates
+    getRates() {
+      fetch(
+        "https://api.exchangerate.host/latest?base=ZAR&symbols=GBP,USD,EUR,BRL"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          let ratesSymbols = ["BRL", "EUR", "GBP", "USD"];
+
+          ratesSymbols.forEach((symbol) => {
+            this.rates[symbol] = data.rates[symbol].toFixed(4);
+          });
+        });
+    },
+
+    nameSurname(name, surname) {
+      return name + " " + surname;
+    },
+
     progressbarColor: function(listid) {
       const colors = {
         1: ["teal lighten-1", 14.3],
@@ -241,20 +269,11 @@ export default {
 
       return colors[listid];
     },
-
-    // Format fb timestamp to Do MMM YYYY
-    dateFormat(param) {
-      let date = moment(param.toDate()).format("Do MMM YYYY");
-      return date;
-    },
-
-    nameSurname(name, surname) {
-      return name + " " + surname;
-    },
   },
 
   created() {
     this.$store.dispatch("getUsers");
+    this.getRates();
   },
 
   mounted() {},

@@ -94,13 +94,7 @@
             readonly
           ></v-text-field>
         </v-col>
-        <v-col cols="12" sm="1" md="1">
-          <v-text-field
-            v-model="card.currency"
-            label="Currency"
-            readonly
-          ></v-text-field>
-        </v-col>
+
         <v-col cols="12" sm="2" md="2">
           <v-text-field
             v-model="i.value"
@@ -108,6 +102,16 @@
             @change="changeFinalPaymentValue()"
             :rules="inputRules"
             :readonly="!edit"
+            :prefix="card.currency"
+          ></v-text-field>
+        </v-col>
+
+        <v-col cols="12" sm="2" md="2" v-if="card.currency !== 'R'">
+          <v-text-field
+            :value="convertCurrency(i.value)"
+            label="ZAR Value"
+            :readonly="true"
+            prefix="R"
           ></v-text-field>
         </v-col>
         <v-col cols="12" sm="2" md="2">
@@ -134,7 +138,7 @@
           </v-menu>
         </v-col>
 
-        <v-col cols="12" sm="4" md="4" align-self="center">
+        <v-col cols="12" sm="3" md="3" align-self="center">
           <v-tooltip
             top
             :disabled="
@@ -209,6 +213,10 @@ export default {
       type: Object,
       required: true,
     },
+    rates: {
+      type: Object,
+      required: true,
+    },
     stepName: {
       type: String,
       required: true,
@@ -228,6 +236,12 @@ export default {
       menu2: false,
       savedAlert: false,
       snackbar: false,
+      symbols: {
+        R$: "BRL",
+        "€": "EUR",
+        "£": "GBP",
+        $: "USD",
+      },
       timeout: 2000,
     };
   },
@@ -299,6 +313,12 @@ export default {
 
       const fbCard2 = db.collection("products").doc(this.card.product_id); // gets the firebase card
 
+      if (this.card.currency !== "R") {
+        this.card.payments.forEach((payment) => {
+          payment.value = this.convertCurrency(payment.value);
+        });
+      }
+
       // Update fb card
       await fbCard2.update({
         payments: this.card.payments,
@@ -350,6 +370,14 @@ export default {
           message: "You do not have permission for this action",
         };
       }
+    },
+
+    // cobvert from currency to ZAR
+    convertCurrency(value) {
+      let conversion =
+        value * (1 / this.rates[this.symbols[this.card.currency]]);
+
+      return conversion.toFixed(2);
     },
 
     // Handles the approval click per stage of card

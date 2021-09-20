@@ -5,6 +5,7 @@
         :cardInfo="card"
         :stepNum="commentPosition"
         :paymentsAllowed="paymentsAllowed"
+        :rates="rates"
         class="pb-12"
       ></Payments>
       <v-row justify="center" align-content="center">
@@ -123,6 +124,10 @@ export default {
       type: Object,
       required: true,
     },
+    rates: {
+      type: Object,
+      required: true,
+    },
     stepName: {
       type: String,
       required: true,
@@ -139,6 +144,12 @@ export default {
       newCard: {
         purchase_approval: this.card.purchase_approval,
         technical_approval: this.card.technical_approval,
+      },
+      symbols: {
+        R$: "BRL",
+        "€": "EUR",
+        "£": "GBP",
+        $: "USD",
       },
     };
   },
@@ -164,6 +175,12 @@ export default {
     // After POP card payments addded to product in fb
     async addPaymentsToProduct() {
       const fbCard2 = db.collection("products").doc(this.card.product_id); // gets the firebase card
+
+      if (this.card.currency !== "R") {
+        this.card.payments.forEach((payment) => {
+          payment.value = this.convertCurrency(payment.value);
+        });
+      }
 
       // Update fb card
       await fbCard2.update({
@@ -207,6 +224,14 @@ export default {
           message: "You do not have permission for this action",
         };
       }
+    },
+
+    // cobvert from currency to ZAR
+    convertCurrency(value) {
+      let conversion =
+        value * (1 / this.rates[this.symbols[this.card.currency]]);
+
+      return conversion.toFixed(2);
     },
 
     // Function handles approval based on which stage the card is in

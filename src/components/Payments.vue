@@ -3,12 +3,23 @@
     <v-tooltip top :disabled="paymentsAllowed.boolean">
       <template v-slot:activator="{ on, attrs }">
         <v-row
-          justify="end"
-          align-content="end"
-          class="pa-0"
+          justify="space-between"
+          align-content="space-between"
+          class="pa-0 pb-3"
           v-bind="attrs"
           v-on="on"
         >
+          <v-col
+            cols="12"
+            sm="3"
+            md="3"
+            align-self="center"
+            class="d-flex flex-row ma-0 pa-0"
+          >
+            <div class="exchangeRate" v-if="cardInfo.currency !== 'R'">
+              EXCHANGE RATE: R 1 = {{ cardInfo.currency }} {{ rates["EUR"] }}
+            </div>
+          </v-col>
           <v-col
             cols="12"
             sm="1"
@@ -72,14 +83,7 @@
         >
         </v-text-field>
       </v-col>
-      <v-col cols="12" sm="2" md="2">
-        <v-text-field
-          v-model="cardInfo.currency"
-          label="Currency"
-          :readonly="allowed"
-          :disabled="allowed"
-        ></v-text-field>
-      </v-col>
+
       <v-col cols="12" sm="2" md="2">
         <v-text-field
           v-model="i.value"
@@ -88,6 +92,18 @@
           :rules="inputRules"
           :readonly="index == 0"
           :disabled="allowed"
+          :prefix="cardInfo.currency"
+        ></v-text-field>
+      </v-col>
+
+      <v-col cols="12" sm="2" md="2" v-if="cardInfo.currency !== 'R'">
+        <v-text-field
+          :value="convertCurrency(i.value)"
+          label="ZAR Value"
+          :rules="inputRules"
+          :readonly="true"
+          :disabled="allowed"
+          prefix="R"
         ></v-text-field>
       </v-col>
       <v-col cols="12" sm="3" md="3">
@@ -149,6 +165,11 @@ export default {
       type: Object,
       required: true,
     },
+
+    rates: {
+      type: Object,
+      required: true,
+    },
   },
   data: () => {
     return {
@@ -161,6 +182,12 @@ export default {
       menu5: false,
       menu6: false,
       savedAlert: false,
+      symbols: {
+        R$: "BRL",
+        "€": "EUR",
+        "£": "GBP",
+        $: "USD",
+      },
     };
   },
 
@@ -238,6 +265,14 @@ export default {
       this.saveChanges();
     },
 
+    // cobvert from currency to ZAR
+    convertCurrency(value) {
+      let conversion =
+        value * (1 / this.rates[this.symbols[this.cardInfo.currency]]);
+
+      return conversion.toFixed(2);
+    },
+
     // removes payment from card.pamets array
     removePayment() {
       if (this.cardInfo.payments.length > 1) {
@@ -260,8 +295,13 @@ export default {
     },
   },
 
-  mounted() {},
+  created() {},
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.exchangeRate {
+  color: var(--v-primary-base);
+  font-size: small;
+}
+</style>
