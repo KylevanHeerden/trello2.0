@@ -55,8 +55,33 @@ export default {
         yaxis: {
           show: false,
         },
+        xaxis: {
+          type: "datetime",
+          labels: {
+            formatter: function(value, timestamp) {
+              return moment(new Date(timestamp)).format("DD MMM YY"); // The formatter function overrides format property
+            },
+          },
+        },
         grid: {
           show: false,
+        },
+
+        annotations: {
+          xaxis: [
+            {
+              x: new Date(this.currentMonth).getTime(),
+              borderColor: "#e1ad01",
+              label: {
+                borderColor: "#e1ad01",
+                style: {
+                  color: "#fff",
+                  background: "#e1ad01",
+                },
+                text: "Current Month",
+              },
+            },
+          ],
         },
       },
       series: [
@@ -121,7 +146,7 @@ export default {
 
           xaxis: [
             {
-              x: moment(new Date()).format("YYYY-MM-DD"),
+              x: new Date(this.currentMonth).getTime(),
               borderColor: "#e1ad01",
               label: {
                 borderColor: "#e1ad01",
@@ -144,13 +169,22 @@ export default {
           showAlways: true,
           min: 0,
           max: this.max,
+
           title: {
             text: "Expenditure (R)",
+          },
+          labels: {
+            formatter: function(value) {
+              return value.toLocaleString("ru-RU");
+            },
           },
         },
 
         xaxis: {
           type: "datetime",
+          datetimeFormatter: {
+            day: "dd MMM yy",
+          },
         },
       };
     },
@@ -181,8 +215,14 @@ export default {
           showAlways: true,
           min: 0,
           max: this.max,
+
           title: {
             text: "Expenditure (R)",
+          },
+          labels: {
+            formatter: function(value) {
+              return value.toLocaleString("ru-RU");
+            },
           },
         },
 
@@ -208,7 +248,7 @@ export default {
 
           xaxis: [
             {
-              x: this.currentMonth,
+              x: new Date(this.currentMonth).getTime(),
               borderColor: "#e1ad01",
               label: {
                 borderColor: "#e1ad01",
@@ -231,8 +271,6 @@ export default {
 
   computed: {},
 
-  mounted() {
-    console.log(this.currentMonth);
-  },
+  mounted() {},
 };
 </script>

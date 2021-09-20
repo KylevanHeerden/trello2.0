@@ -97,10 +97,10 @@
               <div class="eventLabel">Total Expenditure:</div>
             </v-col>
             <v-col cols="12" sm="2" md="2">
-              <div class="eventAnswer">R {{ budgetNumber.toFixed(2) }}</div>
-              <div class="eventAnswer">R {{ committedTotal.toFixed(2) }}</div>
-              <div class="eventAnswer">R {{ actualTotal.toFixed(2) }}</div>
-              <div class="eventAnswer">R {{ data2.at(-1).y.toFixed(2) }}</div>
+              <div class="eventAnswer">R {{ formatNum(budgetNumber) }}</div>
+              <div class="eventAnswer">R {{ formatNum(committedTotal) }}</div>
+              <div class="eventAnswer">R {{ formatNum(actualTotal) }}</div>
+              <div class="eventAnswer">R {{ formatNum(data2.at(-1).y) }}</div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -215,6 +215,27 @@ export default {
       }
 
       this.getData();
+    },
+
+    // format the numbers to have space between three numbers
+    formatNum(num) {
+      if (num % 1 === 0) {
+        return num.toLocaleString("ru-RU");
+      } else {
+        let result =
+          Number(num.toFixed(2))
+            .toLocaleString("ru-RU")
+            .slice(0, -3) +
+          Number(num.toFixed(2))
+            .toString()
+            .slice(
+              Number(num.toFixed(2))
+                .toString()
+                .indexOf(".")
+            );
+
+        return result;
+      }
     },
 
     // function that generates data based on user selection
