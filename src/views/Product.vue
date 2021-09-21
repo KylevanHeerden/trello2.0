@@ -130,7 +130,7 @@ export default {
       productId: localStorage.getItem("LS_ROUTE_KEY"),
       snackbar: {
         snackbar: false,
-        timeout: 20000000,
+        timeout: 5000,
         newListName: "", //This is provided by cardMoved function
       },
       update: true,

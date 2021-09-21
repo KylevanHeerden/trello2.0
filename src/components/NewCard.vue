@@ -387,7 +387,10 @@ export default {
     ...mapState({
       suppliers: (state) => {
         let suppliers = state.suppliers.suppliers;
-        return suppliers.sort();
+
+        return suppliers.sort((a, b) =>
+          a.supplier_name.localeCompare(b.supplier_name)
+        );
       },
     }),
     ...mapGetters(["getSuppliers", "getUserProfile"]),
@@ -433,6 +436,23 @@ export default {
       } else {
         ("");
       }
+    },
+
+    // After approval new payments array addded to card in fb
+    async addPaymentsToCard(cardID) {
+      const fbCard2 = db.collection("cards").doc(cardID); // gets the firebase card
+
+      // Update fb card
+      await fbCard2.update({
+        payments: [
+          {
+            committed: false,
+            date: "",
+            payment: "Final Payment",
+            value: this.newCard.total_inc_vat,
+          },
+        ],
+      });
     },
 
     // Add files to the newCard files Array
@@ -541,6 +561,8 @@ export default {
         this.newCard.product_id = 0;
         this.loading = false;
         this.newCardDialog = false;
+
+        this.addPaymentsToCard(FBcard.id);
       }
     },
 
@@ -675,7 +697,7 @@ export default {
     updateTotal() {
       this.updateVat(this.newCard.price);
       if (this.VATexclude) {
-        this.newCard.VAT = 0.0;
+        this.newCard.VAT = "0.00";
 
         this.newCard.total_exc_vat = this.newCard.price.toFixed(2);
         this.newCard.total_inc_vat = (
