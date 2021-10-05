@@ -215,7 +215,7 @@ export default {
     team() {
       let teams = this.getTeams;
       let team = teams.filter(
-        (team) => team.programme.programme_id === this.programme.id
+        (team) => team.programme.programme_id == this.programme.id
       );
       return team[0];
     },
