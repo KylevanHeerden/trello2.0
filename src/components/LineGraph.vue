@@ -164,7 +164,7 @@ export default {
                   color: "#fff",
                   background: "#e1ad01",
                 },
-                text: "Current Month",
+                text: "Today",
               },
             },
           ],
@@ -173,23 +173,14 @@ export default {
         tooltip: {
           y: {
             formatter: function(num) {
-              if (num % 1 === 0) {
-                return "R " + num.toLocaleString("ru-RU");
-              } else {
-                let result =
-                  Number(num.toFixed(2))
-                    .toLocaleString("ru-RU")
-                    .slice(0, -3) +
-                  Number(num.toFixed(2))
-                    .toString()
-                    .slice(
-                      Number(num.toFixed(2))
-                        .toString()
-                        .indexOf(".")
-                    );
+              var parts = num
+                .toFixed(2)
+                .toString()
+                .split(".");
+              parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+              var joined = parts.join(".");
 
-                return "R " + result;
-              }
+              return "R " + joined;
             },
           },
         },
@@ -272,7 +263,7 @@ export default {
                   color: "#fff",
                   background: "#e1ad01",
                 },
-                text: "Current Month",
+                text: "Today",
               },
             },
           ],
@@ -281,23 +272,14 @@ export default {
         tooltip: {
           y: {
             formatter: function(num) {
-              if (num % 1 === 0) {
-                return "R " + num.toLocaleString("ru-RU");
-              } else {
-                let result =
-                  Number(num.toFixed(2))
-                    .toLocaleString("ru-RU")
-                    .slice(0, -3) +
-                  Number(num.toFixed(2))
-                    .toString()
-                    .slice(
-                      Number(num.toFixed(2))
-                        .toString()
-                        .indexOf(".")
-                    );
+              var parts = num
+                .toFixed(2)
+                .toString()
+                .split(".");
+              parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+              var joined = parts.join(".");
 
-                return "R " + result;
-              }
+              return "R " + joined;
             },
           },
         },

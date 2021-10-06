@@ -219,23 +219,14 @@ export default {
 
     // format the numbers to have space between three numbers
     formatNum(num) {
-      if (num % 1 === 0) {
-        return num.toLocaleString("ru-RU");
-      } else {
-        let result =
-          Number(num.toFixed(2))
-            .toLocaleString("ru-RU")
-            .slice(0, -3) +
-          Number(num.toFixed(2))
-            .toString()
-            .slice(
-              Number(num.toFixed(2))
-                .toString()
-                .indexOf(".")
-            );
+      var parts = num
+        .toFixed(2)
+        .toString()
+        .split(".");
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      var joined = parts.join(".");
 
-        return result;
-      }
+      return joined;
     },
 
     // function that generates data based on user selection
@@ -485,6 +476,8 @@ export default {
       }
 
       this.data1 = sumPerDay;
+      this.data1[0].y = "0.00";
+
       this.data2 = finalData21;
 
       let forcastNumber = 0;

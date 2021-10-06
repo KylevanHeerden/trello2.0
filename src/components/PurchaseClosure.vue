@@ -29,7 +29,11 @@
           </v-menu>
         </v-col>
         <v-col cols="12" sm="8" md="8" class=" d-flex justify-center pt-7">
-          <v-row justify="center" class="text-center pt-0">
+          <v-row
+            justify="center"
+            class="text-center pt-0"
+            v-if="card.POP.length > 0"
+          >
             <v-tooltip top>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -51,6 +55,12 @@
 
             <v-card-text class="numEmails pt-0">
               Number of emails sent: {{ card.supplier_email_count }}
+            </v-card-text>
+          </v-row>
+
+          <v-row v-else justify="center" class="text-center pt-0">
+            <v-card-text class="numEmails">
+              POP has not yet been loaded
             </v-card-text>
           </v-row>
           <v-snackbar

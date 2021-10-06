@@ -135,7 +135,7 @@
             dark
             class="addFieldBtn"
           >
-            Clear
+            Change
           </v-btn>
         </v-card-actions>
       </v-card>
