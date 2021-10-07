@@ -7,7 +7,7 @@
           <v-radio-group v-model="searchOption" row mandatory>
             <v-radio label="PO Number" value="PO#"></v-radio>
             <v-radio label="Supplier" value="Supplier"></v-radio>
-            <v-radio label="Total Exc VAT" value="Value"></v-radio>
+            <v-radio label="Total Inc VAT" value="Value"></v-radio>
           </v-radio-group>
           <v-text-field v-model="search" data-cypress="searchbar">
           </v-text-field>
@@ -207,10 +207,10 @@ export default {
         return searchCards.sort((a, b) => (a.createdOn > b.createdOn ? -1 : 1));
       } else if (this.searchOption == "Value") {
         let searchCards = this.cards.filter((card) => {
-          let cardTotalExcVAT = card.total_exc_vat;
-          if (cardTotalExcVAT == null) {
+          let cardTotalIncVAT = card.total_inc_vat;
+          if (cardTotalIncVAT == null) {
             return;
-          } else if (cardTotalExcVAT.match(this.search)) {
+          } else if (cardTotalIncVAT.match(this.search)) {
             return card;
           }
         });

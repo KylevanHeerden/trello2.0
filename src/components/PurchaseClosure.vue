@@ -3,6 +3,13 @@
     <v-container>
       <v-row justify="start">
         <v-col cols="12" sm="4" md="4">
+          <v-text-field
+            :label="'Purchase Approver Personal:'"
+            v-model="team['purchase_approver'].users[0].text"
+          >
+          </v-text-field>
+        </v-col>
+        <v-col cols="12" sm="4" md="4">
           <v-menu
             v-model="menu2"
             :close-on-content-click="false"
@@ -28,7 +35,7 @@
             ></v-date-picker>
           </v-menu>
         </v-col>
-        <v-col cols="12" sm="8" md="8" class=" d-flex justify-center pt-7">
+        <v-col cols="12" sm="4" md="4" class=" d-flex justify-center pt-7">
           <v-row
             justify="center"
             class="text-center pt-0"

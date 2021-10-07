@@ -11,13 +11,14 @@
         >
           <v-col
             cols="12"
-            sm="3"
-            md="3"
+            sm="5"
+            md="5"
             align-self="center"
             class="d-flex flex-row ma-0 pa-0"
           >
             <div class="exchangeRate" v-if="cardInfo.currency !== 'R'">
-              EXCHANGE RATE: R 1 = {{ cardInfo.currency }} {{ rates["EUR"] }}
+              EXCHANGE RATE: {{ cardInfo.currency }}
+              {{ rates[symbols[cardInfo.currency]] }} from exchangerate.host
             </div>
           </v-col>
           <v-col
@@ -301,7 +302,7 @@ export default {
 
 <style scoped>
 .exchangeRate {
-  color: var(--v-primary-base);
+  color: grey;
   font-size: small;
 }
 </style>

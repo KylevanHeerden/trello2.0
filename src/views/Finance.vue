@@ -201,6 +201,17 @@ export default {
       const map = this.programmes.map((programme) => {
         return { text: programme.name, value: programme.id };
       });
+
+      map.sort(function(a, b) {
+        if (a.text < b.text) {
+          return -1;
+        }
+        if (a.text > b.text) {
+          return 1;
+        }
+        return 0;
+      });
+
       return map;
     },
   },
