@@ -2,7 +2,7 @@
   <v-dialog v-model="newProgrammeDialog" persistent max-width="400">
     <template v-slot:activator="{ on, attrs }">
       <v-btn
-        class="mx-8"
+        class=""
         elevation="2"
         small
         dark
@@ -16,105 +16,122 @@
         Add Programme
       </v-btn>
     </template>
-    <v-card data-cypress="newProgrammeModal">
-      <v-card-title class="headline backgroundColorPrimary">
-        New Programme
-      </v-card-title>
-      <v-card-text class="mt-6">
-        <v-form class="px-3" ref="newProgrammeForm">
-          <v-text-field
-            label="Title"
-            v-model="newProgramme.name"
-            :rules="inputRules"
-            data-cypress="newProgrammeTitle"
+    <v-form ref="form">
+      <v-card data-cypress="newProgrammeModal">
+        <v-card-title class="headline backgroundColorPrimary">
+          New Programme
+        </v-card-title>
+        <v-card-text class="mt-6">
+          <v-form class="px-3" ref="newProgrammeForm">
+            <v-text-field
+              label="Title"
+              v-model="newProgramme.name"
+              data-cypress="newProgrammeTitle"
+            >
+            </v-text-field>
+            <v-text-field
+              label="Team"
+              v-model="newProgramme.team.team_name"
+              data-cypresss="newProgrammeTeam"
+            >
+            </v-text-field>
+            <v-select
+              v-model="newProgramme.programme_type"
+              label="Programme Type"
+              :items="programmeTypeOptions"
+              item-text="text"
+              item-value="value"
+              return-object
+              data-cypress="newProgType"
+            ></v-select>
+            <v-select
+              v-model="newProgramme.status"
+              v-if="newProgramme.programme_type.value == 'X'"
+              label="Programme Status"
+              :items="programmeStatusOptions1"
+              item-text="text"
+              item-value="value"
+              return-object
+              data-cypress="newProgType"
+            ></v-select>
+            <v-select
+              v-model="newProgramme.status"
+              v-if="newProgramme.programme_type.value == 'BS'"
+              label="Programme Status"
+              :items="programmeStatusOptions2"
+              item-text="text"
+              item-value="value"
+              return-object
+              data-cypress="newProgType"
+            ></v-select>
+            <v-select
+              v-model="newTeam.technical_approver.users"
+              label="Technical Authority"
+              :items="mapUsersArray"
+              item-text="text"
+              item-value="value"
+              multiple
+              chips
+              hint="More than one may be selected"
+              persistent-hint
+              return-object
+              data-cypress="newProgTechnicalAuth"
+            ></v-select>
+            <v-select
+              v-model="newTeam.purchase_approver.users"
+              label="Purchase Authority"
+              :items="mapUsersArray"
+              multiple
+              chips
+              hint="More than one may be selected"
+              persistent-hint
+              return-object
+              data-cypress="newProgPurchaseAuth"
+            ></v-select>
+            <v-select
+              v-model="newTeam.procurer.users"
+              label="Procument Authority"
+              :items="mapUsersArray"
+              multiple
+              chips
+              hint="More than one may be selected"
+              persistent-hint
+              return-object
+              data-cypress="newProgProcurer"
+            ></v-select>
+            <v-text-field
+              v-model="newProgramme.budget"
+              label="Buget Value"
+              :rules="inputRulesMoney"
+              prefix="R"
+              data-cypress="budgetValue"
+            >
+            </v-text-field>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue-grey darken-3"
+            text
+            @click="newProgrammeDialog = false"
+            v-if="!loading"
+            data-cypress="newProgrammeCancelBtn"
           >
-          </v-text-field>
-          <v-text-field
-            label="Team"
-            v-model="newProgramme.team.team_name"
-            :rules="inputRules"
-            data-cypresss="newProgrammeTeam"
+            Cancel
+          </v-btn>
+          <v-btn
+            color="blue-grey darken-3"
+            text
+            @click="submit"
+            :loading="loading"
+            data-cypress="newProgrammeAddBtn"
           >
-          </v-text-field>
-          <v-select
-            v-model="newProgramme.programme_type"
-            label="Programme Type"
-            :items="programmeTypeOptions"
-            item-text="text"
-            item-value="value"
-            return-object
-            data-cypress="newProgType"
-          ></v-select>
-          <v-select
-            v-model="newTeam.technical_approver.users"
-            label="Technical Authority"
-            :items="mapUsersArray"
-            item-text="text"
-            item-value="value"
-            multiple
-            chips
-            hint="More than one may be selected"
-            persistent-hint
-            return-object
-            :rules="selectRequired"
-            data-cypress="newProgTechnicalAuth"
-          ></v-select>
-          <v-select
-            v-model="newTeam.purchase_approver.users"
-            label="Purchase Authority"
-            :items="mapUsersArray"
-            multiple
-            chips
-            hint="More than one may be selected"
-            persistent-hint
-            return-object
-            :rules="selectRequired"
-            data-cypress="newProgPurchaseAuth"
-          ></v-select>
-          <v-select
-            v-model="newTeam.procurer.users"
-            label="Procument Authority"
-            :items="mapUsersArray"
-            multiple
-            chips
-            hint="More than one may be selected"
-            persistent-hint
-            return-object
-            :rules="selectRequired"
-            data-cypress="newProgProcurer"
-          ></v-select>
-          <v-text-field
-            v-model="newProgramme.budget"
-            label="Buget Value"
-            :rules="inputRulesMoney"
-            prefix="R"
-            data-cypress="budgetValue"
-          >
-          </v-text-field>
-        </v-form>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          color="blue-grey darken-3"
-          text
-          @click="newProgrammeDialog = false"
-          v-if="!loading"
-          data-cypress="newProgrammeCancelBtn"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          color="blue-grey darken-3"
-          text
-          @click="submit"
-          :loading="loading"
-          data-cypress="newProgrammeAddBtn"
-        >
-          Add
-        </v-btn>
-      </v-card-actions>
-    </v-card>
+            Add
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-form>
   </v-dialog>
 </template>
 
@@ -137,7 +154,8 @@ export default {
           team_name: "",
         },
         budget: "",
-        programme_type: "",
+        programme_type: { text: "", value: "" },
+        status: "",
       },
       newProgrammeDialog: false,
       newTeam: {
@@ -164,8 +182,19 @@ export default {
       },
       programmeTypeOptions: [
         { text: "Capability Domain", value: "CD" },
-        { text: "X - Programmes", value: "X" },
-        { text: "Y - Programmes", value: "Y" },
+        { text: "Blue Sky", value: "BS" },
+        { text: "Special Pursuit", value: "X" },
+        { text: "R&D Deployment", value: "Y" },
+      ],
+      programmeStatusOptions1: [
+        { text: "Active", value: "active" },
+        { text: "Complete", value: "complete" },
+        { text: "Suspended", value: "suspended" },
+        { text: "Terminated", value: "terminated" },
+      ],
+      programmeStatusOptions2: [
+        { text: "Designated", value: "des" },
+        { text: "Undesignated", value: "undes" },
       ],
       selectRequired: [(v) => v.length > 0 || "Required"],
     };
@@ -206,61 +235,90 @@ export default {
         let programme = await db.collection("programmes").add({});
         let team = await db.collection("teams").add({});
 
-        // Setup new programme data
-        const progData = {
-          name: this.newProgramme.name,
-          createdOn: new Date(),
-          team: {
-            team_id: team.id,
-            team_name: this.newProgramme.team.team_name,
-          },
-          products: [],
-          budget: this.newProgramme.budget,
-          programme_type: this.newProgramme.programme_type.value,
-          total: "0",
-        };
+        if (
+          this.newProgramme.programme_type.value == "X" ||
+          this.newProgramme.programme_type.value == "BS"
+        ) {
+          // Setup new programme data
+          const progData = {
+            name: this.newProgramme.name,
+            createdOn: new Date(),
+            team: {
+              team_id: team.id,
+              team_name: this.newProgramme.team.team_name,
+            },
+            products: [],
+            budget: this.newProgramme.budget,
+            programme_type: this.newProgramme.programme_type.value,
+            total: "0",
+            status: this.newProgramme.status.value,
+          };
 
-        // Setup new team data
-        const teamData = {
-          name: progData.team.team_name,
-          programme: {
-            programme_id: programme.id,
-            programme_name: progData.name,
-          },
-          technical_approver: this.newTeam.technical_approver,
-          purchase_approver: this.newTeam.purchase_approver,
-          procurer: this.newTeam.procurer,
-          quality_approver: this.newTeam.quality_approver,
-          receiver: {},
-          createdOn: new Date(),
-          updatedOn: new Date(),
-        };
+          // Setup new team data
+          const teamData = {
+            name: progData.team.team_name,
+            programme: {
+              programme_id: programme.id,
+              programme_name: progData.name,
+            },
+            technical_approver: this.newTeam.technical_approver,
+            purchase_approver: this.newTeam.purchase_approver,
+            procurer: this.newTeam.procurer,
+            quality_approver: this.newTeam.quality_approver,
+            receiver: {},
+            createdOn: new Date(),
+            updatedOn: new Date(),
+          };
 
-        // Triggers createNewProgramme defined in vuex
-        this.createNewProgramme({ progData, teamData });
+          // Triggers createNewProgramme defined in vuex
+          this.createNewProgramme({ progData, teamData });
 
-        this.newProgrammeDialog = false;
-        this.loading = false;
+          this.newProgrammeDialog = false;
+          this.loading = false;
 
-        this.newTeam = {
-          name: "",
-          programme_id: "",
-          technical_approver: [],
-          purchase_approver: [],
-          procurer: [],
-          quality_approver: [],
-          createdOn: new Date(),
-          updatedOn: new Date(),
-        };
+          this.$refs.form.resetValidation();
+          this.$refs.form.reset();
+        } else {
+          // Setup new programme data
+          const progData = {
+            name: this.newProgramme.name,
+            createdOn: new Date(),
+            team: {
+              team_id: team.id,
+              team_name: this.newProgramme.team.team_name,
+            },
+            products: [],
+            budget: this.newProgramme.budget,
+            programme_type: this.newProgramme.programme_type.value,
+            total: "0",
+            status: "",
+          };
 
-        this.newProgramme = {
-          name: "",
-          team: {
-            team_name: "",
-            team_id: team.id,
-          },
-          budget: "",
-        };
+          // Setup new team data
+          const teamData = {
+            name: progData.team.team_name,
+            programme: {
+              programme_id: programme.id,
+              programme_name: progData.name,
+            },
+            technical_approver: this.newTeam.technical_approver,
+            purchase_approver: this.newTeam.purchase_approver,
+            procurer: this.newTeam.procurer,
+            quality_approver: this.newTeam.quality_approver,
+            receiver: {},
+            createdOn: new Date(),
+            updatedOn: new Date(),
+          };
+
+          // Triggers createNewProgramme defined in vuex
+          this.createNewProgramme({ progData, teamData });
+
+          this.newProgrammeDialog = false;
+          this.loading = false;
+
+          this.$refs.form.resetValidation();
+          this.$refs.form.reset();
+        }
       }
     },
   },

@@ -75,7 +75,7 @@
       </v-card>
     </v-row>
 
-    <v-row align-content="center" justify="center" class="adminRow">
+    <!-- <v-row align-content="center" justify="center" class="adminRow">
       <v-card elevation="2" width="50%">
         <v-card-text>
           Add a field to each doc in firebase:
@@ -101,7 +101,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-row>
+    </v-row> -->
 
     <!-- <v-row align-content="center" justify="center" class="adminRow">
       <v-card elevation="2" width="50%">
@@ -122,7 +122,7 @@
       </v-card>
     </v-row> -->
 
-    <v-row align-content="center" justify="center" class="adminRow">
+    <!-- <v-row align-content="center" justify="center" class="adminRow">
       <v-card elevation="2" width="50%">
         <v-card-text>
           Change the comment in Quality Approval to 5:
@@ -139,7 +139,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-row>
+    </v-row> -->
   </v-container>
 </template>
 

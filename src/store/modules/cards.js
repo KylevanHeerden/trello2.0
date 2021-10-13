@@ -10,9 +10,18 @@ export default {
     },
 
     getCardsByProgrammeId: (state) => (id) => {
-      return state.cards.filter(
+      let array = [];
+
+      state.cards.forEach((card) => {
+        if (card.team !== undefined) {
+          array.push(card);
+        }
+      });
+
+      let filtered = array.filter(
         (card) => card.team.programme.programme_id === id
       );
+      return filtered;
     },
 
     getFilesCount: (state) => (id) => {

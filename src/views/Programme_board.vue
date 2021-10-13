@@ -140,6 +140,7 @@ export default {
       products: (state) => state.products.products,
       currentUser: (state) => state.profile.userProfile,
       comments: (state) => state.comments.comments,
+      cards12: (state) => state.cards.cards,
     }),
     ...mapGetters([
       "getProgrammeById",
@@ -153,6 +154,7 @@ export default {
 
     cards() {
       let cards = this.getCardsByProgrammeId(this.fetchedProgrammeId);
+
       let notArchived = [];
 
       cards.forEach((card) => {

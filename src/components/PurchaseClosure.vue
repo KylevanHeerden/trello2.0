@@ -21,7 +21,7 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
                 :value="card.delivery_date"
-                label="Devilvery Date"
+                label="Delivery Date"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
@@ -192,6 +192,17 @@
         Payment Updated
       </v-snackbar>
 
+      <v-snackbar
+        v-model="savedAlert2"
+        color="green"
+        timeout="2000"
+        class="text-center"
+        data-cypress="updatedCardSnackbar"
+      >
+        <v-icon>check_circle</v-icon>
+        Delivery Date Updated
+      </v-snackbar>
+
       <Comments
         :cardComments="cardComments"
         :position="commentPosition"
@@ -252,6 +263,7 @@ export default {
       inputRules: [(v) => v.length >= 3 || "Minimum length is 3 characters"], //Validation rule for form
       menu2: false,
       savedAlert: false,
+      savedAlert2: false,
       snackbar: false,
       symbols: {
         R$: "BRL",
@@ -294,7 +306,7 @@ export default {
     },
     // saves delivery date to fb card and product
     async addDeliveryDate() {
-      this.savedAlert = true;
+      this.savedAlert2 = true;
 
       this.menu2 = false;
 

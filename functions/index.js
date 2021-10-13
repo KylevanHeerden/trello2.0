@@ -724,19 +724,19 @@ exports.sendEmailToSuppliers = functions.https.onRequest(
       // setup e-mail data, even with unicode symbols
       var mailOptions = {
         from: '"RaptorApp" <dc@nanodyn.co.za>', // sender address (who sends)
-        to: "kylevh@nanodyn.co.za", // list of receivers (who receives)
+        to: `${card.supplier_email}`, // list of receivers (who receives)
         subject: `Order ${card.supplier_quote_num} - Nanodyn Systems Payment Confirmation `, // Subject line
         template: "emailSupplier",
         context: {
           date: `${formatDate}`,
           quote_num: `${card.supplier_quote_num}`,
         },
-        attachments: [
-          {
-            filename: `${card.POP[0].file_name}`,
-            path: `${card.POP[0].link}`,
-          },
-        ],
+        // attachments: [
+        //   {
+        //     filename: `${card.POP[0].file_name}`,
+        //     path: `${card.POP[0].link}`,
+        //   },
+        // ],
       };
 
       // send mail with defined transport object
