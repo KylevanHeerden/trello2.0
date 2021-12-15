@@ -1,9 +1,9 @@
 {
   "projects": {
-    "default": "purchase-app-staging",
-    "staging": "purchase-app-staging",
-    "production": "purchase-app-f14b0"
+    "default": "trello2",
+    "production": "trellov2"
   },
+  "targets": {},
   "hosting": {
     "public": "./dist",
     "rewrites": [

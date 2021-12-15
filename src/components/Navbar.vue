@@ -14,13 +14,13 @@
         data-cypress="homeLink"
       >
         <v-toolbar-title class="text-uppercase NavTitle">
-          <span class="font-weight-light">RAPTOR</span>
+          <span class="font-weight-light">PURCHASE</span>
           <span class="App">App</span>
-          <v-img
+          <!-- <v-img
             src="@/assets/raptor.png"
             max-height="50px"
             max-width="50px"
-          ></v-img>
+          ></v-img> -->
         </v-toolbar-title>
       </router-link>
 

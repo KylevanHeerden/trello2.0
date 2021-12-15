@@ -24,11 +24,11 @@
                     :key="item.PO_number"
                     class="list-item"
                     router
-                    :to="`/product/${item.product_id}`"
+                    :to="`/product/{item.product_id}`"
                   >
                     <v-list-item-content class="text-center">
                       <v-list-item-title
-                        v-text="`${item.name}`"
+                        v-text="`{item.name}`"
                       ></v-list-item-title>
                       <v-list-item-subtitle v-if="searchOption === 'PO#'"
                         >PO#: {{ item.PO_number }}</v-list-item-subtitle
@@ -122,24 +122,24 @@
       </v-card>
     </v-row> -->
 
-    <!-- <v-row align-content="center" justify="center" class="adminRow">
+    <v-row align-content="center" justify="center" class="adminRow">
       <v-card elevation="2" width="50%">
         <v-card-text>
-          Change the comment in Quality Approval to 5:
+          Admin:
         </v-card-text>
         <v-card-actions class="justify-end v-card-actions">
           <v-btn
             :disabled="false"
-            @click="changeComment5()"
+            @click="admin()"
             small
             dark
             class="addFieldBtn"
           >
-            Change
+            Admin
           </v-btn>
         </v-card-actions>
       </v-card>
-    </v-row> -->
+    </v-row>
   </v-container>
 </template>
 
@@ -160,6 +160,7 @@ export default {
       programme: "",
       search: "",
       searchOption: null,
+      randomNames: [],
     };
   },
   computed: {
@@ -220,7 +221,7 @@ export default {
     },
 
     url() {
-      return `https://${process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/${this.programme}`;
+      return `https://{process.env.VUE_APP_EXPORT_LINK}.cloudfunctions.net/csvJsonReport/{this.programme}`;
     },
   },
 
@@ -348,21 +349,424 @@ export default {
       return "Done!";
     },
 
-    async changeComment5() {
-      db.collection("comments")
+    // async admin() {
+    //   var cards_ids = [];
+    //   db.collection("cards")
+    //     .get()
+    //     .then(function(querySnapshot) {
+    //       var i = 0;
+    //       querySnapshot.forEach((doc) => {
+    //         i += 1;
+
+    //         var newItems = [];
+
+    //         doc.data().lineItems.forEach((item) => {
+    //           var newItem = {
+    //             card_id: item.card_id,
+    //             createdOn: item.createdOn,
+    //             id: item.id == undefined ? "1234567" : item.id,
+    //             item_name: `Item {i}.1`,
+    //             item_number: item.item_number,
+    //             programme_id: item.programme_id,
+    //             quantity: item.quantity,
+    //             unit_price: item.unit_price,
+    //             updatedOn: item.updatedOn,
+    //           };
+
+    //           newItems.push(newItem);
+    //         });
+
+    //         cards_ids.push({ id: doc.id, i: i, lineItems: newItems });
+
+    //         // // console.log(newCard);
+
+    //         // doc.ref.update(newCard);
+    //       });
+
+    //       var batch = db.batch();
+
+    //       cards_ids.forEach((id) => {
+    //         var docRef = db.collection("cards").doc(id.id);
+
+    //         var newCard = {
+    //           POP: [],
+    //           contact_number: "1234567890",
+    //           contact_person: "Bob Smith",
+    //           files: [
+    //             {
+    //               file_name: `Quote {id.i}`,
+    //               link:
+    //                 "https://firebasestorage.googleapis.com/v0/b/trellov2.appspot.com/o/sample.pdf?alt=media&token=3863cdf9-28a8-4056-b3d1-a521ad9449f1",
+    //             },
+    //           ],
+    //           files_count: 1,
+    //           lineItems: id.lineItems,
+    //           name: `Quote {id.i}`,
+    //           nano_item_description: `Simple description of item {id.i}`,
+    //           purchase_order: [
+    //             {
+    //               file_name: `Purchase Order {id.i}`,
+    //               link:
+    //                 "https://firebasestorage.googleapis.com/v0/b/trellov2.appspot.com/o/sample.pdf?alt=media&token=3863cdf9-28a8-4056-b3d1-a521ad9449f1",
+    //             },
+    //           ],
+    //           supplier_name: "Jack Hall",
+    //           supplier_email: "jack@supplier.com",
+    //           supplier_quote_num: "123456",
+    //           team: {
+    //             name: "Team Procurement",
+    //             procurer: {
+    //               listRefId: 5,
+    //               users: [
+    //                 {
+    //                   slack_id: "U010PGJC431",
+    //                   text: "John Duck",
+    //                   value: "V8Ylm7toh4bldT7KdgnHg6OX4Iv2",
+    //                 },
+    //               ],
+    //             },
+    //             purchase_approver: {
+    //               listRefId: 4,
+    //               users: [
+    //                 {
+    //                   slack_id: "U010PGJC431",
+    //                   text: "Sammy Smith",
+    //                   value: "7ZY2QIfEVUQvbYUCHutKu3PasDF3",
+    //                 },
+    //               ],
+    //             },
+    //             technical_approver: {
+    //               listRefId: 3,
+    //               users: [
+    //                 {
+    //                   slack_id: "U010PGJC431",
+    //                   text: "Alison Ralph",
+    //                   value:
+    //                     "V8Ylm7Yj8iCheaZcWY5jo1wrLgFubMPir2toh4bldT7KdgnHg6OX4Iv2",
+    //                 },
+    //               ],
+    //             },
+    //             receiver: {},
+    //             quality_approver: {
+    //               listRefId: 6,
+    //               user: {
+    //                 slack_id: "U010PGJC431",
+    //                 text: "Alison Ralph",
+    //                 value:
+    //                   "V8Ylm7Yj8iCheaZcWY5jo1wrLgFubMPir2toh4bldT7KdgnHg6OX4Iv2",
+    //               },
+    //             },
+    //           },
+    //         };
+
+    //         batch.update(docRef, newCard);
+    //       });
+
+    //       batch.commit().then(() => {
+    //         alert("I am done!");
+    //       });
+    //     });
+    //   return "Done!";
+    // },
+
+    // async admin() {
+    //   var doc_ids = [];
+
+    //   var names = this.randomNames;
+
+    //   db.collection("comments")
+    //     .get()
+    //     .then(function(querySnapshot) {
+    //       var i = 0;
+    //       querySnapshot.forEach((doc) => {
+    //         i += 1;
+
+    //         doc_ids.push({ id: doc.id, i: i });
+    //       });
+
+    //       var batch = db.batch();
+
+    //       doc_ids.forEach((id) => {
+    //         var docRef = db.collection("comments").doc(id.id);
+
+    //         var newComment = {
+    //           text:
+    //             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent non rhoncus nulla, ut pretium orci.",
+    //           username: names[id.i],
+    //         };
+
+    //         batch.update(docRef, newComment);
+    //       });
+
+    //       batch.commit().then(() => {
+    //         alert("I am done!");
+    //       });
+    //     });
+    //   return "Done!";
+    // },
+
+    // async admin() {
+    //   var doc_ids = [];
+
+    //   db.collection("line_items")
+    //     .get()
+    //     .then(function(querySnapshot) {
+    //       var i = 0;
+    //       querySnapshot.forEach((doc) => {
+    //         i += 1;
+
+    //         doc_ids.push({ id: doc.id, i: i });
+    //       });
+
+    //       var batch = db.batch();
+
+    //       doc_ids.forEach((id) => {
+    //         if (id.i < 500) {
+    //           var docRef = db.collection("line_items").doc(id.id);
+
+    //           var newComment = {
+    //             item_name: `Item ${id.i}`,
+    //           };
+
+    //           batch.update(docRef, newComment);
+    //         }
+    //       });
+
+    //       batch.commit().then(() => {
+    //         alert("I am done!");
+    //       });
+
+    //       var batch2 = db.batch();
+
+    //       doc_ids.forEach((id) => {
+    //         if (id.i >= 500) {
+    //           var docRef = db.collection("line_items").doc(id.id);
+
+    //           var newComment = {
+    //             item_name: `Item ${id.i}`,
+    //           };
+
+    //           batch2.update(docRef, newComment);
+    //         }
+    //       });
+
+    //       batch2.commit().then(() => {
+    //         alert("I am done!");
+    //       });
+    //     });
+    //   return "Done!";
+    // },
+
+    // async admin() {
+    //   var doc_ids = [];
+
+    //   var names = this.randomNames;
+
+    //   db.collection("users")
+    //     .get()
+    //     .then(function(querySnapshot) {
+    //       var i = 0;
+    //       querySnapshot.forEach((doc) => {
+    //         i += 1;
+
+    //         var newTeams = [];
+
+    //         doc.data().teams.forEach((team) => {
+    //           var newTeam = {
+    //             programme_name: "Programme",
+    //             team_id: team.team_id,
+    //             team_name: "Team Procurement",
+    //           };
+
+    //           newTeams.push(newTeam);
+    //         });
+
+    //         doc_ids.push({ id: doc.id, i: i, teams: newTeams });
+    //       });
+
+    //       var batch = db.batch();
+
+    //       doc_ids.forEach((id) => {
+    //         var docRef = db.collection("users").doc(id.id);
+
+    //         var name = names[i].split(" ");
+
+    //         var newTeam = {
+    //           email: `user${i}@mail.com`,
+    //           name: name[0],
+    //           surname: name[1],
+    //           teams: id.teams,
+    //         };
+
+    //         batch.update(docRef, newTeam);
+    //       });
+
+    //       batch.commit().then(() => {
+    //         alert("I am done!");
+    //       });
+    //     });
+    //   return "Done!";
+    // },
+
+    async admin() {
+      var doc_ids = [];
+
+      var names = this.randomNames;
+
+      db.collection("products")
         .get()
         .then(function(querySnapshot) {
-          querySnapshot.forEach(function(doc) {
-            if (doc.data().position == 4) {
-              doc.ref.update({
-                position: 5,
-              });
-            }
+          var i = 0;
+          querySnapshot.forEach((doc) => {
+            i += 1;
+
+            var programmeData = {
+              programme_id: doc.data().programme.programme_id,
+              programme_name: `Programme ${i}`,
+            };
+
+            doc_ids.push({
+              id: doc.id,
+              i: i,
+
+              programme: programmeData,
+            });
           });
 
-          alert("I am done!");
+          var batch = db.batch();
+
+          doc_ids.forEach((id) => {
+            var docRef = db.collection("products").doc(id.id);
+
+            var newProduct = {
+              name: `Product ${id.i}`,
+              cards: [],
+              programme: id.programme,
+              person: names[id.i],
+            };
+
+            batch.update(docRef, newProduct);
+          });
+
+          batch.commit().then(() => {
+            alert("I am done!");
+          });
         });
       return "Done!";
+    },
+
+    generateNames() {
+      let firstNameCollection = [
+        "Harry",
+        "Ross",
+        "Bruce",
+        "Cook",
+        "Carolyn",
+        "Morgan",
+        "Albert",
+        "Walker",
+        "Randy",
+        "Reed",
+        "Larry",
+        "Barnes",
+        "Lois",
+        "Wilson",
+        "Jesse",
+        "Campbell",
+        "Ernest",
+        "Rogers",
+        "Theresa",
+        "Patterson",
+        "Henry",
+        "Simmons",
+        "Michelle",
+        "Perry",
+        "Frank",
+        "Butler",
+        "Shirley",
+      ];
+
+      let middleNameCollection = [
+        "Brooks",
+        "Rachel",
+        "Edwards",
+        "Christopher",
+        "Perez",
+        "Thomas",
+        "Baker",
+        "Sara",
+        "Moore",
+        "Chris",
+        "Bailey",
+        "Roger",
+        "Johnson",
+        "Marilyn",
+        "Thompson",
+        "Anthony",
+        "Evans",
+        "Julie",
+        "Hall",
+        "Paula",
+        "Phillips",
+        "Annie",
+        "Hernandez",
+        "Dorothy",
+        "Murphy",
+        "Alice",
+        "Howard",
+      ];
+
+      let lastNameCollection = [
+        "Ruth",
+        "Jackson",
+        "Debra",
+        "Allen",
+        "Gerald",
+        "Harris",
+        "Raymond",
+        "Carter",
+        "Jacqueline",
+        "Torres",
+        "Joseph",
+        "Nelson",
+        "Carlos",
+        "Sanchez",
+        "Ralph",
+        "Clark",
+        "Jean",
+        "Alexander",
+        "Stephen",
+        "Roberts",
+        "Eric",
+        "Long",
+        "Amanda",
+        "Scott",
+        "Teresa",
+        "Diaz",
+        "Wanda",
+        "Thomas",
+      ];
+
+      let fullNameCollection = [];
+
+      for (let i = 0; i < 1000; i++) {
+        let newFirstName =
+          firstNameCollection[
+            this.getRndInteger(0, firstNameCollection.length - 1)
+          ];
+        let newLastName =
+          lastNameCollection[
+            this.getRndInteger(0, lastNameCollection.length - 1)
+          ];
+
+        fullNameCollection.push(newFirstName + " " + newLastName);
+      }
+
+      this.randomNames = fullNameCollection;
+    },
+
+    getRndInteger(min, max) {
+      return Math.floor(Math.random() * (max - min)) + min;
     },
 
     // Format fb timestamp to Do MMM YYYY
@@ -409,6 +813,7 @@ export default {
     this.$store.dispatch("getProgrammes");
     this.$store.dispatch("getCards");
     this.$store.dispatch("getUsers");
+    this.generateNames();
   },
 };
 </script>

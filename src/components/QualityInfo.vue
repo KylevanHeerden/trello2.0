@@ -480,7 +480,9 @@ export default {
     this.getUsers;
   },
 
-  mounted() {},
+  mounted() {
+    console.log(this.team);
+  },
 };
 </script>
 

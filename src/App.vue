@@ -6,12 +6,7 @@
       <router-view class="my-3"></router-view>
     </v-main>
     <v-footer>
-      <v-col class="text-center" cols="12">
-        <p>
-          2020 - Nanodyn Systems Pty Ltd
-          <v-icon color="#9e9e9e">copyright</v-icon>
-        </p>
-      </v-col>
+      <v-col class="text-center" cols="12"> </v-col>
     </v-footer>
   </v-app>
 </template>

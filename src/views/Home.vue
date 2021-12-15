@@ -234,7 +234,7 @@
           max-width="400"
           class="pt-7"
         >
-          <v-img
+          <!-- <v-img
             lazy-src="@/assets/N1.png"
             max-height="100"
             max-width="700"
@@ -244,13 +244,13 @@
           ></v-img>
           <h6 class="googleFont" data-cypress="nanodynSlogan1">
             CREATING AN INNOVATION
-          </h6>
-          <h6
+          </h6> -->
+          <!-- <h6
             class="googleFont paddingbottom2rem"
             data-cypress="nanodynSlogan2"
           >
-            REVOLUTION
-          </h6>
+            WELCOME TO PURCHASE APP
+          </h6> -->
 
           <p class="message" data-cypress="loginErrorMessage">
             {{ message }}
@@ -404,7 +404,7 @@
                 :type="show ? 'text' : 'password'"
                 label="Password"
                 id="password2"
-                hint="Minimum 8 Charaters with a lowercase letter, a uppercase letter, a number and a special charater"
+                hint="Minimum 8 charters with a lowercase letter, a uppercase letter, a number and a special charter"
                 :rules="inputRulesPassword"
                 @click:append="show = !show"
                 data-cypress="signupPassword"
